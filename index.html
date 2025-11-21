@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫の模拟小镇 Ver 3.4.0 - 图鉴与革新</title>
+    <title>猫の模拟小镇 Ver 3.4.2 - 和平修正版</title>
     <style>
         :root { --bg: #f0f2f5; --card: #fff; --primary: #4a90e2; --love: #ff6b6b; --text: #333; --dark: #2d3436; --crime: #8e44ad; --item: #e17055; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -293,7 +293,7 @@
 
 <header>
     <div class="header-group">
-        <h1>🏡 猫の模拟小镇 <small>Ver 3.4.0</small></h1>
+        <h1>🏡 猫の模拟小镇 <small>Ver 3.4.2 Peace</small></h1>
         <div style="font-size: 0.9rem;">
             <span id="calendar-display">📅 1月1日 (冬)</span> <span id="weather-display" style="margin-left:5px; color:#0984e3;"></span> |
             <span id="game-day">周一</span> |
@@ -333,7 +333,7 @@
         <div class="log-container">
             <div class="log-header">📡 系统公告</div>
             <div id="game-log">
-                <div class="log-entry">✨ 游戏开始。Ver 3.4.0 图鉴与革新版。</div>
+                <div class="log-entry">✨ 游戏开始。Ver 3.4.2 和平修正版：大幅降低了各主义的冲突概率。</div>
             </div>
         </div>
         <div class="log-container" id="interaction-log-container">
@@ -667,33 +667,33 @@
     
     const IDEOLOGIES = [
         // 左派 (Left)
-        {name:"共产主义",color:"#c0392b",chaosMod:-0.4,loveMod:0.6,wageMod:0.1,desc:"各尽所能，各取所需"},
-        {name:"社会主义",color:"#e74c3c",chaosMod:-0.3,loveMod:0.5,wageMod:0.1,desc:"公平正义，社会互助"},
-        {name:"毛主义",color:"#e17055",chaosMod:0.1,loveMod:0.6,wageMod:0.05,desc:"造反有理，继续革命"},
-        {name:"列宁主义",color:"#d63031",chaosMod:-0.1,loveMod:0.4,wageMod:0.1,desc:"职业革命，先锋带头"},
-        {name:"斯大林主义",color:"#636e72",chaosMod:-0.7,loveMod:-0.1,wageMod:0.2,desc:"钢铁意志，高度集权"},
-        {name:"超视社会主义",color:"#00cec9",chaosMod:-0.2,loveMod:0.3,wageMod:0.2,desc:"科学执政，理性规划"},
+        {name:"共产主义",color:"#c0392b",chaosMod:-0.2,loveMod:0.6,wageMod:0.1,desc:"各尽所能，各取所需"},
+        {name:"社会主义",color:"#e74c3c",chaosMod:-0.15,loveMod:0.5,wageMod:0.1,desc:"公平正义，社会互助"},
+        {name:"毛主义",color:"#e17055",chaosMod:0.05,loveMod:0.6,wageMod:0.05,desc:"造反有理，继续革命"},
+        {name:"列宁主义",color:"#d63031",chaosMod:-0.05,loveMod:0.4,wageMod:0.1,desc:"职业革命，先锋带头"},
+        {name:"斯大林主义",color:"#636e72",chaosMod:-0.35,loveMod:-0.1,wageMod:0.2,desc:"钢铁意志，高度集权"},
+        {name:"超视社会主义",color:"#00cec9",chaosMod:-0.1,loveMod:0.3,wageMod:0.2,desc:"科学执政，理性规划"},
         
         // 中间/温和 (Center)
-        {name:"民主主义",color:"#3498db",chaosMod:0.1,loveMod:0.2,wageMod:0.1,desc:"尊重多元，崇尚表达"},
-        {name:"共和制",color:"#2980b9",chaosMod:-0.1,loveMod:0.1,wageMod:0.15,desc:"天下为公，法治社会"},
-        {name:"君主立宪",color:"#9b59b6",chaosMod:-0.5,loveMod:0.2,wageMod:0.05,desc:"拥护传统，温和改良"},
-        {name:"保守主义",color:"#7f8c8d",chaosMod:-0.2,loveMod:0.2,wageMod:0.02,desc:"尊重传统，循序渐进"},
+        {name:"民主主义",color:"#3498db",chaosMod:0.02,loveMod:0.2,wageMod:0.1,desc:"尊重多元，崇尚表达"},
+        {name:"共和制",color:"#2980b9",chaosMod:-0.05,loveMod:0.1,wageMod:0.15,desc:"天下为公，法治社会"},
+        {name:"君主立宪",color:"#9b59b6",chaosMod:-0.25,loveMod:0.2,wageMod:0.05,desc:"拥护传统，温和改良"},
+        {name:"保守主义",color:"#7f8c8d",chaosMod:-0.1,loveMod:0.2,wageMod:0.02,desc:"尊重传统，循序渐进"},
         
         // 右派 (Right)
-        {name:"资本主义",color:"#f1c40f",chaosMod:0.3,loveMod:-0.4,wageMod:0.6,desc:"金钱至上，效率优先"},
-        {name:"自由主义",color:"#0984e3",chaosMod:0.4,loveMod:-0.1,wageMod:0.3,desc:"天赋人权，小政府"},
-        {name:"重商主义",color:"#f39c12",chaosMod:0.1,loveMod:-0.3,wageMod:0.4,desc:"贸易顺差，财富积累"},
-        {name:"寡头政治",color:"#d35400",chaosMod:-0.2,loveMod:-0.5,wageMod:0.5,desc:"掌握资源，精英特权"},
+        {name:"资本主义",color:"#f1c40f",chaosMod:0.1,loveMod:-0.4,wageMod:0.6,desc:"金钱至上，效率优先"},
+        {name:"自由主义",color:"#0984e3",chaosMod:0.15,loveMod:-0.1,wageMod:0.3,desc:"天赋人权，小政府"},
+        {name:"重商主义",color:"#f39c12",chaosMod:0.02,loveMod:-0.3,wageMod:0.4,desc:"贸易顺差，财富积累"},
+        {name:"寡头政治",color:"#d35400",chaosMod:-0.1,loveMod:-0.5,wageMod:0.5,desc:"掌握资源，精英特权"},
         
         // 极端/其他
-        {name:"无政府主义",color:"#2d3436",chaosMod:0.8,loveMod:0.2,wageMod:-0.2,desc:"拒绝权威，绝对自由"},
-        {name:"法西斯主义",color:"#000000",chaosMod:-0.8,loveMod:-0.6,wageMod:0.1,desc:"极端民族，极权服从"},
-        {name:"军国主义",color:"#2c3e50",chaosMod:-0.3,loveMod:-0.2,wageMod:0.2,desc:"武力至上，铁血扩张"},
-        {name:"封建制",color:"#8e44ad",chaosMod:-0.5,loveMod:0,wageMod:-0.2,desc:"等级森严，忠诚第一"},
-        {name:"军事独裁",color:"#34495e",chaosMod:-0.3,loveMod:-0.3,wageMod:0.2,desc:"铁血纪律，武力崇拜"},
-        {name:"总统制",color:"#34495e",chaosMod:-0.1,loveMod:0,wageMod:0.2,desc:"强力行政，行胜于言"},
-        {name:"选举制",color:"#16a085",chaosMod:0.3,loveMod:0.2,wageMod:0.05,desc:"热衷投票，政治动物"},
+        {name:"无政府主义",color:"#2d3436",chaosMod:0.25,loveMod:0.2,wageMod:-0.2,desc:"拒绝权威，绝对自由"},
+        {name:"法西斯主义",color:"#000000",chaosMod:-0.4,loveMod:-0.6,wageMod:0.1,desc:"极端民族，极权服从"},
+        {name:"军国主义",color:"#2c3e50",chaosMod:-0.15,loveMod:-0.2,wageMod:0.2,desc:"武力至上，铁血扩张"},
+        {name:"封建制",color:"#8e44ad",chaosMod:-0.25,loveMod:0,wageMod:-0.2,desc:"等级森严，忠诚第一"},
+        {name:"军事独裁",color:"#34495e",chaosMod:-0.15,loveMod:-0.3,wageMod:0.2,desc:"铁血纪律，武力崇拜"},
+        {name:"总统制",color:"#34495e",chaosMod:-0.05,loveMod:0,wageMod:0.2,desc:"强力行政，行胜于言"},
+        {name:"选举制",color:"#16a085",chaosMod:0.1,loveMod:0.2,wageMod:0.05,desc:"热衷投票，政治动物"},
     ];
 
     // Map for logic to look up effects easily
@@ -1101,7 +1101,7 @@ const TOWN_EVENTS = [
             const m = this.chars.find(c => c.name === this.mayor);
             if (!m) return;
             let effect = MAYOR_EFFECTS[m.ideology.name];
-            if (effect && effect.happy) {
+            if (effect && effect.happy !== 0) {
                 this.chars.forEach(c => { c.happiness = Math.min(100, Math.max(0, c.happiness + effect.happy)); });
             }
         }
@@ -1231,10 +1231,20 @@ const TOWN_EVENTS = [
                     document.getElementById('mayor-name-display').innerText = m.name;
                     document.getElementById('mayor-ideology-display').innerText = m.ideology.name;
                     document.getElementById('mayor-ideology-display').style.backgroundColor = m.ideology.color;
-                    let effectDesc = "无特殊政策";
-                    let effect = MAYOR_EFFECTS[m.ideology.name];
-                    if(effect) effectDesc = effect.desc;
-                    document.getElementById('mayor-policy-display').innerText = effectDesc;
+                    
+                    // --- Fix Start: Display Detailed Stats ---
+                    const i = m.ideology;
+                    let effectDesc = i.desc;
+                    let statsArr = [];
+                    if (i.wageMod !== 0) statsArr.push(`${i.wageMod > 0 ? '📈' : '📉'}工资${(i.wageMod > 0 ? '+' : '')}${Math.round(i.wageMod * 100)}%`);
+                    if (i.loveMod !== 0) statsArr.push(`${i.loveMod > 0 ? '🥰' : '😒'}好感${(i.loveMod > 0 ? '+' : '')}${i.loveMod}/h`);
+                    if (i.chaosMod !== 0) statsArr.push(`${i.chaosMod < 0 ? '🕊️' : '💥'}冲突${(i.chaosMod > 0 ? '+' : '')}${Math.round(i.chaosMod * 100)}%`);
+                    
+                    if(statsArr.length > 0) {
+                         effectDesc += `<div style="margin-top:5px; padding-top:5px; border-top:1px dashed #ccc; font-weight:bold; font-size:0.85rem; color:#27ae60;">${statsArr.join(' | ')}</div>`;
+                    }
+                    document.getElementById('mayor-policy-display').innerHTML = effectDesc;
+                    // --- Fix End ---
                 }
             }
         }
@@ -1414,7 +1424,16 @@ const TOWN_EVENTS = [
             if (this.tryGift(p, t, v)) return;
             p.currentAction = `和 ${t.name} 在 ${v.name}`; t.currentAction = `和 ${p.name} 在 ${v.name}`; p.interactingWith = t.name; t.interactingWith = p.name; p.hunger -= 2; t.hunger -= 2; this.improveSkill(p, 'social', 0.1);
             if (this.checkRomanceEvent(p, t, pRel, tRel, v)) return; 
-            let chaos = p.personality.chaosBonus + t.personality.chaosBonus + p.ideology.chaosMod + t.ideology.chaosMod; if (v.effect === 'chaos') chaos += 0.2; if (v.effect === 'ntr') chaos += 0.4; 
+            
+            // --- Fix Start: Include Mayor Chaos Influence ---
+            let chaos = p.personality.chaosBonus + t.personality.chaosBonus + p.ideology.chaosMod + t.ideology.chaosMod; 
+            if (this.mayor) {
+                const m = this.chars.find(c => c.name === this.mayor);
+                if (m && m.ideology) chaos += (m.ideology.chaosMod || 0);
+            }
+            // --- Fix End ---
+
+            if (v.effect === 'chaos') chaos += 0.2; if (v.effect === 'ntr') chaos += 0.4; 
             if (Math.random() < Math.max(0, Math.min(1, 0.1 + chaos))) { 
                 pRel.love -= 5; tRel.love -= 5; this.improveSkill(p, 'social', 0.25); this.improveSkill(p, 'intel', 0.25); this.improveSkill(t, 'social', 0.25); this.improveSkill(t, 'intel', 0.25);
                 this.logInteraction(`[💢争吵] ${p.name} 和 ${t.name} 在 ${v.name} 吵架了。`, "tag-reject"); p.addLog(`${timeStr} 和 ${t.name} 吵架`); t.addLog(`${timeStr} 和 ${p.name} 吵架`);
@@ -1458,6 +1477,12 @@ const TOWN_EVENTS = [
                     return b; 
                 }); 
                 this.chars = data.chars.map(cData => { 
+                    // --- Fix Start: Re-bind Ideology ---
+                    if (cData.ideology && cData.ideology.name) {
+                        const canonical = IDEOLOGIES.find(i => i.name === cData.ideology.name);
+                        cData.ideology = canonical || cData.ideology;
+                    }
+                    // --- Fix End ---
                     let c = new Character(cData.name); 
                     Object.assign(c, cData); 
                     if (c.money === undefined) c.money = 0; 
@@ -1522,7 +1547,7 @@ const TOWN_EVENTS = [
         
         showJobBoard() {
             const list = document.getElementById('jobboard-list'); list.innerHTML = '';
-            const oddHeader = document.createElement('div'); oddHeader.className = 'job-section-header'; oddHeader.style.borderLeftColor = '#3498db'; oddHeader.innerText = "🛠 临时零工 / 自由职业"; list.appendChild(oddHeader);
+            const oddHeader = document.createElement('div'); oddHeader.className = 'job-section-header'; oddHeader.style.borderLeftColor = '#3498db'; oddHeader.innerText = "������ 临时零工 / 自由职业"; list.appendChild(oddHeader);
             ODD_JOBS.forEach(job => { const item = document.createElement('div'); item.className = 'job-item'; item.innerHTML = `<div><div class="job-name">${job.name}</div><div class="job-loc" style="font-size:0.8em; color:gray;">Mood: ${job.mood}</div></div><div class="job-wage" style="color:${job.wage<0?'#e74c3c':'#27ae60'}">💰 ${job.wage}</div>`; list.appendChild(item); });
             const hookerItem = document.createElement('div'); hookerItem.className = 'job-item'; hookerItem.innerHTML = `<div><div class="job-name">💋 站街</div></div><div class="job-wage">💰 8-15</div>`; list.appendChild(hookerItem);
             const formalHeader = document.createElement('div'); formalHeader.className = 'job-section-header'; formalHeader.style.borderLeftColor = '#f1c40f'; formalHeader.innerText = "🏢 企业 / 机构岗位"; list.appendChild(formalHeader);
