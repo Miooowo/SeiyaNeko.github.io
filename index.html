@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫の模拟小镇 Ver 3.6.0 - 缤纷四季</title>
+    <title>猫の模拟小镇 Ver 3.7.5 - 修复版</title>
     <style>
         :root { --bg: #f0f2f5; --card: #fff; --primary: #4a90e2; --love: #ff6b6b; --text: #333; --dark: #2d3436; --crime: #8e44ad; --item: #e17055; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -29,6 +30,8 @@
         .btn.fund { background: #9b59b6; font-size: 0.8rem; padding: 4px 8px; margin-left: 5px; } 
         .btn.accelerate { background: #2ecc71; color: white; font-size: 0.8rem; padding: 4px 8px; margin-top: 5px; width: 100%; border: 1px solid #27ae60; }
         .btn.start-build { background: #95a5a6; color: white; font-size: 0.8rem; padding: 4px 8px; margin-top: 5px; width: 100%; border: 1px solid #7f8c8d; cursor: not-allowed; }
+        .btn.resume-build { background: #3498db; color: white; font-size: 0.8rem; padding: 4px 8px; margin-top: 5px; width: 100%; border: 1px solid #2980b9; cursor: pointer; font-weight: bold; }
+        .btn.stop-build { background: #e74c3c; color: white; font-size: 0.8rem; padding: 4px 8px; margin-top: 5px; width: 100%; border: 1px solid #c0392b; }
         
         .btn.control { background: #34495e; width: 100%; margin-top: 10px; }
         .btn.upgrade { background: #8e44ad; color: white; border:none; padding:5px 10px; border-radius:4px; font-size:0.85rem; cursor:pointer; }
@@ -66,6 +69,8 @@
         .char-card.action-use { border-left-color: #00cec9; background: #e0f7fa; }
         .char-card.action-jail { border-left-color: #2d3436; background: #dcdde1; color: #636e72; }
         
+        .char-card.mayor { border: 2px solid #f1c40f; background: #fffce0; box-shadow: 0 0 10px rgba(241, 196, 15, 0.4); }
+
         .bar-container { height: 6px; background: #eee; margin: 8px 0; border-radius: 3px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0; transition: width 0.3s; }
         .hp-fill { background: #2ecc71; } 
@@ -172,7 +177,7 @@
         /* 拨款/操作弹窗样式 */
         .fund-list { display: flex; flex-direction: column; gap: 5px; }
         .fund-item { padding: 8px; background: #f9f9f9; border-radius: 4px; cursor: pointer; border: 1px solid #eee; transition: 0.2s; }
-        .fund-item:hover { background: #eef5ff; border-color: var(--primary); }
+        .fund-item.hover { background: #eef5ff; border-color: var(--primary); }
         .fund-item.selected { background: var(--primary); color: white; border-color: var(--primary); }
         
         .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
@@ -312,23 +317,23 @@
 
 <header>
     <div class="header-group">
-        <h1>🏡 猫の模拟小镇 <small>Ver 3.6.0 缤纷四季</small></h1>
+        <h1>🏡 猫の模拟小镇 <small>Ver 3.7.5 修复版</small></h1>
         <div style="font-size: 0.9rem;">
-            <span id="calendar-display" onclick="showCalendar()" title="点击查看全年日历">📅 1月1日 (冬)</span> <span id="weather-display" style="margin-left:5px; color:#0984e3;"></span> |
+            <span id="calendar-display" onclick="gameInstance.showCalendar()" title="点击查看全年日历">📅 1月1日 (冬)</span> <span id="weather-display" style="margin-left:5px; color:#0984e3;"></span> |
             <span id="game-day">周一</span> |
-            <span>🕒 <span id="game-time">08:00</span></span> <button class="btn speed" onclick="toggleSpeed()" id="speed-btn">⏸ 正常</button>
+            <span>🕒 <span id="game-time">08:00</span></span> <button class="btn speed" onclick="gameInstance.toggleSpeed()" id="speed-btn">⏸ 正常</button>
         </div>
     </div>
     <div class="header-group">
-        <button class="btn gov" onclick="showGov()">🏛 政府 & 财政</button>
-        <button class="btn purple" onclick="showTownEvents()">🎉 举办活动</button>
-        <button class="btn achieve" onclick="showAchievements()">🏆 成就</button>
-        <button class="btn gold" onclick="showLeaderboard()">📊 排行榜</button>
-        <button class="btn cyan" onclick="showJobBoard()">📋 工作榜</button>
-        <button class="btn guide" onclick="showGameGuide()">📘 游戏图鉴</button>
+        <button class="btn gov" onclick="gameInstance.showGov()">🏛 政府 & 财政</button>
+        <button class="btn purple" onclick="gameInstance.showTownEvents()">🎉 举办活动</button>
+        <button class="btn achieve" onclick="gameInstance.showAchievements()">🏆 成就</button>
+        <button class="btn gold" onclick="gameInstance.showLeaderboard()">📊 排行榜</button>
+        <button class="btn cyan" onclick="gameInstance.showJobBoard()">📋 工作榜</button>
+        <button class="btn guide" onclick="gameInstance.showGameGuide()">📘 游戏图鉴</button>
         <button class="btn" onclick="toggleRelationView()">❤ 关系谱</button>
         <span style="font-size:0.8rem;">自动存档: <input type="number" id="autosave-rate" value="30" min="5">秒</span>
-        <button class="btn save" onclick="manualSave()">💾 存档</button>
+        <button class="btn save" onclick="gameInstance.manualSave()">💾 存档</button>
     </div>
 </header>
 
@@ -352,7 +357,7 @@
         <div class="log-container">
             <div class="log-header">📡 系统公告</div>
             <div id="game-log">
-                <div class="log-entry">✨ 游戏开始。Ver 3.6.0 缤纷四季更新！点击左上角日历查看全年节日。</div>
+                <div class="log-entry">✨ 游戏开始。Ver 3.7.5 更新！修复居民UI显示，优化排行榜显示，完善关系谱详情。</div>
             </div>
         </div>
         <div class="log-container" id="interaction-log-container">
@@ -382,11 +387,11 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>📘 游戏图鉴</h3>
-            <button class="modal-close" onclick="closeGameGuide()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeGameGuide()">×</button>
         </div>
         <div class="tab-filter">
-            <button class="filter-btn active" id="guide-tab-personality" onclick="switchGuideTab('personality')">性格</button>
-            <button class="filter-btn" id="guide-tab-ideology" onclick="switchGuideTab('ideology')">信仰主义</button>
+            <button class="filter-btn active" id="guide-tab-personality" onclick="gameInstance.switchGuideTab('personality')">性格</button>
+            <button class="filter-btn" id="guide-tab-ideology" onclick="gameInstance.switchGuideTab('ideology')">信仰主义</button>
         </div>
         <div id="guide-content" class="guide-grid"></div>
     </div>
@@ -396,12 +401,12 @@
     <div class="modal-content" style="max-width:400px;">
         <div class="modal-header">
             <h3 id="edit-title">修改属性</h3>
-            <button class="modal-close" onclick="closeEditModal()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeEditModal()">×</button>
         </div>
         <div style="margin-bottom:15px;">
             <select id="edit-select" style="width:100%; padding:8px; font-size:1rem; border-radius:4px; border:1px solid #ddd;"></select>
         </div>
-        <button class="btn save" style="width:100%" onclick="confirmEdit()">💾 保存修改</button>
+        <button class="btn save" style="width:100%" onclick="gameInstance.confirmEdit()">💾 保存修改</button>
     </div>
 </div>
 
@@ -419,19 +424,19 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="char-detail-modal"><div class="modal-content"><div class="modal-header"><h3 id="detail-name">角色详情</h3><button class="modal-close" onclick="closeCharDetail()">×</button></div><div id="detail-content"></div></div></div>
+<div class="modal-overlay" id="char-detail-modal"><div class="modal-content"><div class="modal-header"><h3 id="detail-name">角色详情</h3><button class="modal-close" onclick="gameInstance.closeCharDetail()">×</button></div><div id="detail-content"></div></div></div>
 
 <div class="modal-overlay" id="gov-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h3>🏛 小镇政府 & 财政中心</h3>
-            <button class="modal-close" onclick="closeGov()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeGov()">×</button>
         </div>
         <div class="gov-panel">
             <div class="gov-mayor-section">
                 <h4 style="margin:0 0 10px 0; color:#2980b9; border-bottom:1px solid #d6eaf8; padding-bottom:5px;">🎖️ 现任镇长</h4>
                 <div id="mayor-info" style="display:flex; align-items:center; gap:15px;">
-                    <div class="mayor-avatar">🧢</div>
+                    <div class="mayor-avatar">🎖️</div>
                     <div class="mayor-details">
                         <div id="mayor-name-display" class="mayor-name">暂无镇长</div>
                         <div id="mayor-ideology-display" class="mayor-ideology" style="background:#ccc">--</div>
@@ -440,7 +445,7 @@
                 </div>
                 <div style="margin-top:15px; border-top:1px dashed #bcdff1; padding-top:10px;">
                     <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; color:#2c3e50;">⚖️ 镇长决策:</div>
-                    <button class="btn" style="background:#e67e22; font-size:0.85rem; width:100%" onclick="executeCommonProsperity()">🤝 共同富裕 (均贫富)</button>
+                    <button class="btn" style="background:#e67e22; font-size:0.85rem; width:100%" onclick="gameInstance.executeCommonProsperity()">🤝 共同富裕 (均贫富)</button>
                     <div style="font-size:0.8rem; color:#666; margin-top:4px;">强制收缴前3名富豪部分资产，平分给所有贫困户(<50)。</div>
                 </div>
             </div>
@@ -454,7 +459,7 @@
                 <div class="gov-stat-card">
                     <div class="label">💰 镇库资金</div>
                     <div class="value" id="town-money">0</div>
-                    <button class="btn fund" onclick="showEmbezzle()">💸 财政拨款</button>
+                    <button class="btn fund" onclick="gameInstance.showEmbezzle()">💸 财政拨款</button>
                 </div>
             </div>
             
@@ -463,7 +468,7 @@
                 <div class="policy-item">
                     <div style="flex:1">
                         <label class="checkbox-container">
-                            <input type="checkbox" id="policy-social-security" onchange="togglePolicy('social')">
+                            <input type="checkbox" id="policy-social-security" onchange="gameInstance.togglePolicy('social')">
                             <span class="policy-name">社会最低保障金</span>
                         </label>
                         <div class="policy-desc">
@@ -474,7 +479,7 @@
                 <div class="policy-item">
                     <div style="flex:1">
                         <label class="checkbox-container">
-                            <input type="checkbox" id="policy-housing" onchange="togglePolicy('housing')">
+                            <input type="checkbox" id="policy-housing" onchange="gameInstance.togglePolicy('housing')">
                             <span class="policy-name">保障性住房计划</span>
                         </label>
                         <div class="policy-desc">
@@ -485,7 +490,7 @@
                 <div class="policy-item">
                     <div style="flex:1">
                         <label class="checkbox-container">
-                            <input type="checkbox" id="policy-food" onchange="togglePolicy('food')">
+                            <input type="checkbox" id="policy-food" onchange="gameInstance.togglePolicy('food')">
                             <span class="policy-name">最低食品保障</span>
                         </label>
                         <div class="policy-desc">
@@ -496,7 +501,7 @@
             </div>
             
             <div style="border-top:1px solid #eee; padding-top:15px;">
-                <button class="btn reset" style="width:100%" onclick="resetData()">🗑 重置小镇数据 (慎用)</button>
+                <button class="btn reset" style="width:100%" onclick="gameInstance.resetData()">🗑 重置小镇数据 (慎用)</button>
             </div>
         </div>
     </div>
@@ -506,15 +511,15 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>📊 小镇排行榜</h3>
-            <button class="modal-close" onclick="closeLeaderboard()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeLeaderboard()">×</button>
         </div>
         <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap: wrap;">
-            <button class="btn" onclick="renderLeaderboard('money')">💰 财富榜</button>
-            <button class="btn" onclick="renderLeaderboard('happiness')" style="background:#2ecc71">❤ 幸福榜</button>
-            <button class="btn" onclick="renderLeaderboard('popularity')" style="background:#a55eea">🔥 人气榜</button>
-            <button class="btn" onclick="renderLeaderboard('robbery')" style="background:#2d3436; color:white;">🔪 抢劫榜</button>
-            <button class="btn" onclick="renderLeaderboard('streetwalk')" style="background:#e056fd; color:white;">💋 站街榜</button>
-            <button class="btn" onclick="renderLeaderboard('assault')" style="background:#c0392b; color:white;">😈 劫色榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('money')">💰 财富榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('happiness')" style="background:#2ecc71">❤ 幸福榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('popularity')" style="background:#a55eea">🔥 人气榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('robbery')" style="background:#2d3436; color:white;">🔪 抢劫榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('streetwalk')" style="background:#e056fd; color:white;">💋 站街榜</button>
+            <button class="btn" onclick="gameInstance.renderLeaderboard('assault')" style="background:#c0392b; color:white;">😈 劫色榜</button>
         </div>
         <div id="leaderboard-list" class="rank-list"></div>
     </div>
@@ -524,34 +529,34 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>🏆 荣誉成就馆</h3>
-            <button class="modal-close" onclick="closeAchievements()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeAchievements()">×</button>
         </div>
         <div id="achievements-list" class="achieve-list"></div>
     </div>
 </div>
 
-<div class="modal-overlay" id="jobboard-modal"><div class="modal-content"><div class="modal-header"><h3>📋 人才市场 & 工作榜</h3><button class="modal-close" onclick="closeJobBoard()">×</button></div><div id="jobboard-list"></div></div></div>
-<div class="modal-overlay" id="embezzle-modal"><div class="modal-content"><div class="modal-header"><h3>💸 镇库拨款</h3><button class="modal-close" onclick="closeEmbezzle()">×</button></div><div style="margin-bottom:15px;"><p>当前镇库资金: <span id="embezzle-town-money" style="font-weight:bold; color:#f1c40f;">0</span></p><p>选择拨款对象:</p><div id="embezzle-list" class="fund-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; border:1px solid #eee; padding:5px;"></div><div style="display:flex; gap:10px; align-items:center;"><span>金额:</span><input type="number" id="embezzle-amount" value="100" style="width:100px;"><button class="btn save" onclick="doEmbezzle()">确认拨款</button></div></div></div></div>
-<div class="modal-overlay" id="action-select-modal"><div class="modal-content"><div class="modal-header"><h3>🕹️ 强制安排活动</h3><button class="modal-close" onclick="closeActionSelect()">×</button></div><div id="action-select-content"></div></div></div>
+<div class="modal-overlay" id="jobboard-modal"><div class="modal-content"><div class="modal-header"><h3>📋 人才市场 & 工作榜</h3><button class="modal-close" onclick="gameInstance.closeJobBoard()">×</button></div><div id="jobboard-list"></div></div></div>
+<div class="modal-overlay" id="embezzle-modal"><div class="modal-content"><div class="modal-header"><h3>💸 镇库拨款</h3><button class="modal-close" onclick="gameInstance.closeEmbezzle()">×</button></div><div style="margin-bottom:15px;"><p>当前镇库资金: <span id="embezzle-town-money" style="font-weight:bold; color:#f1c40f;">0</span></p><p>选择拨款对象:</p><div id="embezzle-list" class="fund-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; border:1px solid #eee; padding:5px;"></div><div style="display:flex; gap:10px; align-items:center;"><span>金额:</span><input type="number" id="embezzle-amount" value="100" style="width:100px;"><button class="btn save" onclick="gameInstance.doEmbezzle()">确认拨款</button></div></div></div></div>
+<div class="modal-overlay" id="action-select-modal"><div class="modal-content"><div class="modal-header"><h3>🕹️ 强制安排活动</h3><button class="modal-close" onclick="gameInstance.closeActionSelect()">×</button></div><div id="action-select-content"></div></div></div>
 <div class="modal-overlay" id="town-event-modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>🎉 活动策划部</h3><button class="modal-close" onclick="closeTownEvents()">×</button></div>
+        <div class="modal-header"><h3>🎉 活动策划部</h3><button class="modal-close" onclick="gameInstance.closeTownEvents()">×</button></div>
         <div class="tab-filter">
-            <button class="filter-btn active" id="evt-tab-normal" onclick="switchEventTab('normal')">常规活动</button>
-            <button class="filter-btn" id="evt-tab-season" onclick="switchEventTab('season')">🗓️ 今日节日/限定</button>
+            <button class="filter-btn active" id="evt-tab-normal" onclick="gameInstance.switchEventTab('normal')">常规活动</button>
+            <button class="filter-btn" id="evt-tab-season" onclick="gameInstance.switchEventTab('season')">🗓️ 今日节日/限定</button>
         </div>
         <p style="color:#666; font-size:0.9rem; margin-bottom:15px;">当前镇库: <span id="event-town-money" style="font-weight:bold; color:#f1c40f; font-size:1.1rem;">0</span> (当前日期: <span id="event-season-name"></span>)</p>
         <div id="town-event-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px;"></div>
     </div>
 </div>
-<div class="modal-overlay" id="building-detail-modal"><div class="modal-content"><div class="modal-header"><h3 id="b-detail-name">建筑详情</h3><button class="modal-close" onclick="closeBuildingDetail()">×</button></div><div id="b-detail-content"></div></div></div>
+<div class="modal-overlay" id="building-detail-modal"><div class="modal-content"><div class="modal-header"><h3 id="b-detail-name">建筑详情</h3><button class="modal-close" onclick="gameInstance.closeBuildingDetail()">×</button></div><div id="b-detail-content"></div></div></div>
 
 <!-- 日历模态框 -->
 <div class="modal-overlay" id="calendar-modal">
     <div class="modal-content" style="max-width:800px;">
         <div class="modal-header">
             <h3>📅 小镇年历</h3>
-            <button class="modal-close" onclick="closeCalendar()">×</button>
+            <button class="modal-close" onclick="gameInstance.closeCalendar()">×</button>
         </div>
         <div style="margin-bottom:10px; color:#666; font-size:0.9rem;">
             鼠标悬停红色日期可查看节日名称。特定节日当天可在活动中心举办庆典。
@@ -731,6 +736,14 @@
         {name:"军事独裁",color:"#34495e",chaosMod:-0.15,loveMod:-0.3,wageMod:0.2,desc:"铁血纪律，武力崇拜"},
         {name:"总统制",color:"#34495e",chaosMod:-0.05,loveMod:0,wageMod:0.2,desc:"强力行政，行胜于言"},
         {name:"选举制",color:"#16a085",chaosMod:0.1,loveMod:0.2,wageMod:0.05,desc:"热衷投票，政治动物"},
+
+        // 新增主义
+        {name:"技术加速主义",color:"#00d2d3",chaosMod:0.2,loveMod:-0.1,wageMod:0.5,desc:"技术爆炸，不惜一切代价追求进步"},
+        {name:"集权主义",color:"#2d3436",chaosMod:-0.4,loveMod:-0.3,wageMod:-0.1,desc:"绝对服从，抹杀个性以换取秩序"},
+        {name:"帝国主义",color:"#6D214F",chaosMod:0.1,loveMod:-0.4,wageMod:0.4,desc:"对外扩张，掠夺资源"},
+        {name:"世界大同主义",color:"#55efc4",chaosMod:-0.3,loveMod:0.5,wageMod:0.1,desc:"四海一家，消除隔阂"},
+        {name:"人道主义",color:"#fab1a0",chaosMod:-0.2,loveMod:0.6,wageMod:0.05,desc:"以人为本，关怀弱者"},
+        {name:"激进主义",color:"#ff7675",chaosMod:0.4,loveMod:0,wageMod:0.3,desc:"打破常规，剧烈变革"},
     ];
 
     // Map for logic to look up effects easily
@@ -762,7 +775,7 @@ const TOWN_EVENTS = [
         { id: 'artfest', name: '🎨 艺术节', cost: 300, desc: '全员快乐+15，关系+3。10%概率发生艺术品失窃。', emoji: '🎨' },
         { id: 'marathon', name: '🏃 全民马拉松', cost: 200, desc: '快乐+10，饱食-10。5%概率有人受伤(快乐-20)。', emoji: '🏃' },
         { id: 'reading', name: '📚 读书会', cost: 100, desc: '快乐+5，关系+2。20%概率树苗枯死效果减半。', emoji: '📚' },
-        { id: 'shopping', name: '🛍️ 购物节 (双11)', cost: 0, desc: '双11狂欢！居民疯狂购物，镇库获得全额商品收入！', emoji: '🛍️' },
+        { id: 'shopping', name: '🛍️ 购物节', cost: 0, desc: '双11狂欢！居民疯狂购物，镇库获得全额商品收入！', emoji: '🛍️' },
         
         // 节日 / 特定日期
         { id: 'new_year', name: '🧨 元旦佳节', cost: 300, desc: '新年新气象！全员快乐+20，消费欲望提升。', emoji: '🧨', date: {m:1, d:1} },
@@ -891,8 +904,12 @@ const TOWN_EVENTS = [
             this.history = [];
             this.level = 1; 
             this.isUnderConstruction = false; 
+            this.hasPermit = false;
             
-            if (this.isBuilt) this.currentProgress = this.totalCost;
+            if (this.isBuilt) {
+                this.currentProgress = this.totalCost;
+                this.hasPermit = true;
+            }
         }
         addLog(msg) {
             this.history.unshift(msg);
@@ -937,6 +954,10 @@ const TOWN_EVENTS = [
             return map[s];
         }
         
+        getIdeologyNames() { return IDEOLOGIES.map(i => i.name); }
+        getPersonalityNames() { return PERSONALITIES.map(p => p.name); }
+        getTraitNames() { return TRAITS.map(t => t.name); }
+
         generateDailyWeather() {
             const season = this.getSeason();
             const roll = Math.random();
@@ -966,9 +987,9 @@ const TOWN_EVENTS = [
             this.chars = NAMES.map(n => { let c = new Character(n); NAMES.forEach(target => { if (target !== n) c.relationships[target] = { love: 0, status: 'stranger' }; }); return c; }); 
             this.buildings = BUILDINGS_BLUEPRINT.map(b => new Building(b)); 
             
-            const park = this.buildings.find(b => b.id === 'park'); if(park) { park.isBuilt = true; park.currentProgress = park.totalCost; }
-            const clinic = this.buildings.find(b => b.id === 'clinic'); if(clinic) { clinic.isBuilt = true; clinic.currentProgress = clinic.totalCost; }
-            const baozi = this.buildings.find(b => b.id === 'baozi'); if(baozi) { baozi.isBuilt = true; baozi.currentProgress = baozi.totalCost; }
+            const park = this.buildings.find(b => b.id === 'park'); if(park) { park.isBuilt = true; park.currentProgress = park.totalCost; park.hasPermit = true; }
+            const clinic = this.buildings.find(b => b.id === 'clinic'); if(clinic) { clinic.isBuilt = true; clinic.currentProgress = clinic.totalCost; clinic.hasPermit = true; }
+            const baozi = this.buildings.find(b => b.id === 'baozi'); if(baozi) { baozi.isBuilt = true; baozi.currentProgress = baozi.totalCost; baozi.hasPermit = true; }
             
             setTimeout(() => this.triggerConstructionVote(), 2000);
         }
@@ -1119,6 +1140,7 @@ const TOWN_EVENTS = [
                 const building = this.buildings.find(b => b.id === winner.id);
                 if(building) {
                     building.isUnderConstruction = true;
+                    building.hasPermit = true;
                     this.log(`[🗳️公投] 投票结束！**${building.name}** 胜出，正式动工！`, "tag-gov");
                     this.updateUI();
                 }
@@ -1269,16 +1291,16 @@ const TOWN_EVENTS = [
             const modal = document.getElementById('action-select-modal');
             const content = document.getElementById('action-select-content');
             let html = `<p>为 <b>${c.name}</b> 选择下一个行动 (立即生效):</p><div class="action-grid">`;
-            html += `<button class="action-btn" onclick="setOverride('${name}', 'rest', '', '回家休息')">🛌 休息/躺平</button>`;
-            if (c.job) { html += `<button class="action-btn" style="border-color:#f1c40f" onclick="setOverride('${name}', 'work', '', '去上班')">💼 去上班</button>`; }
+            html += `<button class="action-btn" onclick="gameInstance.setOverride('${name}', 'rest', '', '回家休息')">🛌 休息/躺平</button>`;
+            if (c.job) { html += `<button class="action-btn" style="border-color:#f1c40f" onclick="gameInstance.setOverride('${name}', 'work', '', '去上班')">💼 去上班</button>`; }
             const pendings = this.buildings.filter(b => !b.isBuilt);
-            pendings.forEach(b => { html += `<button class="action-btn" style="border-color:#e67e22" onclick="setOverride('${name}', 'build', '${b.id}', '建设 ${b.name}')">🔨 建设: ${b.name}</button>`; });
+            pendings.forEach(b => { html += `<button class="action-btn" style="border-color:#e67e22" onclick="gameInstance.setOverride('${name}', 'build', '${b.id}', '建设 ${b.name}')">🔨 建设: ${b.name}</button>`; });
             const venues = this.buildings.filter(b => b.isBuilt);
-            venues.forEach(b => { const icon = b.effect === 'food' ? '🍔' : (b.effect === 'shop' ? '🛍️' : '🎡'); html += `<button class="action-btn" onclick="setOverride('${name}', 'visit', '${b.id}', '去 ${b.name}')">${icon} 去: ${b.name}</button>`; });
+            venues.forEach(b => { const icon = b.effect === 'food' ? '🍔' : (b.effect === 'shop' ? '🛍️' : '🎡'); html += `<button class="action-btn" onclick="gameInstance.setOverride('${name}', 'visit', '${b.id}', '去 ${b.name}')">${icon} 去: ${b.name}</button>`; });
             html += `</div><p style="margin-top:10px;">强制社交 (选择对象):</p><div class="action-grid">`;
-            this.chars.forEach(t => { if (t.name !== c.name) { html += `<button class="action-btn" style="border-color:#ff7675" onclick="setOverride('${name}', 'social', '${t.name}', '找 ${t.name}')">❤ 找: ${t.name}</button>`; } });
+            this.chars.forEach(t => { if (t.name !== c.name) { html += `<button class="action-btn" style="border-color:#ff7675" onclick="gameInstance.setOverride('${name}', 'social', '${t.name}', '找 ${t.name}')">❤ 找: ${t.name}</button>`; } });
             html += `</div><p style="margin-top:10px;">强制犯罪 (选择受害人):</p><div class="action-grid">`;
-            this.chars.forEach(t => { if (t.name !== c.name) { html += `<button class="action-btn" style="border-color:#2d3436; color:#2d3436" onclick="setOverride('${name}', 'crime_rob', '${t.name}', '抢劫 ${t.name}')">🔪 抢: ${t.name}</button>`; html += `<button class="action-btn" style="border-color:#c0392b; color:#c0392b" onclick="setOverride('${name}', 'crime_assault', '${t.name}', '劫色 ${t.name}')">😈 劫: ${t.name}</button>`; } });
+            this.chars.forEach(t => { if (t.name !== c.name) { html += `<button class="action-btn" style="border-color:#2d3436; color:#2d3436" onclick="gameInstance.setOverride('${name}', 'crime_rob', '${t.name}', '抢劫 ${t.name}')">🔪 抢: ${t.name}</button>`; html += `<button class="action-btn" style="border-color:#c0392b; color:#c0392b" onclick="gameInstance.setOverride('${name}', 'crime_assault', '${t.name}', '劫色 ${t.name}')">😈 劫: ${t.name}</button>`; } });
             html += `</div>`;
             content.innerHTML = html;
             document.getElementById('char-detail-modal').classList.remove('active');
@@ -1299,7 +1321,6 @@ const TOWN_EVENTS = [
                     document.getElementById('mayor-ideology-display').innerText = m.ideology.name;
                     document.getElementById('mayor-ideology-display').style.backgroundColor = m.ideology.color;
                     
-                    // --- Fix Start: Display Detailed Stats ---
                     const i = m.ideology;
                     let effectDesc = i.desc;
                     let statsArr = [];
@@ -1311,7 +1332,6 @@ const TOWN_EVENTS = [
                          effectDesc += `<div style="margin-top:5px; padding-top:5px; border-top:1px dashed #ccc; font-weight:bold; font-size:0.85rem; color:#27ae60;">${statsArr.join(' | ')}</div>`;
                     }
                     document.getElementById('mayor-policy-display').innerHTML = effectDesc;
-                    // --- Fix End ---
                 }
             }
         }
@@ -1349,10 +1369,8 @@ const TOWN_EVENTS = [
             let eventsToShow = [];
             
             if (tab === 'normal') {
-                // 常规活动：无季节，无日期
                 eventsToShow = TOWN_EVENTS.filter(ev => !ev.season && !ev.date);
             } else {
-                // 季节限定：匹配季节 OR 匹配今日日期
                 eventsToShow = TOWN_EVENTS.filter(ev => {
                     if (ev.date) {
                         return ev.date.m === this.dateMonth && ev.date.d === this.dateDay;
@@ -1362,7 +1380,7 @@ const TOWN_EVENTS = [
             }
             
             if (eventsToShow.length === 0) { list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:#999;">当前时段暂无特殊活动。</div>`; return; }
-            eventsToShow.forEach(ev => { const div = document.createElement('div'); div.className = 'event-card'; const canAfford = this.townMoney >= ev.cost; div.innerHTML = `<div class="event-header"><span class="event-name">${ev.name}</span><span class="event-cost">-${ev.cost}</span></div><div class="event-desc">${ev.desc}</div><button class="event-btn" ${canAfford?'':'disabled'} onclick="triggerTownEvent('${ev.id}')">${canAfford?'🎉 立即举办':'💸 资金不足'}</button>`; list.appendChild(div); });
+            eventsToShow.forEach(ev => { const div = document.createElement('div'); div.className = 'event-card'; const canAfford = this.townMoney >= ev.cost; div.innerHTML = `<div class="event-header"><span class="event-name">${ev.name}</span><span class="event-cost">-${ev.cost}</span></div><div class="event-desc">${ev.desc}</div><button class="event-btn" ${canAfford?'':'disabled'} onclick="gameInstance.triggerTownEvent('${ev.id}')">${canAfford?'🎉 立即举办':'💸 资金不足'}</button>`; list.appendChild(div); });
         }
 
         triggerTownEvent(id) {
@@ -1379,7 +1397,6 @@ const TOWN_EVENTS = [
                             const t = this.chars.find(x=>x.name===tName); 
                             if (t && !t.partner && c.relationships[tName].love > maxL) { maxL = c.relationships[tName].love; bestT = t; } 
                         } 
-                        // 樱花祭门槛较低
                         const threshold = (id === 'sakura' || id === 'valentines') ? 25 : 40;
                         if (bestT && maxL > threshold && Math.random() < 0.5) { 
                             if (bestT.decideProposal(c.name, 'confess') || Math.random() < (id!=='matchmaking'?0.4:0.3)) { 
@@ -1403,11 +1420,10 @@ const TOWN_EVENTS = [
                 const isSpecialDay = id === 'charity_day';
                 this.chars.forEach(c => { 
                     if (c.money > 10) { 
-                        // 慈善日捐款更多
                         const base = isSpecialDay ? 50 : 20;
                         const donation = Math.min(c.money, rand(5, base)); 
                         c.money -= donation; totalRaised += donation; 
-                        c.happiness = isSpecialDay ? c.happiness + 5 : c.happiness - 5; // 慈善日大家乐于助人
+                        c.happiness = isSpecialDay ? c.happiness + 5 : c.happiness - 5; 
                         this.chars.forEach(other => { if(other.name!==c.name) { c.relationships[other.name].love += 2; } }); 
                         if (isSpecialDay) c.addLog(`[💝慈善日] 捐款 💰${donation} 帮助他人`);
                     } 
@@ -1426,7 +1442,7 @@ const TOWN_EVENTS = [
                 const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.length > 0); if (shops.length === 0) { this.log("⚠️ 镇上没有营业的商店，购物节取消了。", "tag-reject"); return; }
                 let shopperCount = 0; let totalSpent = 0;
                 this.chars.forEach(c => { if (c.money >= 10) { const shop = choose(shops); const affordables = shop.sells.filter(sid => ITEMS_DB[sid] && ITEMS_DB[sid].price <= c.money); if (affordables.length > 0) { const itemId = choose(affordables); const item = ITEMS_DB[itemId]; c.money -= item.price; 
-                this.townMoney += item.price; // 全额纳入镇库
+                this.townMoney += item.price; 
                 c.bag.push(itemId); c.happiness = Math.min(100, c.happiness + 15); totalSpent += item.price; shopperCount++; c.addLog(`[🛍️购物节] 在 ${shop.name} 抢购了 ${item.name}`); } } });
                 if (shopperCount > 0) { this.logInteraction(`[🛍️狂欢] 购物节圆满结束！${shopperCount} 位居民抢购了商品，镇库收入 💰${totalSpent}。`, "tag-item"); } else { this.logInteraction(`[🌬️冷清] 购物节大家囊中羞涩，无人消费...`, "tag-lonely"); }
             }
@@ -1472,7 +1488,12 @@ const TOWN_EVENTS = [
             if (this.speedLevel === 0) { btn.innerText = "▶ 继续"; btn.style.backgroundColor = "#7f8c8d"; } 
             else { btn.style.backgroundColor = ""; if (this.speedLevel === 1) { this.speed = 1500; btn.innerText = "⏸ 正常"; } else if (this.speedLevel === 2) { this.speed = 750; btn.innerText = "⏩ 2x"; } else { this.speed = 500; btn.innerText = "⏩ 3x"; } this.loopId = setInterval(() => this.tick(), this.speed); }
         }
-        toggleConstruction(buildId) { const b = this.buildings.find(x => x.id === buildId); if (!b || b.isBuilt) return; b.isUnderConstruction = !b.isUnderConstruction; this.updateUI(); }
+        toggleConstruction(buildId) { 
+            const b = this.buildings.find(x => x.id === buildId); 
+            if (!b || b.isBuilt) return; 
+            b.isUnderConstruction = !b.isUnderConstruction; 
+            this.updateUI(); 
+        }
         accelerateBuild(buildId) { const b = this.buildings.find(x => x.id === buildId); if (!b || b.isBuilt) return; if (this.townMoney >= 50) { this.townMoney -= 50; b.currentProgress += 20; this.log(`[💸加速] 镇长斥资加速 **${b.name}** 建设。`, "tag-build"); if (b.currentProgress >= b.totalCost) { b.isBuilt = true; this.log(`[🔨竣工] **${b.name}** 建成了！`, "tag-build"); this.unlockAchievement('first_build'); if(b.id==='gym') this.unlockAchievement('first_gym'); if(b.id==='museum') this.unlockAchievement('culture_hub'); this.distributeConstructionReward(b); this.triggerConstructionVote(); } this.updateUI(); } else { alert("镇库资金不足 (需要50)！"); } }
         
         upgradeBuilding(bid) { const b = this.buildings.find(x => x.id === bid); if(!b || !b.isBuilt) return; if(b.level >= 3) { alert("已达到最高等级！"); return; } const cost = Math.floor(b.totalCost * b.level); if(this.townMoney >= cost) { this.townMoney -= cost; b.level++; this.log(`[🏗️升级] **${b.name}** 升级到了 Lv.${b.level}！员工收入将获得提升！`, "tag-build"); this.showBuildingDetail(bid); this.updateUI(); } else { alert(`资金不足，升级需要 💰${cost}`); } }
@@ -1496,7 +1517,7 @@ const TOWN_EVENTS = [
             if (p.consecutiveWork >= 12) this.unlockAchievement('workaholic');
             const skillType = getJobSkillType(role); this.improveSkill(p, skillType, 0.2);
             const skillVal = p.skills[skillType] || 0; const title = getLevelInfo(skillVal).title;
-            p.currentAction = `[打工] 在 ${b.name} 当${title}${role}`; const timeStr = this.getDateTimeStr(); p.addLog(`${timeStr} 在 ${b.name} 工作 (${title})`); b.addLog(`${timeStr} 员工 ${p.name} 在此工作`);
+            p.currentAction = `[打工] 在 ${b.name} 进行 ${role} 工作`; const timeStr = this.getDateTimeStr(); p.addLog(`${timeStr} 在 ${b.name} 工作 (${title})`); b.addLog(`${timeStr} 员工 ${p.name} 在此工作`);
         }
         
         doOddJob(p) { 
@@ -1580,13 +1601,11 @@ const TOWN_EVENTS = [
             p.currentAction = `和 ${t.name} 在 ${v.name}`; t.currentAction = `和 ${p.name} 在 ${v.name}`; p.interactingWith = t.name; t.interactingWith = p.name; p.hunger -= 2; t.hunger -= 2; this.improveSkill(p, 'social', 0.1);
             if (this.checkRomanceEvent(p, t, pRel, tRel, v)) return; 
             
-            // --- Fix Start: Include Mayor Chaos Influence ---
             let chaos = p.personality.chaosBonus + t.personality.chaosBonus + p.ideology.chaosMod + t.ideology.chaosMod; 
             if (this.mayor) {
                 const m = this.chars.find(c => c.name === this.mayor);
                 if (m && m.ideology) chaos += (m.ideology.chaosMod || 0);
             }
-            // --- Fix End ---
 
             if (v.effect === 'chaos') chaos += 0.2; if (v.effect === 'ntr') chaos += 0.4; 
             if (Math.random() < Math.max(0, Math.min(1, 0.1 + chaos))) { 
@@ -1629,15 +1648,17 @@ const TOWN_EVENTS = [
                     if (bData.prostitutes !== undefined) b.prostitutes = bData.prostitutes; if (!b.prostitutes) b.prostitutes = []; 
                     if(bData.history) b.history = bData.history; 
                     b.level = bData.level || 1; b.isUnderConstruction = bData.isUnderConstruction || false;
+                    
+                    if (bData.hasPermit !== undefined) b.hasPermit = bData.hasPermit;
+                    else if (b.currentProgress > 0 || b.isBuilt) b.hasPermit = true; 
+
                     return b; 
                 }); 
                 this.chars = data.chars.map(cData => { 
-                    // --- Fix Start: Re-bind Ideology ---
                     if (cData.ideology && cData.ideology.name) {
                         const canonical = IDEOLOGIES.find(i => i.name === cData.ideology.name);
                         cData.ideology = canonical || cData.ideology;
                     }
-                    // --- Fix End ---
                     let c = new Character(cData.name); 
                     Object.assign(c, cData); 
                     if (c.money === undefined) c.money = 0; 
@@ -1690,7 +1711,16 @@ const TOWN_EVENTS = [
                 this.buildings.filter(b => b.category === cat).forEach(b => { 
                     const div = document.createElement('div'); div.className = 'build-card'; div.id = `build-${b.id}`; div.onclick = (e) => { if(e.target.tagName !== 'BUTTON') gameInstance.showBuildingDetail(b.id); };
                     let btnHtml = ''; 
-                    if (!b.isBuilt) { if (b.isUnderConstruction) { btnHtml = `<button class="btn accelerate" onclick="gameInstance.accelerateBuild('${b.id}')">💸 资金加速 (50)</button><button class="btn stop-build" onclick="gameInstance.toggleConstruction('${b.id}')">⏹ 暂停施工</button>`; } else { btnHtml = `<button class="btn start-build" disabled title="请等待镇长发起投票">🗳️ 待投票启动</button>`; } }
+                    if (!b.isBuilt) { 
+                        if (b.isUnderConstruction) { 
+                            btnHtml = `<button class="btn accelerate" onclick="gameInstance.accelerateBuild('${b.id}')">💸 资金加速 (50)</button><button class="btn stop-build" onclick="gameInstance.toggleConstruction('${b.id}')">⏹ 暂停施工</button>`; 
+                        } else if (b.currentProgress > 0 || b.hasPermit) {
+                            // 修复：恢复施工按钮逻辑，使用 distinct class 和 gameInstance
+                            btnHtml = `<button class="btn resume-build" onclick="gameInstance.toggleConstruction('${b.id}')">▶ 恢复施工</button>`;
+                        } else { 
+                            btnHtml = `<button class="btn start-build" disabled title="请等待镇长发起投票">🗳️ 待投票启动</button>`; 
+                        } 
+                    }
                     div.innerHTML = `<div><div style="font-weight:bold; font-size:1.05rem">${b.name}</div><div style="font-size:0.8rem; color:#666">${b.desc}</div></div><div><div class="bar-container"><div class="bar-fill" style="background:#00b894; width:0%"></div></div><div class="build-prog">未建成</div>${btnHtml}</div>`; bList.appendChild(div); 
                 });
             });
@@ -1728,6 +1758,8 @@ const TOWN_EVENTS = [
             this.switchGuideTab('personality');
             modal.classList.add('active');
         }
+
+        showLeaderboard() { this.renderLeaderboard('money'); }
 
         switchGuideTab(tab) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1786,270 +1818,413 @@ const TOWN_EVENTS = [
             
             let bagHtml = '<div style="color:#999; font-size:0.85rem;">背包空空如也</div>'; if (c.bag && c.bag.length > 0) { bagHtml = '<div class="bag-grid">'; c.bag.forEach(itemId => { const item = ITEMS_DB[itemId]; if(item) { const tooltipText = getItemTooltipText(itemId); bagHtml += `<div class="bag-item tooltip-item" data-tip="${tooltipText}">${item.name}</div>`; } }); bagHtml += '</div>'; }
             let historyHtml = '<div class="history-list">'; if (!c.history || c.history.length === 0) { historyHtml += '<div class="history-item">暂无活动记录</div>'; } else { c.history.forEach(h => { historyHtml += `<div class="history-item">${h}</div>`; }); } historyHtml += '</div>';
-            const ideologyHtml = `<div class="ideology-box"><div style="color:${ideology.color}; font-weight:bold; font-size:1.1rem;">${ideology.name}</div><div style="font-size:0.9rem; color:#555; margin:4px 0;">${ideology.desc}</div><div style="font-size:0.85rem;"><span class="stat-positive">❤ +${ideology.loveMod} 好感</span> | <span class="stat-positive">💢 ${Math.floor(ideology.chaosMod * 100)}% 吵架</span> | <span class="stat-positive">💰 ${Math.floor(ideology.wageMod * 100)}% 工资</span></div></div>`;
+            
             let jailStatus = ""; if (c.jailTerm > 0) { jailStatus = `<div style="margin-top:5px; color:#e74c3c; font-weight:bold;">⛓️ 服刑中: 剩余 ${(c.jailTerm/60).toFixed(1)} 小时</div>`; }
             const skillsHtml = `<div class="skill-row"><span class="skill-name">社交</span><div class="skill-track"><div class="skill-bar sk-social" style="width:${c.skills.social}%"></div></div><span class="skill-val">${Math.floor(c.skills.social)}</span></div><div class="skill-row"><span class="skill-name">手艺</span><div class="skill-track"><div class="skill-bar sk-craft" style="width:${c.skills.craft}%"></div></div><span class="skill-val">${Math.floor(c.skills.craft)}</span></div><div class="skill-row"><span class="skill-name">智力</span><div class="skill-track"><div class="skill-bar sk-intel" style="width:${c.skills.intel}%"></div></div><span class="skill-val">${Math.floor(c.skills.intel)}</span></div><div class="skill-row"><span class="skill-name">体能</span><div class="skill-track"><div class="skill-bar sk-str" style="width:${c.skills.strength}%"></div></div><span class="skill-val">${Math.floor(c.skills.strength)}</span></div>`;
+            
+            // 独立出信仰主义模块，放到最下方
+            const ideologySection = `
+                <div class="detail-group">
+                    <div class="detail-label">
+                         <span>信仰主义</span>
+                         <button class="edit-btn" onclick="gameInstance.openEditModal('修改主义', gameInstance.getIdeologyNames(), '${ideology.name}', 'ideology', '${c.name}')">[修改]</button>
+                    </div>
+                    <div class="ideology-box">
+                         <div style="color:${ideology.color}; font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${ideology.name}</div>
+                         <div style="font-size:0.9rem; color:#555; margin-bottom:5px;">${ideology.desc}</div>
+                         <div style="font-size:0.85rem;"><span class="stat-positive">❤ +${ideology.loveMod} 好感</span> | <span class="stat-positive">💢 ${Math.floor(ideology.chaosMod * 100)}% 吵架</span> | <span class="stat-positive">💰 ${Math.floor(ideology.wageMod * 100)}% 工资</span></div>
+                    </div>
+                </div>`;
 
             content.innerHTML = `
                 <div class="detail-group">
-                    <div class="detail-label">基本状态 <button class="edit-btn" onclick="openEditModal('修改性别', ['♂ 男', '♀ 女'], '${c.gender}', 'gender', '${c.name}')">[修改性别]</button></div>
+                    <div class="detail-label">基本状态 <button class="edit-btn" onclick="gameInstance.openEditModal('修改性别', ['♂ 男', '♀ 女'], '${c.gender}', 'gender', '${c.name}')">[修改性别]</button></div>
                     <div class="detail-val">性别: ${c.gender} | 💰 ${c.money} | ❤ ${Math.floor(c.happiness)} | 🍗 ${Math.floor(c.hunger)} | 🚑 ${Math.floor(c.health)}</div>
-                    <div class="detail-val" style="margin-top:5px; color:#8e44ad">✨ 颜值: ${Math.floor(c.appearance)}</div>
-                    <div style="background:#f8f9fa; padding:8px; border-radius:6px; margin-top:8px; border:1px solid #eee;">
-                        <div class="detail-val">👷 ${jobText} <span style="margin-left:5px; font-size:0.9em">${wageHtml}</span></div>
+                    <div class="detail-val" style="margin-top:5px; color:#8e44ad">✨ ${c.appearance} 颜值</div>
+                </div>
+                <div class="detail-group">
+                   <div class="detail-label">职业 & 技能 <button class="edit-btn" onclick="gameInstance.showActionSelect('${c.name}')">[强制干预]</button></div>
+                   <div class="detail-val">${jobText}</div>
+                   <div class="detail-desc">收入: ${wageHtml}</div>
+                   <div style="margin-top:8px;">${skillsHtml}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">性格 & 特质 
+                        <span style="font-weight:normal">
+                            <button class="edit-btn" onclick="gameInstance.openEditModal('修改性格', gameInstance.getPersonalityNames(), '${c.personality.name}', 'personality', '${c.name}')">[改性格]</button>
+                            <button class="edit-btn" onclick="gameInstance.openEditModal('重置特质', gameInstance.getTraitNames(), '', 'trait', '${c.name}')">[改特质]</button>
+                        </span>
                     </div>
-                    ${jailStatus}
-                    <button class="btn control" onclick="showActionSelect('${c.name}')">🕹️ 强制安排活动</button>
+                    <div class="detail-val">${c.personality.name} (${c.personality.desc})</div>
+                    <div style="margin-top:5px;">${traitsHtml}</div>
                 </div>
-                <div class="detail-group"><div class="detail-label">🔧 职业技能</div>${skillsHtml}</div>
-                <div class="detail-group"><div class="detail-label">👣 最近足迹</div>${historyHtml}</div>
-                <div class="detail-group"><div class="detail-label">🎒 背包</div>${bagHtml}</div>
                 <div class="detail-group">
-                    <div class="detail-label">性格 <button class="edit-btn" onclick="editPersonality('${c.name}')">[修改]</button></div>
-                    <div class="detail-val">${c.personality.name}</div><div class="detail-desc">${c.personality.desc}</div>
+                    <div class="detail-label">人际关系 (点击查看详情)</div>
+                    <div class="detail-desc">伴侣: ${c.partner ? `<b>${c.partner}</b>` : '单身'} ${c.prostitute ? '(失足)' : ''}</div>
                 </div>
-                <div class="detail-group"><div class="detail-label">特性 <button class="edit-btn" onclick="editTraits('${c.name}')">[重置]</button></div><div>${traitsHtml}</div></div>
                 <div class="detail-group">
-                    <div class="detail-label">信仰 <button class="edit-btn" onclick="editIdeology('${c.name}')">[修改]</button></div>
-                    ${ideologyHtml}
+                    <div class="detail-label">当前背包</div>
+                    ${bagHtml}
                 </div>
+                <div class="detail-group">
+                    <div class="detail-label">最近动态 ${jailStatus}</div>
+                    ${historyHtml}
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">犯罪记录</div>
+                    <div class="detail-desc">抢劫: ${c.stat_rob} | 被抢: ${c.stat_be_robbed} | 站街: ${c.stat_streetwalk} | 骚扰: ${c.stat_assault} | 被骚扰: ${c.stat_be_assaulted}</div>
+                </div>
+                ${ideologySection}
             `;
             modal.classList.add('active');
         }
         
+        closeCharDetail() { document.getElementById('char-detail-modal').classList.remove('active'); }
+        
         showBuildingDetail(bid) {
-            const b = this.buildings.find(x => x.id === bid); if (!b) return;
-            const modal = document.getElementById('building-detail-modal'); document.getElementById('b-detail-name').innerText = `${b.name} (Lv.${b.level})`; const content = document.getElementById('b-detail-content');
-            let statusHtml = b.isBuilt ? `<span style="color:#27ae60">✅ 营业中</span>` : `<span style="color:#e67e22">🚧 建设中 (${Math.floor(b.currentProgress/b.totalCost*100)}%)</span>`;
-            const upgradeCost = Math.floor(b.totalCost * b.level); const upgradeBtn = (b.isBuilt && b.level < 3) ? `<button class="btn upgrade" onclick="gameInstance.upgradeBuilding('${b.id}')">⏫ 升级 (💰${upgradeCost})</button>` : (b.isBuilt ? `<span style="color:#9b59b6; font-weight:bold;">已满级</span>` : '');
-            const trainBtn = (b.isBuilt && b.staff.length > 0) ? `<button class="btn train" onclick="gameInstance.boostTraining('${b.id}')">📚 培训员工 (💰200)</button>` : '';
-            let staffListHtml = '';
-            if (b.jobs.length === 0) { staffListHtml = '<div style="padding:10px; color:#999;">此建筑不提供工作岗位</div>'; } else { b.jobs.forEach((role, index) => { const workerName = b.staff[index] || "【空缺】"; let wage = getJobWage(role); let extraInfo = ""; let progressBarHtml = ""; if (b.staff[index]) { const worker = this.chars.find(c => c.name === workerName); if (worker) { wage = worker.calculateWage(wage, role); const skillType = getJobSkillType(role); const skillVal = worker.skills[skillType] || 0; const levelInfo = getLevelInfo(skillVal); extraInfo = `<span style="font-size:0.8em; color:#2ecc71">(${levelInfo.title})</span>`; if (levelInfo.level < 3) { let prevThreshold = 0; if (levelInfo.level === 1) prevThreshold = 20; if (levelInfo.level === 2) prevThreshold = 50; const range = levelInfo.next - prevThreshold; const progress = skillVal - prevThreshold; const pct = Math.max(0, Math.min(100, Math.floor((progress / range) * 100))); progressBarHtml = `<div style="margin-top:4px; background:#eee; height:4px; border-radius:2px; width:100%; position:relative; margin-bottom:2px;" title="晋升进度: ${Math.floor(skillVal)}/${levelInfo.next}"><div style="background:#f1c40f; height:100%; width:${pct}%; border-radius:2px; transition:width 0.3s;"></div></div><div style="font-size:0.7rem; color:#999; text-align:right;">晋升进度: ${pct}%</div>`; } else { progressBarHtml = `<div style="font-size:0.7rem; color:#f1c40f; text-align:right; margin-top:4px;">✨ 大师级</div>`; } } } const color = b.staff[index] ? "#0984e3" : "#ccc"; staffListHtml += `<div class="staff-list-item" style="flex-direction:column; align-items:stretch;"><div style="display:flex; justify-content:space-between; align-items:center;"><div><span class="staff-role">${role}</span>${extraInfo}<div style="font-size:0.8rem; color:#666;">日薪: 💰${wage}</div></div><div style="font-weight:bold; color:${color};">${workerName}</div></div>${progressBarHtml}</div>`; }); }
-            if (b.id === 'footshop' && b.prostitutes.length > 0) { staffListHtml += `<div style="margin-top:10px; font-weight:bold; color:#e056fd;">💋 特殊服务人员:</div>`; b.prostitutes.forEach(name => { staffListHtml += `<div class="staff-list-item"><span class="staff-role">技师</span><span class="staff-name" style="color:#e056fd">${name}</span></div>`; }); }
-            let sellsHtml = ''; if (b.sells && b.sells.length > 0) { sellsHtml = `<div style="margin-top:10px; font-weight:bold;">🛍️ 售卖商品:</div><div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">`; b.sells.forEach(itemId => { const item = ITEMS_DB[itemId]; if (item) { const tooltipText = getItemTooltipText(itemId); sellsHtml += `<span class="tooltip-item" data-tip="${tooltipText}" style="cursor:help; background:#fff5f0; border:1px solid #e17055; color:#d35400; padding:2px 6px; border-radius:4px; font-size:0.8rem;">${item.name} (💰${item.price})</span>`; } }); sellsHtml += `</div>`; }
-            let historyHtml = '<div class="history-list">'; if (!b.history || b.history.length === 0) { historyHtml += '<div class="history-item">暂无访客记录</div>'; } else { b.history.forEach(h => { historyHtml += `<div class="history-item">${h}</div>`; }); } historyHtml += '</div>';
-            content.innerHTML = `<div style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #eee;"><div style="font-size:0.9rem; color:#666; margin-bottom:5px;">${b.desc}</div><div style="margin-bottom:5px;">${upgradeBtn}</div><div>状态: ${statusHtml}</div><div>消费价格: 💰${b.price}</div><div>营业时间: ${b.open}:00 - ${b.close}:00</div>${sellsHtml}</div><div style="font-weight:bold; margin-bottom:5px;">👣 最近访客记录</div>${historyHtml}<div style="font-weight:bold; margin-bottom:5px; margin-top:10px; display:flex; justify-content:space-between;"><span>👥 岗位与员工</span><span>${trainBtn}</span></div><div style="border:1px solid #eee; border-radius:6px; overflow:hidden;">${staffListHtml}</div>`;
-            modal.classList.add('active');
-        }
-        
-        editPersonality(name) { openEditModal("修改性格", PERSONALITIES.map(p=>p.name), this.chars.find(x=>x.name===name)?.personality.name, 'personality', name); }
-        editIdeology(name) { openEditModal("修改信仰", IDEOLOGIES.map(i=>i.name), this.chars.find(x=>x.name===name)?.ideology.name, 'ideology', name); }
-        editTraits(name) { const c = this.chars.find(x=>x.name===name); if(c){ c.traits=[]; const count=rand(0,2); for(let i=0;i<count;i++){ const t=TRAITS.filter(x=>!c.traits.includes(x)); if(t.length) c.traits.push(choose(t)); } this.showCharacterDetail(name); } }
-        
-        // --- Calendar System ---
-        showCalendar() {
-            const modal = document.getElementById('calendar-modal');
-            this.renderCalendar();
-            modal.classList.add('active');
-        }
-        closeCalendar() { document.getElementById('calendar-modal').classList.remove('active'); }
-        
-        renderCalendar() {
-            const container = document.getElementById('calendar-container');
-            container.innerHTML = '';
-            const curM = this.dateMonth; const curD = this.dateDay;
+            const b = this.buildings.find(x => x.id === bid); if(!b) return;
+            const modal = document.getElementById('building-detail-modal'); document.getElementById('b-detail-name').innerText = b.name;
+            const content = document.getElementById('b-detail-content');
             
-            for(let m=1; m<=12; m++) {
-                const mCard = document.createElement('div');
-                mCard.className = 'month-card';
-                let season = ''; if(m>=3 && m<=5) season='(春)'; else if(m>=6 && m<=8) season='(夏)'; else if(m>=9 && m<=11) season='(秋)'; else season='(冬)';
-                
-                let gridHtml = '<div class="days-grid">';
-                // 使用 MONTH_DAYS 数组决定天数
-                const totalDays = MONTH_DAYS[m];
-                for(let d=1; d<=totalDays; d++) {
-                    const isToday = (m === curM && d === curD);
-                    const evt = TOWN_EVENTS.find(e => e.date && e.date.m === m && e.date.d === d);
-                    let classes = 'day-cell';
-                    if(isToday) classes += ' today';
-                    if(evt) classes += ' event-day';
-                    
-                    gridHtml += `<div class="${classes}" ${evt ? `data-evt="${evt.name}"` : ''}>${d}</div>`;
+            const staffHtml = b.staff.map(sName => {
+                const char = this.chars.find(c => c.name === sName);
+                let wageInfo = "未知";
+                let skillTitle = "";
+                let skillBarHtml = "";
+                if (char && char.job) {
+                     const base = getBaseJobWage(char.job.role);
+                     const wage = char.calculateWage(base, char.job.role);
+                     const skillType = getJobSkillType(char.job.role);
+                     const sVal = char.skills[skillType]||0;
+                     const levelInfo = getLevelInfo(sVal);
+                     skillTitle = levelInfo.title;
+                     wageInfo = `💰${wage}`;
+                     
+                     let prevCap = 0;
+                     let nextCap = 20;
+                     if(levelInfo.level === 1) { prevCap = 20; nextCap = 50; }
+                     if(levelInfo.level === 2) { prevCap = 50; nextCap = 80; }
+                     if(levelInfo.level === 3) { prevCap = 80; nextCap = 100; }
+                     
+                     const pct = Math.min(100, Math.max(0, ((sVal - prevCap) / (nextCap - prevCap)) * 100));
+                     
+                     skillBarHtml = `<div style="width:60px; height:4px; background:#eee; margin-top:4px; border-radius:2px;" title="熟练度进度"><div style="height:100%; background:#0984e3; width:${pct}%"></div></div>`;
                 }
-                gridHtml += '</div>';
-                
-                mCard.innerHTML = `<div class="month-title">${m}月 ${season}</div>${gridHtml}`;
-                container.appendChild(mCard);
+                return `<div class="staff-list-item">
+                    <div style="display:flex; flex-direction:column;">
+                        <div><span class="staff-role">${sName===b.staff[0] && b.category!=='service'?'店长/经理':'员工'}:</span> <span class="staff-name">${sName}</span> <span class="lvl-badge">${skillTitle}</span></div>
+                        ${skillBarHtml}
+                    </div>
+                    <div style="font-weight:bold; color:#27ae60;">${wageInfo}</div>
+                </div>`;
+            }).join('') || '<div style="padding:10px; color:#999">暂无员工</div>';
+
+            const prosHtml = b.prostitutes.map(p => `<div class="staff-list-item"><span class="staff-role">技师:</span><span class="staff-name">${p}</span></div>`).join('');
+            let historyHtml = '<div class="history-list">'; b.history.forEach(h => { historyHtml += `<div class="history-item">${h}</div>`; }); historyHtml += '</div>';
+            
+            let statsHtml = '';
+            if (b.isBuilt) {
+                statsHtml = `
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="btn upgrade" onclick="gameInstance.upgradeBuilding('${b.id}')">🏗️ 升级建筑 (Lv.${b.level+1})</button>
+                    ${b.staff.length > 0 ? `<button class="btn train" onclick="gameInstance.boostTraining('${b.id}')">📚 员工培训 (200)</button>` : ''}
+                </div>
+                <div style="font-size:0.9rem; color:#666; margin-bottom:5px;">当前等级: Lv.${b.level}</div>
+                `;
             }
+
+            content.innerHTML = `
+                <div style="margin-bottom:15px; font-size:0.9rem; color:#555;">${b.desc}</div>
+                ${statsHtml}
+                <div class="section-title">员工列表 (${b.staff.length}/${b.jobs.length})</div>
+                <div style="max-height:150px; overflow-y:auto; border:1px solid #eee; border-radius:4px; margin-bottom:15px;">${staffHtml}</div>
+                ${prosHtml ? `<div class="section-title">特殊服务人员</div><div style="max-height:100px; overflow-y:auto; border:1px solid #eee; border-radius:4px; margin-bottom:15px;">${prosHtml}</div>` : ''}
+                <div class="section-title">经营日志</div>
+                ${historyHtml}
+            `;
+            modal.classList.add('active');
         }
-        
+        closeBuildingDetail() { document.getElementById('building-detail-modal').classList.remove('active'); }
+
         updateUI() {
-            const townMoneyEl = document.getElementById('town-money');
-            if (townMoneyEl) townMoneyEl.innerText = this.townMoney;
-            const h = Math.floor(this.gameTime / 60); const m = this.gameTime % 60;
-            document.getElementById('game-time').innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            document.getElementById('game-time').innerText = `${Math.floor(this.gameTime/60).toString().padStart(2,'0')}:${(this.gameTime%60).toString().padStart(2,'0')}`;
             document.getElementById('game-day').innerText = DAYS[this.gameDay];
-            const seasonName = this.getSeasonName();
-            document.getElementById('calendar-display').innerText = `📅 ${this.dateMonth}月${this.dateDay}日 (${seasonName})`;
-            const wInfo = WEATHER_TYPES[this.weather];
-            document.getElementById('weather-display').innerText = wInfo ? wInfo.name : '';
-            const resCountEl = document.getElementById('resident-count');
-            if (resCountEl) resCountEl.innerText = this.chars.length;
-            const charList = document.getElementById('char-list'); charList.innerHTML = ''; 
+            document.getElementById('calendar-display').innerText = `📅 ${this.dateMonth}月${this.dateDay}日 (${this.getSeasonName()})`;
+            document.getElementById('weather-display').innerText = WEATHER_TYPES[this.weather].name;
+            document.getElementById('town-money').innerText = this.townMoney;
+            document.getElementById('resident-count').innerText = this.chars.length;
+            
+            const charList = document.getElementById('char-list');
+            charList.innerHTML = '';
             this.chars.forEach(c => {
-                let lovedOne = "无"; let maxL = 0; for(let name in c.relationships) { if(c.relationships[name].love > maxL) { maxL = c.relationships[name].love; lovedOne = name; } }
-                let statusHtml = c.partner ? `<span style="color:var(--love)">❤ ${c.partner}</span>` : `<span style="color:#999">喜欢: ${lovedOne}</span>`;
-                let actionClass = ""; if (c.jailTerm > 0) actionClass = "action-jail"; else if (c.currentAction.includes("建设")) actionClass = "action-build"; else if (c.currentAction.includes("工作") || c.currentAction.includes("打工") || c.currentAction.includes("卖银")) actionClass = "action-work"; else if (c.currentAction.includes("躺平") || c.currentAction.includes("睡觉")) actionClass = "action-lieflat"; else if (c.currentAction.includes("吃") || c.currentAction.includes("享用")) actionClass = "action-eat"; else if (c.currentAction.includes("犯罪") || c.currentAction.includes("抢劫") || c.currentAction.includes("劫色")) actionClass = "action-crime"; else if (c.currentAction.includes("购物") || c.currentAction.includes("送礼")) actionClass = "action-shop"; else if (c.currentAction.includes("使用") || c.currentAction.includes("服用")) actionClass = "action-use"; else actionClass = "action-social";
-                let jobTitle = "无业"; if(c.job) { const skillType = getJobSkillType(c.job.role); const title = getLevelInfo(c.skills[skillType]||0).title; jobTitle = `${title}${c.job.role}`; }
-                let jobInfo = c.job ? `<span style="font-size:0.8em;color:#666;background:#eee;padding:2px 4px;border-radius:4px;">${jobTitle}</span>` : `<span style="font-size:0.8em;color:#aaa">无业</span>`;
-                let nameHtml = `<strong>${c.name}</strong>`; if (gameInstance && gameInstance.mayor === c.name) { nameHtml += ` <span class="tag-gov">🎖️镇长</span>`; }
-                const div = document.createElement('div'); div.className = `char-card ${actionClass}`; div.onclick = () => gameInstance.showCharacterDetail(c.name);
-                div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div>${nameHtml} <span style="font-size:0.75em;color:#888;">${c.gender}</span> ${jobInfo}</div><div style="text-align:right; font-size:0.85rem;"><span style="color:#f39c12">💰${c.money}</span></div></div><div style="font-size:0.8em; margin-bottom:5px;">${statusHtml}</div><div class="bar-container" title="健康 (Health)"><div class="bar-fill health-fill" style="width:${c.health}%"></div></div><div class="bar-container" title="饱食 (Hunger)" style="height:3px;margin-top:2px;"><div class="bar-fill food-fill" style="width:${c.hunger}%"></div></div><div class="bar-container" title="心情 (Mood)" style="height:3px;margin-top:2px;"><div class="bar-fill hp-fill" style="width:${c.happiness}%"></div></div><div style="color:#555;margin-top:2px; font-size:0.85rem">${c.currentAction}</div>`;
+                const div = document.createElement('div');
+                let actionClass = 'action-rest';
+                if(c.currentAction.includes("打工") || c.currentAction.includes("上班")) actionClass = 'action-work';
+                else if(c.currentAction.includes("建设")) actionClass = 'action-build';
+                else if(c.currentAction.includes("吃饭") || c.currentAction.includes("包子")) actionClass = 'action-eat';
+                else if(c.currentAction.includes("犯罪") || c.currentAction.includes("抢劫") || c.currentAction.includes("骚扰")) actionClass = 'action-crime';
+                else if(c.currentAction.includes("躺平") || c.currentAction.includes("睡觉")) actionClass = 'action-lieflat';
+                else if(c.currentAction.includes("互动") || c.currentAction.includes("和")) actionClass = 'action-social';
+                else if(c.currentAction.includes("坐牢")) actionClass = 'action-jail';
+                else if(c.currentAction.includes("购物") || c.currentAction.includes("买")) actionClass = 'action-shop';
+                
+                const isMayor = this.mayor === c.name;
+                div.className = `char-card ${actionClass} ${isMayor ? 'mayor' : ''}`;
+                div.onclick = () => gameInstance.showCharacterDetail(c.name);
+                
+                let statusIcons = "";
+                if(c.partner) statusIcons += "❤️";
+                if(c.money < 10) statusIcons += "💸";
+                if(c.happiness < 30) statusIcons += "😭";
+                if(c.health < 30) statusIcons += "😷";
+                
+                let mayorIcon = isMayor ? "🎖️" : "";
+                let jobDisplay = c.job ? `在${this.buildings.find(b=>b.id===c.job.buildingId)?.name||'未知'}进行${c.job.role}工作` : (c.prostitute ? "失足" : "无业");
+                
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                        <span>${mayorIcon} ${c.name} <span style="font-size:0.8em; color:#666;">${c.gender}</span></span>
+                        <span>${statusIcons}</span>
+                    </div>
+                    <div style="font-size:0.85rem; margin:2px 0; display:flex; justify-content:space-between;">
+                        <span style="color:#666;">${jobDisplay}</span>
+                        <span style="color:#f1c40f; font-weight:bold;">💰${c.money}</span>
+                    </div>
+                    <div style="font-size:0.8rem; color:#888; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.currentAction}</div>
+                    
+                    <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+                        <span style="font-size:0.8rem; width:12px;">❤</span>
+                        <div class="bar-container" style="flex:1; margin:0;" title="心情: ${Math.floor(c.happiness)}">
+                            <div class="bar-fill" style="width:${c.happiness}%; background:${c.happiness<30?'#e74c3c':'#3498db'}"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+                        <span style="font-size:0.8rem; width:12px;">🍗</span>
+                        <div class="bar-container" style="flex:1; margin:0;" title="饱食: ${Math.floor(c.hunger)}">
+                            <div class="bar-fill food-fill" style="width:${c.hunger}%"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+                        <span style="font-size:0.8rem; width:12px;">🚑</span>
+                        <div class="bar-container" style="flex:1; margin:0;" title="健康: ${Math.floor(c.health)}">
+                            <div class="bar-fill health-fill" style="width:${c.health}%"></div>
+                        </div>
+                    </div>
+                `;
                 charList.appendChild(div);
             });
+            
+            this.renderUIStatic();
+            
+            const bList = document.getElementById('build-list');
             this.buildings.forEach(b => {
-                const el = document.getElementById(`build-${b.id}`);
-                if (el) {
-                    const pct = Math.min(100, (b.currentProgress / b.totalCost) * 100); el.querySelector('.bar-fill').style.width = `${pct}%`;
-                    let staffHtml = ""; if (b.jobs.length > 0) staffHtml = `<div style="font-size:0.75rem; color:#666; margin-top:4px;">员工: ${b.staff.length}/${b.jobs.length}</div>`;
-                    let levelBadge = `<span class="lvl-badge">Lv.${b.level}</span>`;
-                    if (b.isBuilt) { el.classList.add('built'); el.classList.remove('building'); el.classList.remove('active-project'); el.querySelector('.build-prog').innerHTML = `✅ 营业中 ${levelBadge} <br>Price: 💰${b.price} ${staffHtml}`; } else if (b.currentProgress > 0 || b.isUnderConstruction) { if (b.isUnderConstruction) { el.classList.add('active-project'); el.classList.remove('building'); el.querySelector('.build-prog').innerText = `🚧 施工中: ${Math.floor(pct)}%`; } else { el.classList.add('building'); el.classList.remove('active-project'); el.querySelector('.build-prog').innerText = `⏳ 暂停施工: ${Math.floor(pct)}%`; } } else { el.querySelector('.build-prog').innerText = `未开工 (💰${b.price})`; }
-                    const btnContainer = el.lastElementChild;
-                    const existingStartBtn = btnContainer.querySelector('.start-build');
-                    const existingAccelerate = btnContainer.querySelector('.accelerate');
-                    if (!b.isBuilt) { if (b.isUnderConstruction && !existingAccelerate) { btnContainer.innerHTML = `<div class="bar-container"><div class="bar-fill" style="background:#00b894; width:${pct}%"></div></div><div class="build-prog">🚧 施工中: ${Math.floor(pct)}%</div><button class="btn accelerate" onclick="gameInstance.accelerateBuild('${b.id}')">💸 资金加速 (50)</button><button class="btn stop-build" onclick="gameInstance.toggleConstruction('${b.id}')">⏹ 暂停施工</button>`; } else if (!b.isUnderConstruction && !existingStartBtn) { btnContainer.innerHTML = `<div class="bar-container"><div class="bar-fill" style="background:#00b894; width:${pct}%"></div></div><div class="build-prog">⏳ 待投票启动</div><button class="btn start-build" disabled title="由镇长发起投票决定">🗳️ 待公投启动</button>`; } }
+                const card = document.getElementById(`build-${b.id}`);
+                if (card) {
+                    if (b.isBuilt) card.className = 'build-card built';
+                    else if (b.isUnderConstruction) card.className = 'build-card building';
+                    else card.className = 'build-card';
+                    
+                    const bar = card.querySelector('.bar-fill');
+                    const prog = card.querySelector('.build-prog');
+                    if (bar && prog) {
+                        const pct = Math.min(100, Math.floor((b.currentProgress / b.totalCost) * 100));
+                        bar.style.width = `${pct}%`;
+                        if(b.isBuilt) prog.innerText = `已建成 (Lv.${b.level}) - 员工: ${b.staff.length}`;
+                        else if(b.isUnderConstruction) prog.innerText = `建设中... ${pct}%`;
+                        else prog.innerText = b.currentProgress > 0 ? `暂停中 (${pct}%)` : `未动工 (需💰${b.totalCost})`;
+                    }
                 }
             });
-            if (isRelViewOpen) this.renderRelations();
         }
 
-        renderRelations() {
-            if (!isRelViewOpen) return;
-            try {
-                const incomingLove = {}; this.chars.forEach(c => incomingLove[c.name] = 0); this.chars.forEach(c => { for(let tName in c.relationships) if(incomingLove[tName] !== undefined) incomingLove[tName] += c.relationships[tName].love; });
-                const sortedChars = [...this.chars].sort((a,b) => (incomingLove[b.name]||0) - (incomingLove[a.name]||0));
-                if (sortedChars.length > 0) { const topName = sortedChars[0].name; const botName = sortedChars[sortedChars.length - 1].name; document.getElementById('stat-pop').innerHTML = `${topName} <small>(${incomingLove[topName]||0}❤)</small>`; document.getElementById('stat-lonely').innerHTML = `${botName} <small>(${incomingLove[botName]||0}❤)</small>`; }
-                const listEl = document.getElementById('rel-list'); listEl.innerHTML = '';
-                this.chars.forEach(c => {
-                    const div = document.createElement('div'); div.className = 'rel-item';
-                    let rels = Object.entries(c.relationships).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.love - a.love).filter(r => r.love > 0 || r.status !== 'stranger');
-                    let relHtml = rels.map(r => { let tagClass = "tag-friend"; if (r.status === 'spouse') tagClass = 'tag-spouse'; else if (r.status === 'lover') tagClass = 'tag-lover'; else if (r.status === 'mistress') tagClass = 'tag-mistress'; else if (r.status === 'bestfriend') tagClass = 'tag-bestfriend'; else if (r.status === 'ex') tagClass = 'tag-ex'; else if (r.status === 'enemy') tagClass = 'tag-enemy'; const cnStatus = REL_TRANSLATE[r.status] || r.status; return `<div style="margin-top:4px;"><span class="rel-tag ${tagClass}">${cnStatus}</span><b>${r.name}</b> <span style="color:#999">(${r.love})</span></div>`; }).join('');
-                    if(!relHtml) relHtml = `<div style="color:#ccc;font-size:0.8rem">暂无特别关系</div>`; div.innerHTML = `<strong>${c.name}</strong>${relHtml}`; listEl.appendChild(div);
-                });
-                const canvas = document.getElementById('rel-canvas'); const container = document.getElementById('rel-graph-container'); const w = container.clientWidth || 800; const h = container.clientHeight || 600; canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); const cx = w / 2; const cy = h / 2; const r = Math.min(cx, cy) - 50; ctx.clearRect(0, 0, w, h); const points = {}; this.chars.forEach((c, i) => { const angle = (i / this.chars.length) * Math.PI * 2 - Math.PI / 2; points[c.name] = { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r }; });
-                this.chars.forEach(c => { const p1 = points[c.name]; for (let tName in c.relationships) { const rel = c.relationships[tName]; if ((rel.love > 40 || (rel.status !== 'stranger' && rel.status !== 'friend')) && points[tName]) { const p2 = points[tName]; ctx.beginPath(); const dx = p2.x - p1.x; const dy = p2.y - p1.y; const midX = (p1.x + p2.x) / 2; const midY = (p1.y + p2.y) / 2; const offset = 20; const angle = Math.atan2(dy, dx); const cpX = midX - Math.sin(angle) * offset; const cpY = midY + Math.cos(angle) * offset; ctx.moveTo(p1.x, p1.y); ctx.quadraticCurveTo(cpX, cpY, p2.x, p2.y); let color = 'rgba(200,200,200,0.2)'; let width = 1; let dash = []; if(rel.status === 'spouse') { color = 'rgba(232,67,147,0.8)'; width = 3; } else if(rel.status === 'lover') { color = 'rgba(255,107,107,0.7)'; width = 2; } else if(rel.status === 'mistress') { color = 'rgba(255,140,0,0.7)'; width = 2; dash = [5, 5]; } else if(rel.status === 'bestfriend') { color = 'rgba(52,152,219,0.6)'; width = 2; } else if(rel.status === 'ex') { color = 'rgba(99,110,114,0.5)'; width = 1.5; dash = [2, 2]; } else if(rel.status === 'enemy') { color = 'rgba(192, 57, 43, 0.8)'; width = 2; } ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]); const arrowAngle = Math.atan2(p2.y - cpY, p2.x - cpX); const arrowLen = 8; ctx.beginPath(); const endX = p2.x - Math.cos(arrowAngle) * 22; const endY = p2.y - Math.sin(arrowAngle) * 22; ctx.moveTo(endX, endY); ctx.lineTo(endX - arrowLen * Math.cos(arrowAngle - Math.PI / 6), endY - arrowLen * Math.sin(arrowAngle - Math.PI / 6)); ctx.lineTo(endX - arrowLen * Math.cos(arrowAngle + Math.PI / 6), endY - arrowLen * Math.sin(arrowAngle + Math.PI / 6)); ctx.fillStyle = color; ctx.fill(); } } });
-                this.chars.forEach(c => { const p = points[c.name]; ctx.beginPath(); ctx.arc(p.x, p.y, 20, 0, Math.PI*2); ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = c.partner ? "#ff6b6b" : "#4a90e2"; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = "#333"; ctx.font = "11px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(c.name, p.x, p.y); });
-            } catch(e) { console.error("Render Error:", e); }
+        renderLeaderboard(type) {
+            const list = document.getElementById('leaderboard-list'); list.innerHTML = '';
+            const sorted = [...this.chars].sort((a, b) => {
+                if(type==='money') return b.money - a.money;
+                if(type==='happiness') return b.happiness - a.happiness;
+                if(type==='popularity') {
+                    const popA = this.chars.reduce((acc, c) => acc + (c.relationships[a.name]?.love || 0), 0);
+                    const popB = this.chars.reduce((acc, c) => acc + (c.relationships[b.name]?.love || 0), 0);
+                    return popB - popA;
+                }
+                if(type==='robbery') return (b.stat_rob||0) - (a.stat_rob||0);
+                if(type==='streetwalk') return (b.stat_streetwalk||0) - (a.stat_streetwalk||0);
+                if(type==='assault') return (b.stat_assault||0) - (a.stat_assault||0);
+                return 0;
+            });
+            sorted.forEach((c, i) => {
+                const div = document.createElement('div'); div.className = 'rank-item';
+                let val = 0; let unit = '';
+                if(type==='money') { val = c.money; unit = '💰'; }
+                if(type==='happiness') { val = Math.floor(c.happiness); unit = '❤'; }
+                if(type==='popularity') { val = this.chars.reduce((acc, x) => acc + (x.relationships[c.name]?.love || 0), 0); unit = '🔥'; }
+                if(type==='robbery') { val = c.stat_rob || 0; unit = '次'; }
+                if(type==='streetwalk') { val = c.stat_streetwalk || 0; unit = '次'; }
+                if(type==='assault') { val = c.stat_assault || 0; unit = '次'; }
+                
+                let displayVal = (['robbery','streetwalk','assault'].includes(type)) ? `${val} ${unit}` : `${unit} ${val}`;
+                
+                div.innerHTML = `<div class="rank-num rank-${i+1}">${i+1}</div><div class="rank-info"><div class="rank-name">${c.name}</div></div><div class="rank-val">${displayVal}</div>`;
+                list.appendChild(div);
+            });
+            document.getElementById('leaderboard-modal').classList.add('active');
+        }
+        closeLeaderboard() { document.getElementById('leaderboard-modal').classList.remove('active'); }
+        
+        showCalendar() {
+            const container = document.getElementById('calendar-container');
+            container.innerHTML = '';
+            for (let m = 1; m <= 12; m++) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'month-card';
+                let seasonIcon = '';
+                if(m>=3 && m<=5) seasonIcon='🌸'; else if(m>=6 && m<=8) seasonIcon='🌞'; else if(m>=9 && m<=11) seasonIcon='🍂'; else seasonIcon='❄️';
+                
+                let daysHtml = `<div class="month-title">${seasonIcon} ${m}月</div><div class="days-grid">`;
+                const daysInMonth = MONTH_DAYS[m];
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const isToday = (this.dateMonth === m && this.dateDay === d);
+                    const evt = TOWN_EVENTS.find(e => e.date && e.date.m === m && e.date.d === d);
+                    const evtClass = evt ? 'event-day' : '';
+                    const todayClass = isToday ? 'today' : '';
+                    const dataAttr = evt ? `data-evt="${evt.name}"` : '';
+                    daysHtml += `<div class="day-cell ${evtClass} ${todayClass}" ${dataAttr}>${d}</div>`;
+                }
+                daysHtml += `</div>`;
+                monthDiv.innerHTML = daysHtml;
+                container.appendChild(monthDiv);
+            }
+            document.getElementById('calendar-modal').classList.add('active');
+        }
+        closeCalendar() { document.getElementById('calendar-modal').classList.remove('active'); }
+
+        closeJobBoard() { document.getElementById('jobboard-modal').classList.remove('active'); }
+        closeGameGuide() { document.getElementById('guide-modal').classList.remove('active'); }
+        manualSave() { this.saveData(false); }
+        resetData() { if(confirm("确定要重置所有数据吗？这将无法撤销！")) { localStorage.removeItem('happyTownV2_Save'); location.reload(); } }
+        
+        openEditModal(title, options, currentVal, type, charName) {
+            document.getElementById('edit-title').innerText = title;
+            const sel = document.getElementById('edit-select'); sel.innerHTML = '';
+            options.forEach(opt => { const op = document.createElement('option'); op.value = opt; op.innerText = opt; if(opt === currentVal) op.selected = true; sel.appendChild(op); });
+            window.editContext = { type, charName };
+            document.getElementById('edit-modal').classList.add('active');
+        }
+        closeEditModal() { document.getElementById('edit-modal').classList.remove('active'); }
+        confirmEdit() {
+            const val = document.getElementById('edit-select').value;
+            const ctx = window.editContext;
+            if (ctx) {
+                const c = this.chars.find(x => x.name === ctx.charName);
+                if (c) {
+                    if (ctx.type === 'gender') c.gender = val;
+                    if (ctx.type === 'personality') { const p = PERSONALITIES.find(x=>x.name===val); if(p) c.personality = p; }
+                    if (ctx.type === 'ideology') { const i = IDEOLOGIES.find(x=>x.name===val); if(i) c.ideology = i; }
+                    if (ctx.type === 'trait') { const t = TRAITS.find(x=>x.name===val); if(t) c.traits = [t]; }
+                    
+                    this.log(`[✏️修改] 玩家修改了 ${c.name} 的属性`, "tag-build");
+                    this.updateUI();
+                    this.showCharacterDetail(c.name);
+                }
+            }
+            this.closeEditModal();
         }
     }
-
-    // --- Helper Functions ---
-    function switchTab(tabName) { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(`tab-${tabName}`).classList.add('active'); document.querySelectorAll('.col-view').forEach(v => v.classList.remove('active-view')); document.getElementById(`view-${tabName}`).classList.add('active-view'); }
-    let gameInstance = null; let isRelViewOpen = false;
-    let currentEditTarget = null;
-    let currentEditType = null;
-
-    function toggleRelationView() { const main = document.getElementById('main-view'); const rel = document.getElementById('relation-view'); isRelViewOpen = !isRelViewOpen; if (isRelViewOpen) { main.style.display = 'none'; rel.classList.add('active'); setTimeout(() => { if (gameInstance) gameInstance.renderRelations(); }, 50); } else { main.style.display = 'flex'; rel.classList.remove('active'); } }
-    function showLeaderboard() { renderLeaderboard('money'); document.getElementById('leaderboard-modal').classList.add('active'); }
-    function closeLeaderboard() { document.getElementById('leaderboard-modal').classList.remove('active'); }
-    function showAchievements() { if(gameInstance) gameInstance.showAchievements(); }
-    function closeAchievements() { if(gameInstance) gameInstance.closeAchievements(); }
-    function showJobBoard() { if(gameInstance) gameInstance.showJobBoard(); }
-    function closeJobBoard() { document.getElementById('jobboard-modal').classList.remove('active'); }
-    function showGameGuide() { if(gameInstance) gameInstance.showGameGuide(); }
-    function closeGameGuide() { document.getElementById('guide-modal').classList.remove('active'); }
-    function switchGuideTab(tab) { if(gameInstance) gameInstance.switchGuideTab(tab); }
     
-    // New Edit Functions
-    function openEditModal(title, options, currentVal, type, charName) {
-        document.getElementById('edit-title').innerText = title;
-        const sel = document.getElementById('edit-select');
-        sel.innerHTML = '';
-        options.forEach(opt => {
-            const el = document.createElement('option');
-            el.value = opt;
-            el.innerText = opt;
-            if (opt === currentVal) el.selected = true;
-            sel.appendChild(el);
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.querySelectorAll('.col-view').forEach(v => v.classList.remove('active-view'));
+        document.getElementById(`view-${tab}`).classList.add('active-view');
+    }
+
+    function toggleRelationView() {
+        const v = document.getElementById('relation-view');
+        const main = document.getElementById('main-view');
+        if (v.classList.contains('active')) { v.classList.remove('active'); main.style.display = 'flex'; }
+        else { v.classList.add('active'); main.style.display = 'none'; renderRelationGraph(); }
+    }
+    
+    function renderRelationGraph() {
+        const canvas = document.getElementById('rel-canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('rel-graph-container');
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        const w = canvas.width, h = canvas.height;
+        const cx = w/2, cy = h/2;
+        const r = Math.min(w, h) * 0.4;
+        const chars = gameInstance.chars;
+        const n = chars.length;
+        const angleStep = (Math.PI * 2) / n;
+        
+        const positions = chars.map((c, i) => {
+            return { x: cx + Math.cos(i*angleStep)*r, y: cy + Math.sin(i*angleStep)*r, color: '#333' };
         });
-        currentEditTarget = charName;
-        currentEditType = type;
-        document.getElementById('edit-modal').classList.add('active');
+        
+        ctx.clearRect(0,0,w,h);
+        
+        // Draw nodes
+        positions.forEach((p, i) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 15, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(chars[i].name.substr(0,2), p.x, p.y);
+        });
+
+        // Stats
+        const list = document.getElementById('rel-list'); list.innerHTML = '';
+        let maxPop = -1, minPop = 99999;
+        let popKing = null, lonely = null;
+        chars.forEach(c => {
+             let pop = 0;
+             chars.forEach(o => pop += (o.relationships[c.name]?.love || 0));
+             if (pop > maxPop) { maxPop = pop; popKing = c; }
+             if (pop < minPop) { minPop = pop; lonely = c; }
+             
+             const div = document.createElement('div'); div.className = 'rel-item';
+             let relsHTML = [];
+             
+             const relevantRels = Object.keys(c.relationships)
+                .map(k => ({name: k, ...c.relationships[k]}))
+                .filter(r => r.status !== 'stranger' || Math.abs(r.love) > 10)
+                .sort((a,b) => Math.abs(b.love) - Math.abs(a.love));
+
+             relevantRels.forEach(r => {
+                 const cnStatus = REL_TRANSLATE[r.status] || r.status;
+                 let colorStyle = '#666';
+                 if(r.status === 'lover' || r.status === 'spouse') colorStyle = '#e84393';
+                 else if(r.status === 'enemy') colorStyle = '#c0392b';
+                 else if(r.status === 'bestfriend') colorStyle = '#3498db';
+                 else if(r.status === 'friend') colorStyle = '#0984e3';
+                 
+                 relsHTML.push(`<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:2px;">
+                    <span>${r.name}</span>
+                    <span><span style="color:${colorStyle}; margin-right:5px;">${cnStatus}</span><span style="color:#aaa">${Math.floor(r.love)}</span></span>
+                 </div>`);
+             });
+             
+             if(relsHTML.length === 0) relsHTML.push('<div style="color:#ccc; font-size:0.8rem;">暂无社交</div>');
+             
+             div.innerHTML = `<div style="font-weight:bold; border-bottom:1px dashed #eee; padding-bottom:2px; margin-bottom:2px;">${c.name}</div>${relsHTML.join('')}`;
+             list.appendChild(div);
+        });
+        document.getElementById('stat-pop').innerText = popKing ? `${popKing.name} (${maxPop})` : '无';
+        document.getElementById('stat-lonely').innerText = lonely ? `${lonely.name} (${minPop})` : '无';
     }
 
-    function confirmEdit() {
-        const val = document.getElementById('edit-select').value;
-        if (currentEditType === 'gender') {
-            const c = gameInstance.chars.find(x => x.name === currentEditTarget);
-            if(c) c.gender = val;
-        } else if (currentEditType === 'personality') {
-            const c = gameInstance.chars.find(x => x.name === currentEditTarget);
-            if(c) c.personality = PERSONALITIES.find(p => p.name === val);
-        } else if (currentEditType === 'ideology') {
-            const c = gameInstance.chars.find(x => x.name === currentEditTarget);
-            if(c) c.ideology = IDEOLOGIES.find(i => i.name === val);
-        }
-        gameInstance.showCharacterDetail(currentEditTarget);
-        closeEditModal();
-    }
-
-    function closeEditModal() {
-        document.getElementById('edit-modal').classList.remove('active');
-        currentEditTarget = null;
-        currentEditType = null;
-    }
-
-    function renderLeaderboard(type) { 
-        if (!gameInstance) return; 
-        const list = document.getElementById('leaderboard-list'); list.innerHTML = ''; 
-        let sorted = [...gameInstance.chars];
-        if (type === 'money') { sorted.sort((a, b) => b.money - a.money); } else if (type === 'happiness') { sorted.sort((a, b) => b.happiness - a.happiness); } else if (type === 'popularity') { const popMap = {}; gameInstance.chars.forEach(c => popMap[c.name] = 0); gameInstance.chars.forEach(source => { for(let target in source.relationships) { if(popMap[target] !== undefined) popMap[target] += source.relationships[target].love; } }); sorted.sort((a, b) => popMap[b.name] - popMap[a.name]); sorted.forEach(c => c._tempPop = popMap[c.name]); } else if (type === 'robbery') { sorted.sort((a, b) => (b.stat_rob || 0) - (a.stat_rob || 0)); } else if (type === 'streetwalk') { sorted.sort((a, b) => (b.stat_streetwalk || 0) - (a.stat_streetwalk || 0)); } else if (type === 'assault') { sorted.sort((a, b) => (b.stat_assault || 0) - (a.stat_assault || 0)); }
-        sorted.forEach((c, index) => { 
-            if (type === 'robbery' && (c.stat_rob||0) === 0 && (c.stat_be_robbed||0) === 0 && index > 5) return;
-            if (type === 'streetwalk' && (c.stat_streetwalk||0) === 0 && index > 5) return;
-            if (type === 'assault' && (c.stat_assault||0) === 0 && (c.stat_be_assaulted||0) === 0 && index > 5) return;
-            const item = document.createElement('div'); item.className = 'rank-item'; let rankClass = ''; if (index === 0) rankClass = 'rank-1'; else if (index === 1) rankClass = 'rank-2'; else if (index === 2) rankClass = 'rank-3'; 
-            let valText = '';
-            if(type==='money') valText = `💰 ${c.money}`; else if(type==='happiness') valText = `❤ ${Math.floor(c.happiness)}`; else if(type==='popularity') valText = `🔥 ${c._tempPop}`; else if(type==='robbery') { valText = `<span style="color:#2d3436">🔪 抢:${c.stat_rob||0}</span> | <span style="color:#999">被抢:${c.stat_be_robbed||0}</span>`; } else if(type==='streetwalk') { valText = `<span style="color:#e056fd">💋 站街: ${c.stat_streetwalk||0} 次</span>`; } else if(type==='assault') { valText = `<span style="color:#c0392b">😈 劫:${c.stat_assault||0}</span> | <span style="color:#999">受害:${c.stat_be_assaulted||0}</span>`; }
-            item.innerHTML = `<div class="rank-num ${rankClass}">${index + 1}</div><div class="rank-info"><div class="rank-name">${c.name}</div></div><div class="rank-val" style="font-size:0.9rem">${valText}</div>`; list.appendChild(item); 
-        }); 
-    }
+    function inputNewResident() { const n = prompt("请输入新居民的名字:"); if(n) gameInstance.addNewResident(n); }
     
-    function closeCharDetail() { document.getElementById('char-detail-modal').classList.remove('active'); }
-    function showGov() { if (gameInstance) gameInstance.showGov(); }
-    function closeGov() { if (gameInstance) gameInstance.closeGov(); }
-    function togglePolicy(type) { if (gameInstance) gameInstance.togglePolicy(type); }
-    function executeCommonProsperity() { if (gameInstance) gameInstance.executeCommonProsperity(); }
-    function showEmbezzle() { if (gameInstance) gameInstance.showEmbezzle(); }
-    function doEmbezzle() { if (gameInstance) gameInstance.doEmbezzle(); }
-    function closeEmbezzle() { if (gameInstance) gameInstance.closeEmbezzle(); }
-    function toggleSpeed() { if (gameInstance) gameInstance.toggleSpeed(); }
-    function showActionSelect(name) { if(gameInstance) gameInstance.showActionSelect(name); }
-    function setOverride(name, type, target, desc) { if(gameInstance) gameInstance.setOverride(name, type, target, desc); }
-    function closeActionSelect() { if(gameInstance) gameInstance.closeActionSelect(); }
-    function editPersonality(name) { if(gameInstance) gameInstance.editPersonality(name); }
-    function editTraits(name) { if(gameInstance) gameInstance.editTraits(name); }
-    function editIdeology(name) { if(gameInstance) gameInstance.editIdeology(name); }
-    function showTownEvents() { if(gameInstance) gameInstance.showTownEvents(); }
-    function triggerTownEvent(id) { if(gameInstance) gameInstance.triggerTownEvent(id); }
-    function closeTownEvents() { if(gameInstance) gameInstance.closeTownEvents(); }
-    function switchEventTab(tab) { if(gameInstance) gameInstance.switchEventTab(tab); }
-    function showBuildingDetail(bid) { if(gameInstance) gameInstance.showBuildingDetail(bid); }
-    function closeBuildingDetail() { document.getElementById('building-detail-modal').classList.remove('active'); }
-    
-    // --- Calendar Functions ---
-    function showCalendar() { if(gameInstance) gameInstance.showCalendar(); }
-    function closeCalendar() { document.getElementById('calendar-modal').classList.remove('active'); }
-    
-    function inputNewResident() { if (!gameInstance) return; const name = prompt("请输入新居民的名字：\n(性格、性别、特质将由系统随机生成)"); if (name && name.trim() !== "") { const cleanName = name.trim().substring(0, 8); gameInstance.addNewResident(cleanName); } }
-
-    document.addEventListener('DOMContentLoaded', () => { 
-        document.getElementById('edit-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
-        document.getElementById('guide-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('guide-modal')) closeGameGuide(); });
-        document.getElementById('char-detail-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('char-detail-modal')) closeCharDetail(); }); 
-        document.getElementById('leaderboard-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('leaderboard-modal')) closeLeaderboard(); }); 
-        document.getElementById('jobboard-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('jobboard-modal')) closeJobBoard(); }); 
-        document.getElementById('embezzle-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('embezzle-modal')) closeEmbezzle(); }); 
-        document.getElementById('action-select-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('action-select-modal')) closeActionSelect(); }); 
-        document.getElementById('town-event-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('town-event-modal')) closeTownEvents(); });
-        document.getElementById('building-detail-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('building-detail-modal')) closeBuildingDetail(); });
-        document.getElementById('achievements-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('achievements-modal')) closeAchievements(); });
-        document.getElementById('gov-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('gov-modal')) closeGov(); });
-        document.getElementById('calendar-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('calendar-modal')) closeCalendar(); });
-    });
-    function manualSave() { if (gameInstance) gameInstance.saveData(); }
-    function resetData() { if(confirm("确定要删除存档并重置所有进度吗？")) { localStorage.removeItem('happyTownV2_Save'); location.reload(); } }
-    window.onload = () => { gameInstance = new Game(); };
-</script><script type="module" src="/index.tsx"></script>
+    window.onload = () => { new Game(); };
+</script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
