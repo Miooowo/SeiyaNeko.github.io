@@ -2472,11 +2472,13 @@ const TOWN_EVENTS = [
             const nameEl = document.getElementById('b-detail-name'); if(nameEl) nameEl.innerText = b.name;
             const content = document.getElementById('b-detail-content');
             
-            const staffHtml = b.staff.map(sName => {
+            const staffHtml = b.staff.map((sName, index) => {
                 const char = this.chars.find(c => c.name === sName);
                 let wageInfo = "未知";
                 let skillTitle = "";
                 let skillBarHtml = "";
+                let roleName = "员工";
+                
                 if (char && char.job) {
                      const base = getBaseJobWage(char.job.role);
                      const wage = char.calculateWage(base, char.job.role);
@@ -2485,6 +2487,9 @@ const TOWN_EVENTS = [
                      const levelInfo = getLevelInfo(sVal);
                      skillTitle = levelInfo.title;
                      wageInfo = `💰${Math.floor(wage)}`;
+                     
+                     // 显示实际职位名称
+                     roleName = char.job.role;
                      
                      let prevCap = 0;
                      let nextCap = 20;
@@ -2495,10 +2500,16 @@ const TOWN_EVENTS = [
                      const pct = Math.min(100, Math.max(0, ((sVal - prevCap) / (nextCap - prevCap)) * 100));
                      
                      skillBarHtml = `<div style="width:60px; height:4px; background:#eee; margin-top:4px; border-radius:2px;" title="熟练度进度"><div style="height:100%; background:#0984e3; width:${pct}%"></div></div>`;
+                } else {
+                    // 如果没有找到角色或职位信息，尝试从建筑职位列表中获取
+                    if (b.jobs && b.jobs[index]) {
+                        roleName = b.jobs[index];
+                    }
                 }
+                
                 return `<div class="staff-list-item">
                     <div style="display:flex; flex-direction:column;">
-                        <div><span class="staff-role">${sName===b.staff[0] && b.category!=='service'?'店长/经理':'员工'}:</span> <span class="staff-name">${sName}</span> <span class="lvl-badge">${skillTitle}</span></div>
+                        <div><span class="staff-role">${roleName}:</span> <span class="staff-name">${sName}</span> <span class="lvl-badge">${skillTitle}</span></div>
                         ${skillBarHtml}
                     </div>
                     <div style="font-weight:bold; color:#27ae60;">${wageInfo}</div>
@@ -2533,9 +2544,60 @@ const TOWN_EVENTS = [
                 `;
             }
 
+            // 格式化营业时间
+            let openTimeStr = '';
+            if (b.open !== undefined && b.close !== undefined) {
+                if (b.open === 0 && b.close === 24) {
+                    openTimeStr = '24小时营业';
+                } else if (b.close < b.open) {
+                    openTimeStr = `${b.open}:00 - 次日${b.close}:00`;
+                } else {
+                    openTimeStr = `${b.open}:00 - ${b.close}:00`;
+                }
+            }
+            
+            // 格式化休息日
+            let closedDaysStr = '';
+            if (b.closedDays && b.closedDays.length > 0) {
+                const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                closedDaysStr = b.closedDays.map(d => dayNames[d]).join('、');
+            } else {
+                closedDaysStr = '无';
+            }
+            
+            // 显示基础工资信息（如果有职位）
+            let wageInfoHtml = '';
+            if (b.jobs && b.jobs.length > 0) {
+                wageInfoHtml = '<div class="section-title">💼 职位与基础工资</div><div style="background:#f8f9fa; padding:10px; border-radius:6px; margin-bottom:15px; border:1px solid #eee;">';
+                b.jobs.forEach((jobRole, idx) => {
+                    const baseWage = getBaseJobWage(jobRole);
+                    wageInfoHtml += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:${idx < b.jobs.length - 1 ? '1px dashed #ddd' : 'none'};">
+                        <span style="font-weight:bold;">${jobRole}</span>
+                        <span style="color:#e67e22; font-weight:bold;">💰${baseWage}/次</span>
+                    </div>`;
+                });
+                wageInfoHtml += '</div>';
+            }
+            
             content.innerHTML = `
                 <div style="margin-bottom:15px; font-size:0.9rem; color:#555;">${b.desc}</div>
                 ${statsHtml}
+                <div class="section-title">📋 基本信息</div>
+                <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid #eee; font-size:0.9rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:#666;">🕒 营业时间:</span>
+                        <span style="font-weight:bold; color:#2c3e50;">${openTimeStr || '未设置'}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:#666;">📅 休息日:</span>
+                        <span style="font-weight:bold; color:#2c3e50;">${closedDaysStr}</span>
+                    </div>
+                    ${b.price > 0 ? `<div style="display:flex; justify-content:space-between;">
+                        <span style="color:#666;">💰 消费价格:</span>
+                        <span style="font-weight:bold; color:#e67e22;">${b.price}元</span>
+                    </div>` : ''}
+                </div>
+                ${wageInfoHtml}
                 ${sellsHtml}
                 <div class="section-title">员工列表 (${b.staff.length}/${b.jobs.length})</div>
                 <div style="max-height:150px; overflow-y:auto; border:1px solid #eee; border-radius:4px; margin-bottom:15px;">${staffHtml}</div>
