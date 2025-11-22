@@ -312,6 +312,71 @@
             white-space: nowrap; z-index: 10;
         }
 
+        /* 成就弹窗动画 */
+        @keyframes achievementPopIn {
+            0% {
+                transform: scale(0.3) translateY(-50px);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05) translateY(0);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes achievementIconBounce {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            25% {
+                transform: translateY(-20px) scale(1.1);
+            }
+            50% {
+                transform: translateY(0) scale(1);
+            }
+            75% {
+                transform: translateY(-10px) scale(1.05);
+            }
+        }
+        
+        @keyframes achievementShine {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+        
+        #achievement-popup-content {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: 4px solid #f1c40f;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4), 0 0 40px rgba(241,196,15,0.4), inset 0 0 20px rgba(255,255,255,0.5);
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+        }
+        
+        #achievement-popup-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: achievementShine 3s infinite;
+            pointer-events: none;
+        }
+        
+        #achievement-popup-modal {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+        }
+
     </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -381,6 +446,42 @@
     <div class="rel-layout">
         <div class="rel-graph" id="rel-graph-container"><canvas id="rel-canvas"></canvas></div>
         <div class="rel-list" id="rel-list"></div>
+    </div>
+</div>
+
+<!-- 单个居民关系谱模态框 -->
+<div class="modal-overlay" id="single-char-relation-modal">
+    <div class="modal-content" style="max-width:900px; width:95%;">
+        <div class="modal-header">
+            <h3 id="single-char-relation-name">居民关系详情</h3>
+            <button class="modal-close" onclick="closeSingleCharRelation()">×</button>
+        </div>
+        <div style="display:flex; gap:20px; min-height:500px; max-height:70vh;">
+            <div style="flex:2; border:1px solid #eee; border-radius:8px; position:relative; background:#fdfdfd; overflow:hidden; min-height:500px;">
+                <canvas id="single-char-relation-canvas" style="width:100%; height:100%; display:block;"></canvas>
+            </div>
+            <div style="flex:1; overflow-y:auto; font-size:0.9rem; padding-left:10px; border-left:1px solid #eee; max-height:70vh;">
+                <div style="color:#666; font-size:0.85rem; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #eee;">
+                    点击关系谱中的节点可查看详细信息
+                </div>
+                <div id="single-char-relation-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 成就解锁弹窗 -->
+<div class="modal-overlay" id="achievement-popup-modal" style="z-index:2000;" onclick="if(event.target.id === 'achievement-popup-modal') closeAchievementPopup();">
+    <div class="modal-content" id="achievement-popup-content" style="max-width:500px; width:90%; text-align:center; animation:achievementPopIn 0.5s ease-out; position:relative;" onclick="event.stopPropagation();">
+        <div style="font-size:4rem; margin-bottom:15px; animation:achievementIconBounce 0.6s ease-out 0.2s both; filter:drop-shadow(0 4px 8px rgba(241,196,15,0.5));">🏆</div>
+        <div style="font-size:1.8rem; font-weight:bold; color:#f1c40f; margin-bottom:15px; text-shadow:2px 2px 4px rgba(0,0,0,0.2); letter-spacing:2px;">成就解锁！</div>
+        <div id="achievement-popup-icon" style="font-size:4rem; margin:20px 0; animation:achievementIconBounce 0.6s ease-out 0.3s both; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></div>
+        <div id="achievement-popup-name" style="font-size:1.6rem; font-weight:bold; color:#2c3e50; margin-bottom:12px; padding:0 10px;"></div>
+        <div id="achievement-popup-desc" style="font-size:1rem; color:#7f8c8d; margin-bottom:25px; line-height:1.6; padding:0 15px;"></div>
+        <div style="background:linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color:white; padding:15px 30px; border-radius:30px; font-size:1.2rem; font-weight:bold; display:inline-block; box-shadow:0 6px 20px rgba(241,196,15,0.5); margin-bottom:15px;">
+            <span id="achievement-popup-reward">💰 +0</span>
+        </div>
+        <button class="btn" onclick="closeAchievementPopup()" style="margin-top:10px; background:#3498db; width:100%; font-size:1rem; padding:12px; border-radius:8px; font-weight:bold; box-shadow:0 4px 10px rgba(52,152,219,0.3);">太棒了！</button>
     </div>
 </div>
 
@@ -1285,7 +1386,7 @@ const TOWN_EVENTS = [
             const candidates = scoredChars.slice(0, 3).map(item => ({
                 id: item.char.name, 
                 name: item.char.name,
-                desc: `信仰: ${item.char.ideology.name} | 资金: 💰${item.char.money}`,
+                desc: `信仰: ${item.char.ideology.name} | 资金: 💰${Math.floor(item.char.money)}`,
                 extra: "候选人"
             }));
 
@@ -1356,7 +1457,15 @@ const TOWN_EVENTS = [
             if (newLevelInfo.level > oldLevelInfo.level) { this.log(`[⭐晋升] 恭喜 **${c.name}** 的 ${type} 技能突破！晋升为 **${newLevelInfo.title}** 级别！`, "tag-promote"); c.happiness = Math.min(100, c.happiness + 20); }
         }
 
-        unlockAchievement(id) { if (this.achievements.includes(id)) return; const ach = ACHIEVEMENTS_DB.find(a => a.id === id); if (!ach) return; this.achievements.push(id); this.townMoney += ach.reward; this.log(`[🏆成就] 恭喜解锁成就：**${ach.name}** (${ach.desc})！奖励资金 💰${ach.reward}`, "tag-promote"); alert(`🏆 成就解锁：${ach.name}\n${ach.desc}\n获得奖励: 💰${ach.reward}`); }
+        unlockAchievement(id) { 
+            if (this.achievements.includes(id)) return; 
+            const ach = ACHIEVEMENTS_DB.find(a => a.id === id); 
+            if (!ach || !ach.reward) return; // 确保成就存在且有奖励
+            this.achievements.push(id); 
+            this.townMoney += ach.reward; 
+            this.log(`[🏆成就] 恭喜解锁成就：**${ach.name}** (${ach.desc})！奖励资金 💰${ach.reward}`, "tag-promote"); 
+            showAchievementPopup(ach);
+        }
 
         findItemInBag(p, type) { return p.bag.find(id => ITEMS_DB[id] && ITEMS_DB[id].type === type); }
 
@@ -1528,7 +1637,7 @@ const TOWN_EVENTS = [
         
         showTownEvents() {
             const modal = document.getElementById('town-event-modal');
-            document.getElementById('event-town-money').innerText = this.townMoney;
+            document.getElementById('event-town-money').innerText = Math.floor(this.townMoney);
             const seasonName = this.getSeasonName();
             document.getElementById('event-season-name').innerText = `${seasonName} (${this.dateMonth}月${this.dateDay}日)`;
             this.switchEventTab('normal');
@@ -1669,7 +1778,7 @@ const TOWN_EVENTS = [
             b.isUnderConstruction = !b.isUnderConstruction; 
             this.updateUI(); 
         }
-        accelerateBuild(buildId) { const b = this.buildings.find(x => x.id === buildId); if (!b || b.isBuilt) return; if (this.townMoney >= 50) { this.townMoney -= 50; b.currentProgress += 20; this.log(`[💸加速] 镇长斥资加速 **${b.name}** 建设。`, "tag-build"); if (b.currentProgress >= b.totalCost) { b.isBuilt = true; this.log(`[🔨竣工] **${b.name}** 建成了！`, "tag-build"); this.unlockAchievement('first_build'); if(b.id==='gym') this.unlockAchievement('first_gym'); if(b.id==='museum') this.unlockAchievement('culture_hub'); this.distributeConstructionReward(b); this.triggerConstructionVote(); } this.updateUI(); } else { alert("镇库资金不足 (需要50)！"); } }
+        accelerateBuild(buildId) { const b = this.buildings.find(x => x.id === buildId); if (!b || b.isBuilt) return; if (this.townMoney >= 50) { this.townMoney -= 50; b.currentProgress += 20; this.log(`[💸加速] 镇长斥资加速 **${b.name}** 建设。`, "tag-build"); if (b.currentProgress >= b.totalCost) { b.isBuilt = true; this.log(`[🔨竣工] **${b.name}** 建成了！`, "tag-build"); this.unlockAchievement('first_build'); if(b.id==='gym') this.unlockAchievement('first_gym'); if(b.id==='museum') this.unlockAchievement('culture_hub'); this.distributeConstructionReward(b); setTimeout(() => this.triggerConstructionVote(), 5000); } this.updateUI(); } else { alert("镇库资金不足 (需要50)！"); } }
         
         upgradeBuilding(bid) { const b = this.buildings.find(x => x.id === bid); if(!b || !b.isBuilt) return; if(b.level >= 3) { alert("已达到最高等级！"); return; } const cost = Math.floor(b.totalCost * b.level); if(this.townMoney >= cost) { this.townMoney -= cost; b.level++; this.log(`[🏗️升级] **${b.name}** 升级到了 Lv.${b.level}！员工收入将获得提升！`, "tag-build"); this.showBuildingDetail(bid); this.updateUI(); } else { alert(`资金不足，升级需要 💰${cost}`); } }
         
@@ -1755,7 +1864,7 @@ const TOWN_EVENTS = [
         doBuild(p, b) { 
             p.consecutiveWork = 0; p.stamina = Math.max(0, p.stamina - 15);
             b.currentProgress += rand(5, 15); p.money += 5; p.happiness -= 2; p.hunger -= 5; p.currentAction = `建设: ${b.name}`; if (!p.constructionContribution[b.id]) p.constructionContribution[b.id] = 0; p.constructionContribution[b.id] += 10; const timeStr = this.getDateTimeStr(); p.addLog(`${timeStr} 参与建设 ${b.name}`); b.addLog(`${timeStr} ${p.name} 参与了建设`);
-            if (b.currentProgress >= b.totalCost && !b.isBuilt) { b.isBuilt = true; this.log(`[🔨竣工] **${b.name}** 建成了！`, "tag-build"); this.unlockAchievement('first_build'); if(b.id==='gym') this.unlockAchievement('first_gym'); if(b.id==='museum') this.unlockAchievement('culture_hub'); this.distributeConstructionReward(b); this.triggerConstructionVote(); } 
+            if (b.currentProgress >= b.totalCost && !b.isBuilt) { b.isBuilt = true; this.log(`[🔨竣工] **${b.name}** 建成了！`, "tag-build"); this.unlockAchievement('first_build'); if(b.id==='gym') this.unlockAchievement('first_gym'); if(b.id==='museum') this.unlockAchievement('culture_hub'); this.distributeConstructionReward(b); setTimeout(() => this.triggerConstructionVote(), 5000); } 
             this.improveSkill(p, 'culture', 0.05); // 建设也许能学到点东西
         }
         
@@ -2101,11 +2210,11 @@ const TOWN_EVENTS = [
         }
         
         showEmbezzle() { 
-            const el = document.getElementById('embezzle-town-money'); if(el) el.innerText = this.townMoney; 
+            const el = document.getElementById('embezzle-town-money'); if(el) el.innerText = Math.floor(this.townMoney); 
             const list = document.getElementById('embezzle-list'); 
             if(list) {
                 list.innerHTML = ''; 
-                this.chars.forEach(c => { const div = document.createElement('div'); div.className = 'fund-item'; div.innerHTML = `${c.name} <small>(💰${c.money})</small>`; div.onclick = () => { document.querySelectorAll('.fund-item').forEach(el=>el.classList.remove('selected')); div.classList.add('selected'); window.selectedFundTarget = c.name; }; list.appendChild(div); }); 
+                this.chars.forEach(c => { const div = document.createElement('div'); div.className = 'fund-item'; div.innerHTML = `${c.name} <small>(💰${Math.floor(c.money)})</small>`; div.onclick = () => { document.querySelectorAll('.fund-item').forEach(el=>el.classList.remove('selected')); div.classList.add('selected'); window.selectedFundTarget = c.name; }; list.appendChild(div); }); 
                 document.getElementById('embezzle-modal').classList.add('active'); 
             }
         }
@@ -2268,7 +2377,7 @@ const TOWN_EVENTS = [
             const nameEl = document.getElementById('detail-name'); if(nameEl) nameEl.innerText = `${c.name} 的个人档案`;
             
             let jobText = "无业"; if (c.prostitute) { jobText = "失足"; } else if (c.job) { const skillType = getJobSkillType(c.job.role); const skillVal = c.skills[skillType] || 0; const levelInfo = getLevelInfo(skillVal); jobText = `${levelInfo.title}${c.job.role}`; }
-            let wageHtml = ''; if (c.job) { const baseWage = getBaseJobWage(c.job.role); const actualWage = c.calculateWage(baseWage, c.job.role); const diff = actualWage - baseWage; const pct = baseWage > 0 ? Math.round((diff / baseWage) * 100) : 0; const color = diff >= 0 ? '#27ae60' : '#e74c3c'; const sign = diff >= 0 ? '+' : ''; wageHtml = `<span style="color:#999; text-decoration:line-through; font-size:0.9em;">${baseWage}</span> <span style="color:${color}; font-weight:bold;">💰${actualWage}</span> <small style="color:${color}">(${sign}${pct}%)</small>`; } else { wageHtml = `<span style="color:#aaa">无收入</span>`; }
+            let wageHtml = ''; if (c.job) { const baseWage = getBaseJobWage(c.job.role); const actualWage = c.calculateWage(baseWage, c.job.role); const diff = actualWage - baseWage; const pct = baseWage > 0 ? Math.round((diff / baseWage) * 100) : 0; const color = diff >= 0 ? '#27ae60' : '#e74c3c'; const sign = diff >= 0 ? '+' : ''; wageHtml = `<span style="color:#999; text-decoration:line-through; font-size:0.9em;">${baseWage}</span> <span style="color:${color}; font-weight:bold;">💰${Math.floor(actualWage)}</span> <small style="color:${color}">(${sign}${pct}%)</small>`; } else { wageHtml = `<span style="color:#aaa">无收入</span>`; }
 
             let traitsHtml = c.traits.map(t => `<div class="trait-tag" title="${t.desc}">${t.name}</div>`).join('') || "无";
             const ideology = c.ideology || { name: "无", color: "#999", desc: "", chaosMod:0, loveMod:0, wageMod:0 };
@@ -2315,7 +2424,7 @@ const TOWN_EVENTS = [
                 <div class="detail-group">
                     <div class="detail-label">生理需求 <button class="edit-btn" onclick="gameInstance.openEditModal('修改性别', ['♂ 男', '♀ 女'], '${c.gender}', 'gender', '${c.name}')">[修改性别]</button></div>
                     <div class="detail-val" style="font-size:0.9rem">
-                        <div>💰 资金: ${c.money}</div>
+                        <div>💰 资金: ${Math.floor(c.money)}</div>
                         <div>❤ 心情: ${Math.floor(c.happiness)} | 🍗 饱食: ${Math.floor(c.hunger)}</div>
                         <div>🚑 健康: ${Math.floor(c.health)} | ⚡ 体力: ${Math.floor(c.stamina)}</div>
                         <div style="color:#8e44ad; margin-top:4px;">✨ 颜值: ${c.appearance}</div>
@@ -2375,7 +2484,7 @@ const TOWN_EVENTS = [
                      const sVal = char.skills[skillType]||0;
                      const levelInfo = getLevelInfo(sVal);
                      skillTitle = levelInfo.title;
-                     wageInfo = `💰${wage}`;
+                     wageInfo = `💰${Math.floor(wage)}`;
                      
                      let prevCap = 0;
                      let nextCap = 20;
@@ -2443,7 +2552,7 @@ const TOWN_EVENTS = [
             const gameDayEl = document.getElementById('game-day'); if(gameDayEl) gameDayEl.innerText = DAYS[this.gameDay];
             const calEl = document.getElementById('calendar-display'); if(calEl) calEl.innerText = `📅 ${this.dateMonth}月${this.dateDay}日 (${this.getSeasonName()})`;
             const weatherEl = document.getElementById('weather-display'); if(weatherEl) weatherEl.innerText = WEATHER_TYPES[this.weather].name;
-            const moneyEl = document.getElementById('town-money'); if(moneyEl) moneyEl.innerText = this.townMoney;
+            const moneyEl = document.getElementById('town-money'); if(moneyEl) moneyEl.innerText = Math.floor(this.townMoney);
             const resCountEl = document.getElementById('resident-count'); if(resCountEl) resCountEl.innerText = this.chars.length;
             
             const charList = document.getElementById('char-list');
@@ -2482,7 +2591,7 @@ const TOWN_EVENTS = [
                         </div>
                         <div style="font-size:0.85rem; margin:2px 0; display:flex; justify-content:space-between;">
                             <span style="color:#666;">${jobDisplay}</span>
-                            <span style="color:#f1c40f; font-weight:bold;">💰${c.money}</span>
+                            <span style="color:#f1c40f; font-weight:bold;">💰${Math.floor(c.money)}</span>
                         </div>
                         <div style="font-size:0.8rem; color:#888; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.currentAction}</div>
                         
@@ -2556,7 +2665,7 @@ const TOWN_EVENTS = [
             sorted.forEach((c, i) => {
                 const div = document.createElement('div'); div.className = 'rank-item';
                 let val = 0; let unit = '';
-                if(type==='money') { val = c.money; unit = '💰'; }
+                if(type==='money') { val = Math.floor(c.money); unit = '💰'; }
                 if(type==='happiness') { val = Math.floor(c.happiness); unit = '❤'; }
                 if(type==='popularity') { val = this.chars.reduce((acc, x) => acc + (x.relationships[c.name]?.love || 0), 0); unit = '🔥'; }
                 if(type==='robbery') { val = c.stat_rob || 0; unit = '次'; }
@@ -2658,6 +2767,7 @@ const TOWN_EVENTS = [
             if (canvas) {
                 canvas.removeEventListener('mousemove', handleRelationCanvasMouseMove);
                 canvas.removeEventListener('mouseleave', handleRelationCanvasMouseLeave);
+                canvas.removeEventListener('click', handleRelationCanvasClick);
             }
             // 移除窗口大小改变监听
             if (relationResizeHandler) {
@@ -2672,6 +2782,7 @@ const TOWN_EVENTS = [
             if (canvas) {
                 canvas.addEventListener('mousemove', handleRelationCanvasMouseMove);
                 canvas.addEventListener('mouseleave', handleRelationCanvasMouseLeave);
+                canvas.addEventListener('click', handleRelationCanvasClick);
             }
             // 添加窗口大小改变监听
             if (!relationResizeHandler) {
@@ -2721,6 +2832,249 @@ const TOWN_EVENTS = [
             relationGraphState.hoveredIndex = -1;
             renderRelationGraph();
         }
+    }
+    
+    function handleRelationCanvasClick(e) {
+        const canvas = document.getElementById('rel-canvas');
+        if (!canvas || relationGraphState.positions.length === 0) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 检查点击是否在某个节点上
+        const clickRadius = 30;
+        for (let i = 0; i < relationGraphState.positions.length; i++) {
+            const pos = relationGraphState.positions[i];
+            const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+            if (distance <= clickRadius) {
+                const char = gameInstance.chars[i];
+                if (char) {
+                    showSingleCharRelation(char);
+                }
+                break;
+            }
+        }
+    }
+    
+    let singleCharRelationResizeHandler = null;
+    let currentSingleChar = null;
+    
+    function showSingleCharRelation(char) {
+        const modal = document.getElementById('single-char-relation-modal');
+        const nameEl = document.getElementById('single-char-relation-name');
+        if (nameEl) nameEl.innerText = `${char.name} 的关系网络`;
+        
+        currentSingleChar = char;
+        renderSingleCharRelationGraph(char);
+        renderSingleCharRelationList(char);
+        
+        modal.classList.add('active');
+        
+        // 添加窗口大小改变监听
+        if (!singleCharRelationResizeHandler) {
+            singleCharRelationResizeHandler = () => {
+                if (currentSingleChar && modal.classList.contains('active')) {
+                    renderSingleCharRelationGraph(currentSingleChar);
+                }
+            };
+            window.addEventListener('resize', singleCharRelationResizeHandler);
+        }
+    }
+    
+    function closeSingleCharRelation() {
+        document.getElementById('single-char-relation-modal').classList.remove('active');
+        currentSingleChar = null;
+    }
+    
+    function renderSingleCharRelationGraph(char) {
+        const canvas = document.getElementById('single-char-relation-canvas');
+        if (!canvas) return;
+        
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        const cx = w / 2, cy = h / 2;
+        
+        ctx.clearRect(0, 0, w, h);
+        
+        // 获取与该居民有关系的其他居民
+        const relatedChars = [];
+        for (let name in char.relationships) {
+            const otherChar = gameInstance.chars.find(c => c.name === name);
+            if (otherChar && otherChar.name !== char.name) {
+                const rel = char.relationships[name];
+                if (Math.abs(rel.love) > 10 || rel.status !== 'stranger') {
+                    relatedChars.push({ char: otherChar, rel: rel });
+                }
+            }
+        }
+        
+        // 中心节点（当前居民）
+        const centerRadius = 30;
+        ctx.beginPath();
+        ctx.arc(cx, cy, centerRadius, 0, Math.PI * 2);
+        ctx.fillStyle = '#fffef0';
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = char.gender.includes('女') ? '#ff7675' : '#74b9ff';
+        ctx.stroke();
+        
+        ctx.fillStyle = '#2c3e50';
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(char.name, cx, cy + centerRadius + 20);
+        
+        // 绘制关系线
+        const n = relatedChars.length;
+        if (n > 0) {
+            const angleStep = (Math.PI * 2) / n;
+            // 根据关系数量动态调整半径
+            const baseRadius = Math.min(w, h) * 0.3;
+            const radius = n <= 3 ? baseRadius * 0.7 : (n <= 6 ? baseRadius : baseRadius * 1.1);
+            
+            relatedChars.forEach((item, i) => {
+                const angle = i * angleStep;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                
+                // 绘制关系线
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(x, y);
+                
+                let color = '#ccc';
+                let width = 1;
+                let label = "";
+                
+                const rel = item.rel;
+                if (rel.status === 'spouse') { color = '#e84393'; width = 4; label = "❤"; }
+                else if (rel.status === 'lover') { color = '#ff7675'; width = 4; label = "❤"; }
+                else if (rel.status === 'enemy') { color = '#c0392b'; width = 3; label = "⚔️"; }
+                else if (rel.status === 'bestfriend') { color = '#3498db'; width = 3; }
+                else if (rel.love > 50) { color = 'rgba(46, 204, 113, 0.8)'; width = 2; }
+                else if (rel.love < -30) { color = 'rgba(231, 76, 60, 0.8)'; width = 2; }
+                else {
+                    const opacity = Math.min(0.6, Math.abs(rel.love) / 100);
+                    color = rel.love > 0 ? `rgba(52, 152, 219, ${opacity})` : `rgba(231, 76, 60, ${opacity})`;
+                }
+                
+                ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.stroke();
+                
+                // 绘制关系标签
+                if (label) {
+                    const mx = (cx + x) / 2;
+                    const my = (cy + y) / 2;
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(mx, my, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = color;
+                    ctx.font = "14px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(label, mx, my);
+                }
+                
+                // 绘制其他居民节点
+                const nodeRadius = n <= 6 ? 18 : 15;
+                ctx.beginPath();
+                ctx.arc(x, y, nodeRadius, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = item.char.gender.includes('女') ? '#ff7675' : '#74b9ff';
+                ctx.stroke();
+                
+                // 绘制名字（根据节点数量调整字体大小）
+                const fontSize = n <= 6 ? 11 : 9;
+                ctx.fillStyle = '#333';
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.textAlign = "center";
+                ctx.fillText(item.char.name, x, y + nodeRadius + (n <= 6 ? 15 : 12));
+                
+                // 绘制好感度
+                const loveColor = rel.love >= 0 ? '#2d98da' : '#e74c3c';
+                ctx.fillStyle = loveColor;
+                ctx.font = `${n <= 6 ? 10 : 8}px Arial`;
+                ctx.fillText(`${Math.floor(rel.love)}`, x, y + nodeRadius + (n <= 6 ? 28 : 22));
+            });
+        } else {
+            // 没有关系时显示提示
+            ctx.fillStyle = '#999';
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("暂无重要关系", cx, cy + 50);
+        }
+    }
+    
+    function renderSingleCharRelationList(char) {
+        const listEl = document.getElementById('single-char-relation-list');
+        if (!listEl) return;
+        
+        listEl.innerHTML = '';
+        
+        // 按关系类型分组
+        const relationsByStatus = {
+            'spouse': [],
+            'lover': [],
+            'mistress': [],
+            'bestfriend': [],
+            'friend': [],
+            'ex': [],
+            'enemy': [],
+            'stranger': []
+        };
+        
+        for (let name in char.relationships) {
+            const otherChar = gameInstance.chars.find(c => c.name === name);
+            if (otherChar && otherChar.name !== char.name) {
+                const rel = char.relationships[name];
+                const status = rel.status || 'stranger';
+                if (relationsByStatus[status]) {
+                    relationsByStatus[status].push({ char: otherChar, rel: rel });
+                }
+            }
+        }
+        
+        // 按好感度排序并显示
+        Object.keys(relationsByStatus).forEach(status => {
+            const relations = relationsByStatus[status];
+            if (relations.length === 0) return;
+            
+            relations.sort((a, b) => b.rel.love - a.rel.love);
+            
+            const statusTitle = document.createElement('div');
+            statusTitle.style.cssText = 'font-weight:bold; margin-top:15px; margin-bottom:8px; padding-bottom:5px; border-bottom:2px solid #eee; color:#2c3e50;';
+            statusTitle.innerText = REL_TRANSLATE[status] || status;
+            listEl.appendChild(statusTitle);
+            
+            relations.forEach(item => {
+                const div = document.createElement('div');
+                div.style.cssText = 'padding:8px; margin-bottom:5px; background:#f8f9fa; border-radius:4px; border-left:3px solid #ddd;';
+                
+                const rel = item.rel;
+                let borderColor = '#ddd';
+                if (status === 'spouse') borderColor = '#e84393';
+                else if (status === 'lover') borderColor = '#ff7675';
+                else if (status === 'enemy') borderColor = '#c0392b';
+                else if (status === 'bestfriend') borderColor = '#3498db';
+                div.style.borderLeftColor = borderColor;
+                
+                const loveColor = rel.love >= 0 ? '#2d98da' : '#e74c3c';
+                div.innerHTML = `
+                    <div style="font-weight:bold; margin-bottom:3px;">${item.char.name}</div>
+                    <div style="font-size:0.85rem; color:#666;">
+                        好感度: <span style="color:${loveColor}; font-weight:bold;">${Math.floor(rel.love)}</span>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        });
     }
     
     // 关系谱全局状态
@@ -2900,6 +3254,71 @@ const TOWN_EVENTS = [
         document.getElementById('stat-lonely').innerText = `${minName} (${Math.floor(minPop)})`;
     }
 
+    function showAchievementPopup(ach) {
+        // 验证成就数据
+        if (!ach || !ach.name || ach.reward === undefined) {
+            console.error('Invalid achievement data:', ach);
+            return;
+        }
+        
+        const modal = document.getElementById('achievement-popup-modal');
+        const iconEl = document.getElementById('achievement-popup-icon');
+        const nameEl = document.getElementById('achievement-popup-name');
+        const descEl = document.getElementById('achievement-popup-desc');
+        const rewardEl = document.getElementById('achievement-popup-reward');
+        const contentEl = document.getElementById('achievement-popup-content');
+        
+        if (!modal) {
+            console.error('Achievement popup modal not found');
+            return;
+        }
+        
+        if (iconEl) {
+            iconEl.innerText = ach.icon || '🏆';
+            iconEl.style.animation = 'none';
+            setTimeout(() => {
+                iconEl.style.animation = 'achievementIconBounce 0.6s ease-out 0.3s both';
+            }, 10);
+        }
+        if (nameEl) nameEl.innerText = ach.name || '未知成就';
+        if (descEl) descEl.innerText = ach.desc || '';
+        if (rewardEl) rewardEl.innerText = `💰 +${ach.reward || 0}`;
+        
+        // 重置动画
+        if (contentEl) {
+            contentEl.style.animation = 'none';
+            setTimeout(() => {
+                contentEl.style.animation = 'achievementPopIn 0.5s ease-out';
+            }, 10);
+        }
+        
+        if (modal) {
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            
+            // 清除之前的自动关闭定时器
+            if (window.achievementPopupTimer) {
+                clearTimeout(window.achievementPopupTimer);
+            }
+            
+            // 4秒后自动关闭，或点击按钮/背景关闭
+            window.achievementPopupTimer = setTimeout(() => {
+                if (modal.classList.contains('active')) {
+                    closeAchievementPopup();
+                }
+            }, 4000);
+        }
+    }
+    
+    function closeAchievementPopup() {
+        const modal = document.getElementById('achievement-popup-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            // 确保弹窗被隐藏
+            modal.style.display = 'none';
+        }
+    }
+    
     function inputNewResident() {
         const name = prompt("请输入新居民的名字:");
         if (name && name.trim() !== "") {
