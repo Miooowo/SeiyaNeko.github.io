@@ -372,6 +372,24 @@
         #achievement-popup-content { background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); border: 4px solid #f1c40f; box-shadow: 0 15px 50px rgba(0,0,0,0.4), 0 0 40px rgba(241,196,15,0.4), inset 0 0 20px rgba(255,255,255,0.5); position: relative; overflow: hidden; padding: 30px; }
         #achievement-popup-content::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: achievementShine 3s infinite; pointer-events: none; }
         #achievement-popup-modal { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(3px); }
+        /* 地图样式 */
+        .map-container { position: relative; width: 100%; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%); border-radius: 8px; border: 2px solid #27ae60; }
+        #view-map .map-canvas { width: 2000px; height: 2000px; position: relative; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%); }
+        .map-building { position: absolute; cursor: pointer; transition: all 0.3s ease; z-index: 10; }
+        .map-building.built { z-index: 20; }
+        .map-building-icon { font-size: 2rem; text-align: center; padding: 8px; background: rgba(255, 255, 255, 0.9); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 2px solid #27ae60; min-width: 50px; }
+        .map-building-icon.not-built { opacity: 0.5; border-color: #95a5a6; background: rgba(200, 200, 200, 0.7); filter: grayscale(1); }
+        .map-building-icon.building { border-color: #e67e22; background: rgba(255, 243, 224, 0.9); }
+        .map-building-name { font-size: 0.75rem; margin-top: 4px; text-align: center; color: #2c3e50; font-weight: bold; background: rgba(255, 255, 255, 0.9); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .map-char { position: absolute; cursor: pointer; z-index: 30; transition: all 0.3s ease; }
+        .map-char-icon { font-size: 1.5rem; text-align: center; padding: 6px; background: rgba(255, 255, 255, 0.95); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid #3498db; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        .map-char-name { font-size: 0.7rem; margin-top: 4px; text-align: center; color: #2c3e50; font-weight: bold; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 4px; white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+        .map-char:hover .map-char-tooltip, .map-building:hover .map-building-tooltip { display: block; }
+        .map-char-tooltip, .map-building-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; white-space: nowrap; z-index: 1000; margin-bottom: 5px; pointer-events: none; }
+        .map-char-tooltip::after, .map-building-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: rgba(0, 0, 0, 0.9); }
+        .map-legend { display: flex; gap: 15px; padding: 15px; background: #f8f9fa; border-top: 1px solid #eee; flex-wrap: wrap; }
+        .map-legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .map-legend-icon { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     </style>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -393,6 +411,7 @@
         <button class="btn gold" onclick="gameInstance.showLeaderboard()">📊 排行榜</button>
         <button class="btn cyan" onclick="gameInstance.showJobBoard()">📋 工作榜</button>
         <button class="btn guide" onclick="gameInstance.showGameGuide()">📘 游戏图鉴</button>
+        <button class="btn" style="background: #16a085; color: white; font-weight: bold;" onclick="gameInstance.showMap()">🗺️ 小镇地图</button>
         <button class="btn" onclick="toggleRelationView()">❤ 关系谱</button>
         <span style="font-size:0.8rem;">自动存档: <input type="number" id="autosave-rate" value="30" min="5">秒</span>
         <button class="btn save" onclick="gameInstance.manualSave()">💾 存档</button>
@@ -400,12 +419,25 @@
 </header>
 <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('residents')" id="tab-residents">👥 居民状态</button>
+    <button class="tab-btn" onclick="switchTab('map')" id="tab-map">🗺️ 小镇地图</button>
     <button class="tab-btn" onclick="switchTab('buildings')" id="tab-buildings">🏗️ 小镇建设</button>
 </div>
 <div class="game-container" id="main-view">
     <div class="col-view active-view" id="view-residents">
         <div class="section-title">居民生活圈 <small style="font-weight:normal; font-size:0.8em; color:#999;">(点击卡片查看详情)</small></div>
         <div class="char-grid" id="char-list"></div>
+    </div>
+    <div class="col-view" id="view-map">
+        <div class="section-title">🗺️ 小镇地图 <small style="font-weight:normal; font-size:0.8em; color:#999;">(点击建筑/居民查看详情，可拖动查看)</small></div>
+        <div class="map-container" style="height: calc(100vh - 200px); min-height: 500px; overflow: auto;">
+            <div class="map-canvas" id="map-canvas" style="width: 2000px; height: 2000px; position: relative;"></div>
+        </div>
+        <div class="map-legend">
+            <div class="map-legend-item"><div class="map-legend-icon" style="background:#27ae60; border:2px solid #27ae60;">🏢</div><span>已建成</span></div>
+            <div class="map-legend-item"><div class="map-legend-icon" style="background:#e67e22; border:2px solid #e67e22;">🏗️</div><span>建设中</span></div>
+            <div class="map-legend-item"><div class="map-legend-icon" style="background:#95a5a6; border:2px solid #95a5a6; opacity:0.5;">🏚️</div><span>未建造</span></div>
+            <div class="map-legend-item"><div class="map-legend-icon" style="background:#3498db; border:2px solid #3498db; border-radius:50%;">👤</div><span>居民位置</span></div>
+        </div>
     </div>
     <div class="col-view" id="view-buildings">
         <div class="section-title">公共设施建设 <small style="font-weight:normal; font-size:0.8em; color:#999;">(所有建设均由镇长发起投票决定)</small></div>
@@ -806,33 +838,33 @@
          return { level: 3, multiplier: 1.6, title: "大师", next: 100 };
     }
     const BUILDINGS_BLUEPRINT = [
-        { id: "huoshao", name: "🥙 火烧铺", category: "food", cost: 150, desc: "3.5元吃饱，体力恢复圣地", effect: "food", price: 3.5, food: 35, open: 6, close: 20, jobs: ["火烧师傅"], sells: ["huoshao_meat", "huoshao_veg", "tofu_pudding"], isBuilt: true },
-        { id: "baozi", name: "🥯 包子铺", category: "food", cost: 100, desc: "物美价廉的早餐店", effect: "shop", price: 0, open: 5, close: 14, jobs: ["早点工"], sells: ["baozi_tofu", "baozi_pork", "baozi_beef"], isBuilt: true }, 
-        { id: "bookstore", name: "📚 知识书店", category: "shop", cost: 400, desc: "精神食粮与堕落之源", effect: "shop", price: 0, open: 9, close: 21, jobs: ["图书管理员"], sells: ["book_novel", "book_manga", "book_h", "book_53"], studyBonus: 0.6 },
-        { id: "ramen", name: "🍜 兰州拉面", category: "food", cost: 250, desc: "正宗牛肉面，管饱", effect: "food", price: 12, food: 35, open: 7, close: 22, jobs: ["拉面师傅"] },
-        { id: "711", name: "🏪 7-11便利店", category: "food", cost: 300, desc: "24小时营业", effect: "shop", price: 0, open: 0, close: 24, jobs: ["收银员"], sells: ["water_wahaha", "water_ganten", "noodle_beef", "chips_lays", "chocolate", "cola_pepsi", "coffee_instant", "sushi_box", "beer_tsingtao", "beer_laoshan"] },
-        { id: "kfc", name: "🍗 肯德基", category: "food", cost: 600, desc: "疯狂星期四", effect: "food", price: 30, food: 50, open: 10, close: 22, jobs: ["前台", "炸鸡厨师"] },
-        { id: "gym", name: "💪 健身房", category: "fun", cost: 800, desc: "挥洒汗水，提升颜值与健康", effect: "beauty", price: 50, open: 6, close: 22, jobs: ["健身教练", "保洁"] },
-        { id: "amusement", name: "🎡 游乐场", category: "fun", cost: 2000, desc: "充满尖叫与欢笑的地方", effect: "fun_high", price: 100, open: 9, close: 20, jobs: ["检票员", "玩偶扮演"] },
-        { id: "museum", name: "🏛 博物馆", category: "fun", cost: 1200, desc: "历史的沉淀，增长见识", effect: "study", price: 40, open: 9, close: 17, jobs: ["讲解员", "保安"], closedDays: [1] },
-        { id: "police", name: "👮 派出所", category: "service", cost: 800, desc: "维护小镇治安", effect: "security", price: 0, open: 0, close: 24, jobs: ["警察", "警察"] }, 
-        { id: "hospital", name: "🏥 综合医院", category: "service", cost: 1500, desc: "设备先进的医疗中心", effect: "health", price: 80, open: 0, close: 24, jobs: ["主治医师", "护士", "保洁"] },
-        { id: "clinic", name: "💊 社区诊所", category: "service", cost: 400, desc: "方便快捷的小诊所", effect: "shop", price: 0, open: 8, close: 20, jobs: ["社区医生", "护士"], sells: ["bandage", "painkiller", "digestion_tablets", "cold_medicine", "anti_inflammatory", "fever_medicine"] },
-        { id: "school", name: "🏫 小镇学校", category: "service", cost: 1000, desc: "知识就是力量", effect: "study", price: 0, open: 7, close: 17, jobs: ["语文老师", "数学老师", "体育老师", "保安"], closedDays: [0, 6] },
-        { id: "library", name: "📚 图书馆", category: "fun", cost: 500, desc: "静谧的阅读时光", effect: "study", price: 0, open: 9, close: 21, jobs: ["图书管理员", "保洁"] },
-        { id: "church", name: "⛪ 婚礼教堂", category: "service", cost: 1200, desc: "神圣之地", effect: "marriage", price: 20, open: 8, close: 20, jobs: ["神父"] },
-        { id: "park", name: "🌳 中心公园", category: "fun", cost: 200, desc: "免费休闲", effect: "romance", price: 0, open: 0, close: 24, jobs: [] },
-        { id: "netcafe", name: "🎮 麦克电竞", category: "fun", cost: 450, desc: "通宵开黑", effect: "fun", price: 15, open: 0, close: 24, jobs: ["网管", "网吧保洁"] },
-        { id: "cinema", name: "🎬 电影院", category: "fun", cost: 400, desc: "恢复心情快", effect: "fun", price: 40, open: 10, close: 24, jobs: ["售票员"] },
-        { id: "bar", name: "🍺 深夜酒吧", category: "fun", cost: 500, desc: "买醉消愁", effect: "shop", price: 50, open: 18, close: 2, jobs: ["老板", "大厨", "跑堂"], closedDays: [0], sells: ["beer_tsingtao", "cocktail", "bloody_mary", "rum", "tequila", "whisky"] },
-        { id: "footshop", name: "💆 神秘洗脚店", category: "fun", cost: 600, desc: "涩情交易场所", effect: "ntr", price: 0, open: 0, close: 24, jobs: ["老板"] },
-        { id: "hotel", name: "🏩 快捷酒店", category: "fun", cost: 800, desc: "懂得都懂", effect: "ntr", price: 100, open: 0, close: 24, jobs: ["前台", "保洁"] },
-        { id: "flowershop", name: "🌹 浪漫花店", category: "shop", cost: 300, desc: "购买鲜花送给心上人", effect: "shop", price: 50, open: 9, close: 20, jobs: ["花艺师"], sells: ["rose"] },
-        { id: "statue", name: "🐱 黄金猫像", category: "landmark", cost: 5000, desc: "纯金打造的猫神像，吸引游客打卡 (税收+50/h)", effect: "tourist", price: 50, open: 0, close: 24, jobs: ["保安"] },
-        { id: "skytower", name: "🗼 通天塔", category: "landmark", cost: 8000, desc: "俯瞰全镇的观光塔 (税收+100/h, 幸福UP)", effect: "tourist_high", price: 100, open: 8, close: 22, jobs: ["检票员", "电梯员", "保洁"] },
-        { id: "hotspring", name: "♨️ 猫山温泉", category: "landmark", cost: 6000, desc: "著名的疗养胜地 (税收+80/h, 健康UP)", effect: "tourist_health", price: 80, open: 10, close: 23, jobs: ["前台", "技师"] },
-        { id: "bank", name: "🏦 银行", category: "government", cost: 3000, desc: "金融中心，提供存款和贷款服务 (税收+60/h)", effect: "finance", price: 60, open: 9, close: 17, jobs: ["银行经理", "柜员", "保安"], closedDays: [0, 6] },
-        { id: "govbuilding", name: "🏛️ 政府大楼", category: "government", cost: 5000, desc: "小镇行政中心，提升政府效率 (税收+100/h, 政策效果+20%)", effect: "government", price: 100, open: 8, close: 18, jobs: ["镇长助理", "行政人员", "保安"], closedDays: [0, 6] }
+        { id: "huoshao", name: "🥙 火烧铺", category: "food", cost: 150, desc: "3.5元吃饱，体力恢复圣地", effect: "food", price: 3.5, food: 35, open: 6, close: 20, jobs: ["火烧师傅"], sells: ["huoshao_meat", "huoshao_veg", "tofu_pudding"], isBuilt: true, mapX: 25, mapY: 45 },
+        { id: "baozi", name: "🥯 包子铺", category: "food", cost: 100, desc: "物美价廉的早餐店", effect: "shop", price: 0, open: 5, close: 14, jobs: ["早点工"], sells: ["baozi_tofu", "baozi_pork", "baozi_beef"], isBuilt: true, mapX: 20, mapY: 50 }, 
+        { id: "bookstore", name: "📚 知识书店", category: "shop", cost: 400, desc: "精神食粮与堕落之源", effect: "shop", price: 0, open: 9, close: 21, jobs: ["图书管理员"], sells: ["book_novel", "book_manga", "book_h", "book_53"], studyBonus: 0.6, mapX: 60, mapY: 30 },
+        { id: "ramen", name: "🍜 兰州拉面", category: "food", cost: 250, desc: "正宗牛肉面，管饱", effect: "food", price: 12, food: 35, open: 7, close: 22, jobs: ["拉面师傅"], mapX: 30, mapY: 40 },
+        { id: "711", name: "🏪 7-11便利店", category: "food", cost: 300, desc: "24小时营业", effect: "shop", price: 0, open: 0, close: 24, jobs: ["收银员"], sells: ["water_wahaha", "water_ganten", "noodle_beef", "chips_lays", "chocolate", "cola_pepsi", "coffee_instant", "sushi_box", "beer_tsingtao", "beer_laoshan"], mapX: 50, mapY: 50 },
+        { id: "kfc", name: "🍗 肯德基", category: "food", cost: 600, desc: "疯狂星期四", effect: "food", price: 30, food: 50, open: 10, close: 22, jobs: ["前台", "炸鸡厨师"], mapX: 45, mapY: 35 },
+        { id: "gym", name: "💪 健身房", category: "fun", cost: 800, desc: "挥洒汗水，提升颜值与健康", effect: "beauty", price: 50, open: 6, close: 22, jobs: ["健身教练", "保洁"], mapX: 70, mapY: 40 },
+        { id: "amusement", name: "🎡 游乐场", category: "fun", cost: 2000, desc: "充满尖叫与欢笑的地方", effect: "fun_high", price: 100, open: 9, close: 20, jobs: ["检票员", "玩偶扮演"], mapX: 80, mapY: 20 },
+        { id: "museum", name: "🏛 博物馆", category: "fun", cost: 1200, desc: "历史的沉淀，增长见识", effect: "study", price: 40, open: 9, close: 17, jobs: ["讲解员", "保安"], closedDays: [1], mapX: 65, mapY: 25 },
+        { id: "police", name: "👮 派出所", category: "service", cost: 800, desc: "维护小镇治安", effect: "security", price: 0, open: 0, close: 24, jobs: ["警察", "警察"], mapX: 40, mapY: 60 }, 
+        { id: "hospital", name: "🏥 综合医院", category: "service", cost: 1500, desc: "设备先进的医疗中心", effect: "health", price: 80, open: 0, close: 24, jobs: ["主治医师", "护士", "保洁"], mapX: 55, mapY: 55 },
+        { id: "clinic", name: "💊 社区诊所", category: "service", cost: 400, desc: "方便快捷的小诊所", effect: "shop", price: 0, open: 8, close: 20, jobs: ["社区医生", "护士"], sells: ["bandage", "painkiller", "digestion_tablets", "cold_medicine", "anti_inflammatory", "fever_medicine"], mapX: 35, mapY: 55 },
+        { id: "school", name: "🏫 小镇学校", category: "service", cost: 1000, desc: "知识就是力量", effect: "study", price: 0, open: 7, close: 17, jobs: ["语文老师", "数学老师", "体育老师", "保安"], closedDays: [0, 6], mapX: 50, mapY: 25 },
+        { id: "library", name: "📚 图书馆", category: "fun", cost: 500, desc: "静谧的阅读时光", effect: "study", price: 0, open: 9, close: 21, jobs: ["图书管理员", "保洁"], mapX: 60, mapY: 35 },
+        { id: "church", name: "⛪ 婚礼教堂", category: "service", cost: 1200, desc: "神圣之地", effect: "marriage", price: 20, open: 8, close: 20, jobs: ["神父"], mapX: 30, mapY: 30 },
+        { id: "park", name: "🌳 中心公园", category: "fun", cost: 200, desc: "免费休闲", effect: "romance", price: 0, open: 0, close: 24, jobs: [], mapX: 50, mapY: 40 },
+        { id: "netcafe", name: "🎮 麦克电竞", category: "fun", cost: 450, desc: "通宵开黑", effect: "fun", price: 15, open: 0, close: 24, jobs: ["网管", "网吧保洁"], mapX: 40, mapY: 30 },
+        { id: "cinema", name: "🎬 电影院", category: "fun", cost: 400, desc: "恢复心情快", effect: "fun", price: 40, open: 10, close: 24, jobs: ["售票员"], mapX: 55, mapY: 30 },
+        { id: "bar", name: "🍺 深夜酒吧", category: "fun", cost: 500, desc: "买醉消愁", effect: "shop", price: 50, open: 18, close: 2, jobs: ["老板", "大厨", "跑堂"], closedDays: [0], sells: ["beer_tsingtao", "cocktail", "bloody_mary", "rum", "tequila", "whisky"], mapX: 35, mapY: 35 },
+        { id: "footshop", name: "💆 神秘洗脚店", category: "fun", cost: 600, desc: "涩情交易场所", effect: "ntr", price: 0, open: 0, close: 24, jobs: ["老板"], mapX: 25, mapY: 35 },
+        { id: "hotel", name: "🏩 快捷酒店", category: "fun", cost: 800, desc: "懂得都懂", effect: "ntr", price: 100, open: 0, close: 24, jobs: ["前台", "保洁"], mapX: 30, mapY: 40 },
+        { id: "flowershop", name: "🌹 浪漫花店", category: "shop", cost: 300, desc: "购买鲜花送给心上人", effect: "shop", price: 50, open: 9, close: 20, jobs: ["花艺师"], sells: ["rose"], mapX: 45, mapY: 45 },
+        { id: "statue", name: "🐱 黄金猫像", category: "landmark", cost: 5000, desc: "纯金打造的猫神像，吸引游客打卡 (税收+50/h)", effect: "tourist", price: 50, open: 0, close: 24, jobs: ["保安"], mapX: 50, mapY: 50 },
+        { id: "skytower", name: "🗼 通天塔", category: "landmark", cost: 8000, desc: "俯瞰全镇的观光塔 (税收+100/h, 幸福UP)", effect: "tourist_high", price: 100, open: 8, close: 22, jobs: ["检票员", "电梯员", "保洁"], mapX: 75, mapY: 50 },
+        { id: "hotspring", name: "♨️ 猫山温泉", category: "landmark", cost: 6000, desc: "著名的疗养胜地 (税收+80/h, 健康UP)", effect: "tourist_health", price: 80, open: 10, close: 23, jobs: ["前台", "技师"], mapX: 85, mapY: 40 },
+        { id: "bank", name: "🏦 银行", category: "government", cost: 3000, desc: "金融中心，提供存款和贷款服务 (税收+60/h)", effect: "finance", price: 60, open: 9, close: 17, jobs: ["银行经理", "柜员", "保安"], closedDays: [0, 6], mapX: 45, mapY: 50 },
+        { id: "govbuilding", name: "🏛️ 政府大楼", category: "government", cost: 5000, desc: "小镇行政中心，提升政府效率 (税收+100/h, 政策效果+20%)", effect: "government", price: 100, open: 8, close: 18, jobs: ["镇长助理", "行政人员", "保安"], closedDays: [0, 6], mapX: 50, mapY: 60 }
     ];
     const CATEGORY_NAMES = { 'food': '🍔 饮食餐饮', 'service': '🏥 公共服务', 'fun': '🎡 休闲娱乐', 'shop': '🛍️ 商业购物', 'landmark': '🚩 地标建筑', 'government': '🏛️ 政府建筑' };
     const DAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -1056,6 +1088,7 @@ const TOWN_EVENTS = [
             this.level = 1; 
             this.isUnderConstruction = false; 
             this.hasPermit = false;
+            this.mapX = blueprint.mapX || 50; this.mapY = blueprint.mapY || 50;
             if (this.isBuilt) {
                 this.currentProgress = this.totalCost;
                 this.hasPermit = true;
@@ -2391,7 +2424,9 @@ const TOWN_EVENTS = [
                     if(bData.history) b.history = bData.history; 
                     b.level = bData.level || 1; b.isUnderConstruction = bData.isUnderConstruction || false;
                     if (bData.hasPermit !== undefined) b.hasPermit = bData.hasPermit;
-                    else if (b.currentProgress > 0 || b.isBuilt) b.hasPermit = true; 
+                    else if (b.currentProgress > 0 || b.isBuilt) b.hasPermit = true;
+                    if (bData.mapX !== undefined) b.mapX = bData.mapX;
+                    if (bData.mapY !== undefined) b.mapY = bData.mapY; 
                     return b; 
                 }); 
                 this.chars = data.chars.map(cData => { 
@@ -3222,6 +3257,85 @@ const TOWN_EVENTS = [
         }
         closeCalendar() { document.getElementById('calendar-modal').classList.remove('active'); }
         closeJobBoard() { document.getElementById('jobboard-modal').classList.remove('active'); }
+        showMap() {
+            switchTab('map');
+            setTimeout(() => this.renderMap(), 100);
+        }
+        renderMap() {
+            const canvas = document.getElementById('map-canvas');
+            if(!canvas) return;
+            canvas.innerHTML = '';
+            const mapWidth = 2000;
+            const mapHeight = 2000;
+            this.buildings.forEach(b => {
+                const x = (b.mapX || 50) * mapWidth / 100;
+                const y = (b.mapY || 50) * mapHeight / 100;
+                const buildingDiv = document.createElement('div');
+                buildingDiv.className = `map-building ${b.isBuilt ? 'built' : ''}`;
+                buildingDiv.style.left = (x - 25) + 'px';
+                buildingDiv.style.top = (y - 25) + 'px';
+                const iconClass = b.isBuilt ? '' : (b.isUnderConstruction ? 'building' : 'not-built');
+                buildingDiv.innerHTML = `
+                    <div class="map-building-icon ${iconClass}" onclick="gameInstance.showBuildingDetail('${b.id}')">
+                        ${b.name.split(' ')[0]}
+                    </div>
+                    <div class="map-building-name">${b.name.replace(/^[^\s]+\s/, '')}</div>
+                    <div class="map-building-tooltip">${b.name}<br>${b.desc}${b.isBuilt ? '<br>✅ 已建成' : (b.isUnderConstruction ? '<br>🏗️ 建设中' : '<br>❌ 未建造')}</div>
+                `;
+                canvas.appendChild(buildingDiv);
+            });
+            this.chars.forEach(c => {
+                let charX = 50, charY = 50;
+                let location = '家';
+                let found = false;
+                if(c.currentAction) {
+                    if(c.currentAction.includes('[打工]') || c.currentAction.includes('[待岗]') || c.currentAction.includes('[下班]')) {
+                        const match = c.currentAction.match(/在\s*([^进行已关门待命]+)/);
+                        if(match) location = match[1].trim();
+                        if(c.job) {
+                            const b = this.buildings.find(x => x.id === c.job.buildingId);
+                            if(b) { charX = b.mapX || 50; charY = b.mapY || 50; location = b.name; found = true; }
+                        }
+                    } else if(c.currentAction.includes('[吃饭]') || c.currentAction.includes('[购物]') || c.currentAction.includes('[休息]') || c.currentAction.includes('[打工]')) {
+                        const match = c.currentAction.match(/在\s*([^，,进行]+)/);
+                        if(match) {
+                            location = match[1].trim();
+                            const b = this.buildings.find(x => x.name === location || x.name.includes(location));
+                            if(b) { charX = b.mapX || 50; charY = b.mapY || 50; found = true; }
+                        }
+                    } else if(c.currentAction.includes('坐牢') || c.currentAction.includes('[🛑坐牢]') || c.currentAction.includes('[被捕]')) {
+                        const police = this.buildings.find(x => x.id === 'police');
+                        if(police) { charX = police.mapX || 50; charY = police.mapY || 50; location = '派出所'; found = true; }
+                    } else if(c.currentAction.includes('睡觉') || c.currentAction.includes('😴')) {
+                        location = '家';
+                        charX = 10 + (c.name.charCodeAt(0) % 20);
+                        charY = 10 + (c.name.charCodeAt(1) % 20);
+                        found = true;
+                    } else if(c.job && !found) {
+                        const b = this.buildings.find(x => x.id === c.job.buildingId);
+                        if(b) { charX = b.mapX || 50; charY = b.mapY || 50; location = b.name; found = true; }
+                    }
+                } else if(c.job && !found) {
+                    const b = this.buildings.find(x => x.id === c.job.buildingId);
+                    if(b) { charX = b.mapX || 50; charY = b.mapY || 50; location = b.name; found = true; }
+                }
+                if(!found) {
+                    charX = 10 + (c.name.charCodeAt(0) % 20);
+                    charY = 10 + (c.name.charCodeAt(1) % 20);
+                }
+                const charDiv = document.createElement('div');
+                charDiv.className = 'map-char';
+                charDiv.style.left = (charX * mapWidth / 100 - 20) + 'px';
+                charDiv.style.top = (charY * mapHeight / 100 - 20) + 'px';
+                charDiv.innerHTML = `
+                    <div class="map-char-icon" onclick="gameInstance.showCharacterDetail('${c.name}')">${c.gender && c.gender.includes('男') ? '👨' : '👩'}</div>
+                    <div class="map-char-name">${c.name}</div>
+                    <div class="map-char-tooltip">${c.name}<br>${c.currentAction || '发呆'}<br>📍 ${location}</div>
+                `;
+                canvas.appendChild(charDiv);
+            });
+        }
+        closeMap() { switchTab('residents'); }
         closeGameGuide() { document.getElementById('guide-modal').classList.remove('active'); }
         manualSave() { this.saveData(false); }
         resetData() { if(confirm("确定要重置所有数据吗？这将无法撤销！")) { localStorage.removeItem('happyTownV2_Save'); location.reload(); } }
@@ -3259,6 +3373,9 @@ const TOWN_EVENTS = [
         document.getElementById(`tab-${tab}`).classList.add('active');
         document.querySelectorAll('.col-view').forEach(v => v.classList.remove('active-view'));
         document.getElementById(`view-${tab}`).classList.add('active-view');
+        if(tab === 'map' && gameInstance) {
+            setTimeout(() => gameInstance.renderMap(), 100);
+        }
     }
     // 窗口大小改变时的处理函数
     let relationResizeHandler = null;
