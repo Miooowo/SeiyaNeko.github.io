@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猫の模拟小镇 Ver 5.0.0 - 深度人格与生理版</title>
+    <title>猫の模拟小镇 Ver 2.1.0 - 深度人格与生理版</title>
     <style>
         :root { --bg: #f0f2f5; --card: #fff; --primary: #4a90e2; --love: #ff6b6b; --text: #333; --dark: #2d3436; --crime: #8e44ad; --item: #e17055; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -319,7 +319,7 @@
 
 <header>
     <div class="header-group">
-        <h1>🏡 猫の模拟小镇 <small>Ver 5.0.0 生理需求版</small></h1>
+        <h1>🏡 猫の模拟小镇 <small>Ver 2.1.0 生理需求版</small></h1>
         <div style="font-size: 0.9rem;">
             <span id="calendar-display" onclick="gameInstance.showCalendar()" title="点击查看全年日历">📅 1月1日 (冬)</span> <span id="weather-display" style="margin-left:5px; color:#0984e3;"></span> |
             <span id="game-day">周一</span> |
@@ -359,7 +359,7 @@
         <div class="log-container">
             <div class="log-header">📡 系统公告</div>
             <div id="game-log">
-                <div class="log-entry">✨ 游戏开始。Ver 5.0.0 生理需求版！四维更新：社交/文化/诚信/恶意。</div>
+                <div class="log-entry">✨ 游戏开始。Ver 2.1.0 生理需求版！四维更新：社交/文化/诚信/恶意。</div>
             </div>
         </div>
         <div class="log-container" id="interaction-log-container">
@@ -537,7 +537,16 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="jobboard-modal"><div class="modal-content"><div class="modal-header"><h3>📋 人才市场 & 工作榜</h3><button class="modal-close" onclick="gameInstance.closeJobBoard()">×</button></div><div id="jobboard-list"></div></div></div>
+<div class="modal-overlay" id="jobboard-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📋 人才市场 & 工作榜</h3>
+            <button class="modal-close" onclick="gameInstance.closeJobBoard()">×</button>
+        </div>
+        <div class="tab-filter" id="jobboard-tabs"></div>
+        <div id="jobboard-list"></div>
+    </div>
+</div>
 <div class="modal-overlay" id="embezzle-modal"><div class="modal-content"><div class="modal-header"><h3>💸 镇库拨款</h3><button class="modal-close" onclick="gameInstance.closeEmbezzle()">×</button></div><div style="margin-bottom:15px;"><p>当前镇库资金: <span id="embezzle-town-money" style="font-weight:bold; color:#f1c40f;">0</span></p><p>选择拨款对象:</p><div id="embezzle-list" class="fund-list" style="max-height:200px; overflow-y:auto; margin-bottom:10px; border:1px solid #eee; padding:5px;"></div><div style="display:flex; gap:10px; align-items:center;"><span>金额:</span><input type="number" id="embezzle-amount" value="100" style="width:100px;"><button class="btn save" onclick="gameInstance.doEmbezzle()">确认拨款</button></div></div></div></div>
 <div class="modal-overlay" id="action-select-modal"><div class="modal-content"><div class="modal-header"><h3>🕹️ 强制安排活动</h3><button class="modal-close" onclick="gameInstance.closeActionSelect()">×</button></div><div id="action-select-content"></div></div></div>
 <div class="modal-overlay" id="town-event-modal">
@@ -582,17 +591,17 @@
         "book_manga": { name: "📚 热血漫画", price: 15, type: "book", happinessBonus: 10, cultureBonus: 1, desc: "二次元的快乐" },
         "book_h": { name: "📕 H书", price: 50, type: "book", happinessBonus: 20, maliceBonus: 5, integrityBonus: -5, desc: "少儿不宜，增加恶意值" },
         "book_53": { name: "📑 5年高考3年模拟", price: 40, type: "book", happinessBonus: -10, cultureBonus: 10, desc: "知识就是力量，但很痛苦" },
-        "baozi_tofu": { name: "🥟 豆腐包", price: 2, type: "food", hungerBonus: 10, desc: "素食主义者的最爱" },
-        "baozi_pork": { name: "🥩 猪肉包", price: 4, type: "food", hungerBonus: 20, desc: "皮薄馅大汁多" },
-        "baozi_beef": { name: "🐮 牛肉包", price: 5, type: "food", hungerBonus: 25, desc: "实实在在的牛肉" },
-        "water_wahaha": { name: "🥤 娃哈哈", price: 2, type: "drink", hungerBonus: 2, happinessBonus: 1, desc: "童年的味道" },
-        "water_ganten": { name: "💧 百岁山", price: 4, type: "drink", hungerBonus: 2, happinessBonus: 3, desc: "水中贵族" },
-        "noodle_beef": { name: "🍜 康师傅", price: 5, type: "food", hungerBonus: 30, desc: "红烧牛肉面，就是这个味" },
-        "chips_lays": { name: "🥔 乐事薯片", price: 6, type: "snack", hungerBonus: 5, happinessBonus: 5, desc: "原味最经典" },
-        "chocolate": { name: "🍫 德芙巧克力", price: 8, type: "snack", hungerBonus: 3, happinessBonus: 8, desc: "纵享丝滑" },
-        "cola_pepsi": { name: "🥤 日本生可乐", price: 5, type: "drink", hungerBonus: 3, happinessBonus: 4, desc: "听说很好喝" },
+        "baozi_tofu": { name: "🥟 豆腐包", price: 2, type: "food", hungerBonus: 10, staminaBonus: 10, desc: "素食主义者的最爱" },
+        "baozi_pork": { name: "🥩 猪肉包", price: 4, type: "food", hungerBonus: 20, staminaBonus: 20, desc: "皮薄馅大汁多" },
+        "baozi_beef": { name: "🐮 牛肉包", price: 5, type: "food", hungerBonus: 25, staminaBonus: 25, desc: "实实在在的牛肉" },
+        "water_wahaha": { name: "🥤 娃哈哈", price: 2, type: "drink", hungerBonus: 2, happinessBonus: 1, staminaBonus: 3, desc: "童年的味道" },
+        "water_ganten": { name: "💧 百岁山", price: 4, type: "drink", hungerBonus: 2, happinessBonus: 3, staminaBonus: 5, desc: "水中贵族" },
+        "noodle_beef": { name: "🍜 康师傅", price: 5, type: "food", hungerBonus: 30, staminaBonus: 30, desc: "红烧牛肉面，就是这个味" },
+        "chips_lays": { name: "🥔 乐事薯片", price: 6, type: "snack", hungerBonus: 5, happinessBonus: 5, staminaBonus: 5, desc: "原味最经典" },
+        "chocolate": { name: "🍫 德芙巧克力", price: 8, type: "snack", hungerBonus: 3, happinessBonus: 8, staminaBonus: 8, desc: "纵享丝滑" },
+        "cola_pepsi": { name: "🥤 日本生可乐", price: 5, type: "drink", hungerBonus: 3, happinessBonus: 4, staminaBonus: 8, desc: "听说很好喝" },
         "coffee_instant": { name: "☕ 速溶咖啡", price: 6, type: "drink", hungerBonus: 2, happinessBonus: 5, staminaBonus: 10, desc: "提神醒脑" },
-        "sushi_box": { name: "🍱 寿司拼盘", price: 12, type: "food", hungerBonus: 35, happinessBonus: 3, desc: "便利店的高级货" },
+        "sushi_box": { name: "🍱 寿司拼盘", price: 12, type: "food", hungerBonus: 35, happinessBonus: 3, staminaBonus: 30, desc: "便利店的高级货" },
         "beer_tsingtao": { name: "🍺 青岛啤酒", price: 6, type: "alcohol", hungerBonus: 2, happinessBonus: 6, desc: "哈啤酒吃嘎啦" },
         "beer_laoshan": { name: "🍺 崂山啤酒", price: 5, type: "alcohol", hungerBonus: 2, happinessBonus: 5, desc: "甚至能当水喝" },
         "cocktail": { name: "🍸 鸡尾酒", price: 25, type: "alcohol", hungerBonus: -2, happinessBonus: 15, desc: "色彩斑斓的微醺" },
@@ -1030,6 +1039,8 @@ const TOWN_EVENTS = [
 
         loadOrInit() { 
             const saveStr = localStorage.getItem('happyTownV2_Save'); 
+            const isNewGame = !saveStr; // 判断是否是新游戏
+            
             if (saveStr) { 
                 this.loadFromJSON(saveStr); 
                 this.checkAndAddNewChars(); 
@@ -1037,12 +1048,16 @@ const TOWN_EVENTS = [
             } else { 
                 this.initNewGame(); 
             } 
-            if (!this.mayor) {
-                // 优先触发镇长选举，选举完成后再触发建设公投
-                setTimeout(() => this.triggerMayorElection(), 1500);
-            } else {
-                // 如果有镇长，延迟触发建设公投
-                setTimeout(() => this.triggerConstructionVote(), 2000);
+            
+            // 只有新游戏时才触发选举和建设公投
+            if (isNewGame) {
+                if (!this.mayor) {
+                    // 优先触发镇长选举，选举完成后再触发建设公投
+                    setTimeout(() => this.triggerMayorElection(), 1500);
+                } else {
+                    // 如果有镇长，延迟触发建设公投
+                    setTimeout(() => this.triggerConstructionVote(), 2000);
+                }
             }
             this.renderUIStatic(); 
         }
@@ -2098,13 +2113,91 @@ const TOWN_EVENTS = [
         closeEmbezzle() { document.getElementById('embezzle-modal').classList.remove('active'); }
         
         showJobBoard() {
-            const list = document.getElementById('jobboard-list'); if(!list) return; list.innerHTML = '';
-            const oddHeader = document.createElement('div'); oddHeader.className = 'job-section-header'; oddHeader.style.borderLeftColor = '#3498db'; oddHeader.innerText = "🛠 临时零工 / 自由职业"; list.appendChild(oddHeader);
-            ODD_JOBS.forEach(job => { const item = document.createElement('div'); item.className = 'job-item'; item.innerHTML = `<div><div class="job-name">${job.name}</div><div class="job-loc" style="font-size:0.8em; color:gray;">Mood: ${job.mood}</div></div><div class="job-wage" style="color:${job.wage<0?'#e74c3c':'#27ae60'}">💰 ${job.wage}</div>`; list.appendChild(item); });
-            const hookerItem = document.createElement('div'); hookerItem.className = 'job-item'; hookerItem.innerHTML = `<div><div class="job-name">💋 站街</div></div><div class="job-wage">💰 8-15</div>`; list.appendChild(hookerItem);
-            const formalHeader = document.createElement('div'); formalHeader.className = 'job-section-header'; formalHeader.style.borderLeftColor = '#f1c40f'; formalHeader.innerText = "🏢 企业 / 机构岗位"; list.appendChild(formalHeader);
-            this.buildings.forEach(b => { if (b.jobs.length > 0) { b.jobs.forEach(role => { const item = document.createElement('div'); item.className = 'job-item'; item.innerHTML = `<div><div class="job-name">👔 ${role}</div><div class="job-loc">${b.name} <span class="lvl-badge">Lv.${b.level}</span></div></div><div class="job-wage">💰 ${getJobWage(role)}</div>`; list.appendChild(item); }); } });
+            const tabsContainer = document.getElementById('jobboard-tabs');
+            const list = document.getElementById('jobboard-list');
+            if(!tabsContainer || !list) return;
+            
+            tabsContainer.innerHTML = '';
+            list.innerHTML = '';
+            
+            // 创建临时零工选项卡
+            const oddJobTab = document.createElement('button');
+            oddJobTab.className = 'filter-btn active';
+            oddJobTab.id = 'job-tab-odd';
+            oddJobTab.innerText = '🛠 临时零工';
+            oddJobTab.onclick = () => this.switchJobTab('odd');
+            tabsContainer.appendChild(oddJobTab);
+            
+            // 为每个有岗位的建筑创建选项卡
+            const buildingsWithJobs = this.buildings.filter(b => b.jobs && b.jobs.length > 0);
+            buildingsWithJobs.forEach((b, index) => {
+                const tab = document.createElement('button');
+                tab.className = 'filter-btn';
+                tab.id = `job-tab-${b.id}`;
+                tab.innerText = b.name;
+                tab.onclick = () => this.switchJobTab(b.id);
+                tabsContainer.appendChild(tab);
+            });
+            
+            // 默认显示临时零工
+            this.switchJobTab('odd');
             document.getElementById('jobboard-modal').classList.add('active');
+        }
+        
+        switchJobTab(tabId) {
+            // 更新选项卡状态
+            document.querySelectorAll('#jobboard-tabs .filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeTab = document.getElementById(`job-tab-${tabId}`);
+            if(activeTab) activeTab.classList.add('active');
+            
+            const list = document.getElementById('jobboard-list');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            if(tabId === 'odd') {
+                // 显示临时零工
+                ODD_JOBS.forEach(job => {
+                    const item = document.createElement('div');
+                    item.className = 'job-item';
+                    item.innerHTML = `
+                        <div>
+                            <div class="job-name">${job.name}</div>
+                            <div class="job-loc" style="font-size:0.8em; color:gray;">Mood: ${job.mood}</div>
+                        </div>
+                        <div class="job-wage" style="color:${job.wage<0?'#e74c3c':'#27ae60'}">💰 ${job.wage}</div>
+                    `;
+                    list.appendChild(item);
+                });
+                // 添加站街选项
+                const hookerItem = document.createElement('div');
+                hookerItem.className = 'job-item';
+                hookerItem.innerHTML = `
+                    <div>
+                        <div class="job-name">💋 站街</div>
+                    </div>
+                    <div class="job-wage">💰 8-15</div>
+                `;
+                list.appendChild(hookerItem);
+            } else {
+                // 显示指定建筑的岗位
+                const building = this.buildings.find(b => b.id === tabId);
+                if(building && building.jobs && building.jobs.length > 0) {
+                    building.jobs.forEach(role => {
+                        const item = document.createElement('div');
+                        item.className = 'job-item';
+                        item.innerHTML = `
+                            <div>
+                                <div class="job-name">👔 ${role}</div>
+                                <div class="job-loc">${building.name} <span class="lvl-badge">Lv.${building.level}</span></div>
+                            </div>
+                            <div class="job-wage">💰 ${getJobWage(role)}</div>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">该建筑暂无岗位</div>';
+                }
+            }
         }
         
         showAchievements() {
@@ -2306,6 +2399,20 @@ const TOWN_EVENTS = [
             const prosHtml = b.prostitutes.map(p => `<div class="staff-list-item"><span class="staff-role">技师:</span><span class="staff-name">${p}</span></div>`).join('');
             let historyHtml = '<div class="history-list">'; b.history.forEach(h => { historyHtml += `<div class="history-item">${h}</div>`; }); historyHtml += '</div>';
             
+            // 显示售卖的物品
+            let sellsHtml = '';
+            if (b.sells && b.sells.length > 0) {
+                sellsHtml = '<div class="section-title">🛍️ 售卖物品</div><div class="bag-grid" style="margin-bottom:15px;">';
+                b.sells.forEach(itemId => {
+                    const item = ITEMS_DB[itemId];
+                    if (item) {
+                        const tooltipText = getItemTooltipText(itemId);
+                        sellsHtml += `<div class="bag-item tooltip-item" data-tip="${tooltipText}" style="cursor:help;">${item.name}<br><small style="color:#e67e22;">💰${item.price}</small></div>`;
+                    }
+                });
+                sellsHtml += '</div>';
+            }
+            
             let statsHtml = '';
             if (b.isBuilt) {
                 statsHtml = `
@@ -2320,6 +2427,7 @@ const TOWN_EVENTS = [
             content.innerHTML = `
                 <div style="margin-bottom:15px; font-size:0.9rem; color:#555;">${b.desc}</div>
                 ${statsHtml}
+                ${sellsHtml}
                 <div class="section-title">员工列表 (${b.staff.length}/${b.jobs.length})</div>
                 <div style="max-height:150px; overflow-y:auto; border:1px solid #eee; border-radius:4px; margin-bottom:15px;">${staffHtml}</div>
                 ${prosHtml ? `<div class="section-title">特殊服务人员</div><div style="max-height:100px; overflow-y:auto; border:1px solid #eee; border-radius:4px; margin-bottom:15px;">${prosHtml}</div>` : ''}
@@ -2535,13 +2643,92 @@ const TOWN_EVENTS = [
         document.getElementById(`view-${tab}`).classList.add('active-view');
     }
 
+    // 窗口大小改变时的处理函数
+    let relationResizeHandler = null;
+    
     function toggleRelationView() {
         const v = document.getElementById('relation-view');
         const main = document.getElementById('main-view');
-        if (v.classList.contains('active')) { v.classList.remove('active'); main.style.display = 'flex'; }
-        else { v.classList.add('active'); main.style.display = 'none'; renderRelationGraph(); }
+        const canvas = document.getElementById('rel-canvas');
+        
+        if (v.classList.contains('active')) { 
+            v.classList.remove('active'); 
+            main.style.display = 'flex';
+            // 移除事件监听器
+            if (canvas) {
+                canvas.removeEventListener('mousemove', handleRelationCanvasMouseMove);
+                canvas.removeEventListener('mouseleave', handleRelationCanvasMouseLeave);
+            }
+            // 移除窗口大小改变监听
+            if (relationResizeHandler) {
+                window.removeEventListener('resize', relationResizeHandler);
+                relationResizeHandler = null;
+            }
+        } else { 
+            v.classList.add('active'); 
+            main.style.display = 'none'; 
+            renderRelationGraph();
+            // 添加事件监听器
+            if (canvas) {
+                canvas.addEventListener('mousemove', handleRelationCanvasMouseMove);
+                canvas.addEventListener('mouseleave', handleRelationCanvasMouseLeave);
+            }
+            // 添加窗口大小改变监听
+            if (!relationResizeHandler) {
+                relationResizeHandler = () => {
+                    if (v.classList.contains('active')) {
+                        renderRelationGraph();
+                    }
+                };
+                window.addEventListener('resize', relationResizeHandler);
+            }
+        }
     }
     
+    function handleRelationCanvasMouseMove(e) {
+        const canvas = document.getElementById('rel-canvas');
+        if (!canvas || relationGraphState.positions.length === 0) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 检查鼠标是否在某个节点上
+        let foundIndex = -1;
+        const hoverRadius = 30; // 悬停检测半径（比节点稍大）
+        
+        for (let i = 0; i < relationGraphState.positions.length; i++) {
+            const pos = relationGraphState.positions[i];
+            const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
+            if (distance <= hoverRadius) {
+                foundIndex = i;
+                break;
+            }
+        }
+        
+        // 如果悬停的节点改变了，重新渲染
+        if (foundIndex !== relationGraphState.hoveredIndex) {
+            relationGraphState.hoveredIndex = foundIndex;
+            renderRelationGraph();
+            
+            // 更新鼠标样式
+            canvas.style.cursor = foundIndex >= 0 ? 'pointer' : 'default';
+        }
+    }
+    
+    function handleRelationCanvasMouseLeave() {
+        if (relationGraphState.hoveredIndex >= 0) {
+            relationGraphState.hoveredIndex = -1;
+            renderRelationGraph();
+        }
+    }
+    
+    // 关系谱全局状态
+    let relationGraphState = {
+        hoveredIndex: -1,
+        positions: []
+    };
+
     function renderRelationGraph() {
         const canvas = document.getElementById('rel-canvas'); if(!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -2555,20 +2742,33 @@ const TOWN_EVENTS = [
         const n = chars.length;
         const angleStep = (Math.PI * 2) / n;
         
-        const positions = chars.map((c, i) => {
-            return { x: cx + Math.cos(i*angleStep)*r, y: cy + Math.sin(i*angleStep)*r, color: '#333' };
+        // 存储位置信息供鼠标事件使用
+        relationGraphState.positions = chars.map((c, i) => {
+            return { 
+                x: cx + Math.cos(i*angleStep)*r, 
+                y: cy + Math.sin(i*angleStep)*r, 
+                char: c,
+                index: i
+            };
         });
         
         ctx.clearRect(0,0,w,h);
         
+        const hoveredIdx = relationGraphState.hoveredIndex;
+        
         // Draw lines
         chars.forEach((c, i) => {
-            const p1 = positions[i];
+            const p1 = relationGraphState.positions[i];
             chars.forEach((t, j) => {
                 if (i >= j) return;
                 const rel = c.relationships[t.name];
                 if (rel && (Math.abs(rel.love) > 25 || rel.status !== 'stranger')) {
-                    const p2 = positions[j];
+                    const p2 = relationGraphState.positions[j];
+                    
+                    // 判断是否应该高亮这条线（与悬停的居民相关）
+                    const isHighlighted = hoveredIdx >= 0 && (i === hoveredIdx || j === hoveredIdx);
+                    const shouldDim = hoveredIdx >= 0 && !isHighlighted;
+                    
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
@@ -2588,11 +2788,35 @@ const TOWN_EVENTS = [
                          color = rel.love > 0 ? `rgba(52, 152, 219, ${opacity})` : `rgba(231, 76, 60, ${opacity})`;
                     }
 
+                    // 高亮效果：增加宽度和亮度
+                    if (isHighlighted) {
+                        width = Math.max(width * 2, 3);
+                        // 增加透明度
+                        if (color.includes('rgba')) {
+                            const match = color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+                            if (match) {
+                                const alpha = Math.min(1, parseFloat(match[4]) * 2);
+                                color = `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${alpha})`;
+                            }
+                        } else {
+                            // 对于非rgba颜色，添加高亮效果
+                            ctx.shadowBlur = 8;
+                            ctx.shadowColor = color;
+                        }
+                    } else if (shouldDim) {
+                        // 非高亮线变暗
+                        ctx.globalAlpha = 0.2;
+                    }
+
                     ctx.strokeStyle = color;
                     ctx.lineWidth = width;
                     ctx.stroke();
                     
-                    if(label) {
+                    // 重置阴影和透明度
+                    ctx.shadowBlur = 0;
+                    ctx.globalAlpha = 1.0;
+                    
+                    if(label && !shouldDim) {
                         const mx = (p1.x + p2.x)/2;
                         const my = (p1.y + p2.y)/2;
                         ctx.fillStyle = '#fff';
@@ -2611,19 +2835,36 @@ const TOWN_EVENTS = [
         
         // Draw nodes
         chars.forEach((c, i) => {
-            const p = positions[i];
+            const p = relationGraphState.positions[i];
+            const isHovered = i === hoveredIdx;
+            
+            // 根据悬停状态调整节点大小
+            const nodeRadius = isHovered ? 25 : 15;
+            const fontSize = isHovered ? 14 : 10;
+            const fontWeight = isHovered ? "bold" : "bold";
+            
+            // 绘制节点阴影（悬停时）
+            if (isHovered) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = c.gender.includes('女') ? '#ff7675' : '#74b9ff';
+            }
+            
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 15, 0, Math.PI*2);
-            ctx.fillStyle = '#fff';
+            ctx.arc(p.x, p.y, nodeRadius, 0, Math.PI*2);
+            ctx.fillStyle = isHovered ? '#fffef0' : '#fff';
             ctx.fill();
-            ctx.lineWidth = 2;
+            ctx.lineWidth = isHovered ? 3 : 2;
             ctx.strokeStyle = c.gender.includes('女') ? '#ff7675' : '#74b9ff';
             ctx.stroke();
             
-            ctx.fillStyle = '#333';
-            ctx.font = "bold 10px Arial";
+            // 重置阴影
+            ctx.shadowBlur = 0;
+            
+            // 绘制名字
+            ctx.fillStyle = isHovered ? '#2c3e50' : '#333';
+            ctx.font = `${fontWeight} ${fontSize}px Arial`;
             ctx.textAlign = "center";
-            ctx.fillText(c.name, p.x, p.y + 25);
+            ctx.fillText(c.name, p.x, p.y + nodeRadius + 20);
         });
 
         // Stats Update
