@@ -123,38 +123,45 @@
          return { level: 3, multiplier: 1.6, title: "大师", next: 100 };
     }
     const BUILDINGS_BLUEPRINT = [
-        { id: "huoshao", name: "🥙 火烧铺", category: "food", cost: 150, desc: "3.5元吃饱，体力恢复圣地", effect: "food", price: 3.5, food: 35, open: 6, close: 20, jobs: ["火烧师傅"], sells: ["huoshao_meat", "huoshao_veg", "tofu_pudding"], isBuilt: true, mapX: 25, mapY: 45 },
-        { id: "baozi", name: "🥯 包子铺", category: "food", cost: 100, desc: "物美价廉的早餐店", effect: "shop", price: 3.5, open: 5, close: 14, jobs: ["早点工"], sells: ["baozi_tofu", "baozi_pork", "baozi_beef"], isBuilt: true, mapX: 20, mapY: 50 },
-        { id: "bookstore", name: "📚 知识书店", category: "shop", cost: 400, desc: "精神食粮与堕落之源", effect: "shop", price: 0, open: 9, close: 21, jobs: ["图书管理员"], sells: ["book_novel", "book_manga", "book_h", "book_53"], studyBonus: 0.6, mapX: 60, mapY: 30 },
-        { id: "ramen", name: "🍜 兰州拉面", category: "food", cost: 250, desc: "正宗牛肉面，管饱", effect: "food", price: 12, food: 35, open: 7, close: 22, jobs: ["拉面师傅"], mapX: 30, mapY: 40 },
-        { id: "711", name: "🏪 7-11便利店", category: "food", cost: 300, desc: "24小时营业", effect: "shop", price: 0, open: 0, close: 24, jobs: ["收银员"], sells: ["water_wahaha", "water_ganten", "noodle_beef", "chips_lays", "chocolate", "cola_pepsi", "coffee_instant", "sushi_box", "beer_tsingtao", "beer_laoshan"], mapX: 50, mapY: 50 },
-        { id: "kfc", name: "🍗 肯德基", category: "food", cost: 600, desc: "疯狂星期四", effect: "food", price: 30, food: 50, open: 10, close: 22, jobs: ["前台", "炸鸡厨师"], mapX: 45, mapY: 35 },
-        { id: "gym", name: "💪 健身房", category: "fun", cost: 800, desc: "挥洒汗水，提升颜值与健康", effect: "beauty", price: 50, open: 6, close: 22, jobs: ["健身教练", "保洁"], mapX: 70, mapY: 40 },
-        { id: "amusement", name: "🎡 游乐场", category: "fun", cost: 2000, desc: "充满尖叫与欢笑的地方", effect: "fun_high", price: 100, open: 9, close: 20, jobs: ["检票员", "玩偶扮演"], mapX: 80, mapY: 20 },
-        { id: "museum", name: "🏛 博物馆", category: "fun", cost: 1200, desc: "历史的沉淀，增长见识", effect: "study", price: 40, open: 9, close: 17, jobs: ["讲解员", "保安"], closedDays: [1], mapX: 65, mapY: 25 },
-        { id: "police", name: "👮 派出所", category: "service", cost: 800, desc: "维护小镇治安", effect: "security", price: 0, open: 0, close: 24, jobs: ["警察", "警察"], mapX: 40, mapY: 60 },
-        { id: "hospital", name: "🏥 综合医院", category: "service", cost: 1500, desc: "设备先进的医疗中心", effect: "health", price: 80, open: 0, close: 24, jobs: ["主治医师", "护士", "保洁"], mapX: 55, mapY: 55 },
-        { id: "clinic", name: "💊 社区诊所", category: "service", cost: 400, desc: "方便快捷的小诊所", effect: "shop", price: 40, open: 8, close: 20, jobs: ["社区医生", "护士"], sells: ["bandage", "painkiller", "digestion_tablets", "cold_medicine", "anti_inflammatory", "fever_medicine"], mapX: 35, mapY: 55 },
-        { id: "school", name: "🏫 小镇学校", category: "service", cost: 1000, desc: "知识就是力量", effect: "study", price: 0, open: 7, close: 17, jobs: ["语文老师", "数学老师", "体育老师", "保安"], closedDays: [0, 6], mapX: 50, mapY: 25 },
-        { id: "library", name: "📚 图书馆", category: "fun", cost: 500, desc: "静谧的阅读时光", effect: "study", price: 0, open: 9, close: 21, jobs: ["图书管理员", "保洁"], mapX: 60, mapY: 35 },
-        { id: "church", name: "⛪ 婚礼教堂", category: "service", cost: 1200, desc: "神圣之地", effect: "marriage", price: 20, open: 8, close: 20, jobs: ["神父"], mapX: 30, mapY: 30 },
-        { id: "park", name: "🌳 中心公园", category: "fun", cost: 200, desc: "免费休闲", effect: "romance", price: 0, open: 0, close: 24, jobs: [], mapX: 50, mapY: 40 },
-        { id: "netcafe", name: "🎮 麦克电竞", category: "fun", cost: 450, desc: "通宵开黑", effect: "fun", price: 15, open: 0, close: 24, jobs: ["网管", "网吧保洁"], mapX: 40, mapY: 30 },
-        { id: "cinema", name: "🎬 电影院", category: "fun", cost: 400, desc: "恢复心情快", effect: "fun", price: 40, open: 10, close: 24, jobs: ["售票员"], mapX: 55, mapY: 30 },
-        { id: "bar", name: "🍺 深夜酒吧", category: "fun", cost: 500, desc: "买醉消愁", effect: "shop", price: 50, open: 18, close: 2, jobs: ["老板", "大厨", "跑堂"], closedDays: [0], sells: ["beer_tsingtao", "cocktail", "bloody_mary", "rum", "tequila", "whisky"], mapX: 35, mapY: 35 },
-        { id: "footshop", name: "💆 神秘洗脚店", category: "fun", cost: 600, desc: "涩情交易场所", effect: "ntr", price: 0, open: 0, close: 24, jobs: ["老板"], mapX: 25, mapY: 35 },
-        { id: "hotel", name: "🏩 快捷酒店", category: "fun", cost: 800, desc: "懂得都懂", effect: "ntr", price: 100, open: 0, close: 24, jobs: ["前台", "保洁"], mapX: 30, mapY: 40 },
-        { id: "flowershop", name: "🌹 浪漫花店", category: "shop", cost: 300, desc: "购买鲜花送给心上人", effect: "shop", price: 50, open: 9, close: 20, jobs: ["花艺师"], sells: ["rose"], mapX: 45, mapY: 45 },
-        { id: "statue", name: "🐱 黄金猫像", category: "landmark", cost: 5000, desc: "纯金打造的猫神像，吸引游客打卡 (税收+50/h)", effect: "tourist", price: 50, open: 0, close: 24, jobs: ["保安"], mapX: 48, mapY: 52 },
-        { id: "skytower", name: "🗼 通天塔", category: "landmark", cost: 8000, desc: "俯瞰全镇的观光塔 (税收+100/h, 幸福UP)", effect: "tourist_high", price: 100, open: 8, close: 22, jobs: ["检票员", "电梯员", "保洁"], mapX: 75, mapY: 50 },
-        { id: "hotspring", name: "♨️ 猫山温泉", category: "landmark", cost: 6000, desc: "著名的疗养胜地 (税收+80/h, 健康UP)", effect: "tourist_health", price: 80, open: 10, close: 23, jobs: ["前台", "技师"], mapX: 85, mapY: 40 },
-        { id: "bank", name: "🏦 银行", category: "government", cost: 3000, desc: "金融中心，提供存款和贷款服务", effect: "finance", price: 60, open: 9, close: 17, jobs: ["银行经理", "柜员", "保安"], closedDays: [0, 6], mapX: 45, mapY: 50, isBuilt: true },
-        { id: "govbuilding", name: "🏛️ 政府大楼", category: "government", cost: 5000, desc: "小镇行政中心，提升政府效率 (税收+100/h, 政策效果+20%)", effect: "government", price: 100, open: 8, close: 18, jobs: ["镇长助理", "行政人员", "保安"], closedDays: [0, 6], mapX: 50, mapY: 60 },
-        { id: "sharehouse", name: "🏘️ 咕噜咕噜合租楼", category: "residence", cost: 0, desc: "简陋的合租楼，仅提供基本住所 (健康每日-1)", effect: "residence_basic", price: 0, open: 0, close: 24, jobs: [], isBuilt: true, mapX: 15, mapY: 20, residenceEffects: { health: -1 } },
-        { id: "dormitory", name: "🏚️ 尾巴巷集体宿舍", category: "residence", cost: 800, desc: "条件稍好的集体宿舍 (健康每日+0.5, 心情每日+0.5)", effect: "residence_medium", price: 500, open: 0, close: 24, jobs: [], mapX: 18, mapY: 25, residenceEffects: { health: 0.5, happiness: 0.5 } },
-        { id: "community", name: "🏡 爪印社区", category: "residence", cost: 2000, desc: "舒适的社区住宅 (健康每日+1, 心情每日+1, 体力恢复+10%)", effect: "residence_high", price: 1500, open: 0, close: 24, jobs: [], mapX: 20, mapY: 30, residenceEffects: { health: 1, happiness: 1, staminaRecovery: 0.1 } }
+        { id: "huoshao", name: "🥙 火烧铺", category: "food", cost: 150, desc: "3.5元吃饱，体力恢复圣地", effect: "food", price: 3.5, food: 35, open: 6, close: 20, jobs: ["火烧师傅"], sells: ["huoshao_meat", "huoshao_veg", "tofu_pudding"], isBuilt: true, mapX: 25, mapY: 45, powerConsumption: 5 },
+        { id: "baozi", name: "🥯 包子铺", category: "food", cost: 100, desc: "物美价廉的早餐店", effect: "shop", price: 3.5, open: 5, close: 14, jobs: ["早点工"], sells: ["baozi_tofu", "baozi_pork", "baozi_beef"], isBuilt: true, mapX: 20, mapY: 50, powerConsumption: 3 },
+        { id: "bookstore", name: "📚 知识书店", category: "shop", cost: 400, desc: "精神食粮与堕落之源", effect: "shop", price: 0, open: 9, close: 21, jobs: ["图书管理员"], sells: ["book_novel", "book_manga", "book_h", "book_53"], studyBonus: 0.6, mapX: 60, mapY: 30, powerConsumption: 8 },
+        { id: "ramen", name: "🍜 兰州拉面", category: "food", cost: 250, desc: "正宗牛肉面，管饱", effect: "food", price: 12, food: 35, open: 7, close: 22, jobs: ["拉面师傅"], mapX: 30, mapY: 40, powerConsumption: 6 },
+        { id: "711", name: "🏪 7-11便利店", category: "food", cost: 300, desc: "24小时营业", effect: "shop", price: 0, open: 0, close: 24, jobs: ["收银员"], sells: ["water_wahaha", "water_ganten", "noodle_beef", "chips_lays", "chocolate", "cola_pepsi", "coffee_instant", "sushi_box", "beer_tsingtao", "beer_laoshan"], mapX: 50, mapY: 50, powerConsumption: 10 },
+        { id: "kfc", name: "🍗 肯德基", category: "food", cost: 600, desc: "疯狂星期四", effect: "food", price: 30, food: 50, open: 10, close: 22, jobs: ["前台", "炸鸡厨师"], mapX: 45, mapY: 35, powerConsumption: 12 },
+        { id: "gym", name: "💪 健身房", category: "fun", cost: 800, desc: "挥洒汗水，提升颜值与健康", effect: "beauty", price: 50, open: 6, close: 22, jobs: ["健身教练", "保洁"], mapX: 70, mapY: 40, powerConsumption: 20 },
+        { id: "amusement", name: "🎡 游乐场", category: "fun", cost: 2000, desc: "充满尖叫与欢笑的地方", effect: "fun_high", price: 100, open: 9, close: 20, jobs: ["检票员", "玩偶扮演"], mapX: 80, mapY: 20, powerConsumption: 30 },
+        { id: "museum", name: "🏛 博物馆", category: "fun", cost: 1200, desc: "历史的沉淀，增长见识", effect: "study", price: 40, open: 9, close: 17, jobs: ["讲解员", "保安"], closedDays: [1], mapX: 65, mapY: 25, powerConsumption: 15 },
+        { id: "police", name: "👮 派出所", category: "service", cost: 800, desc: "维护小镇治安", effect: "security", price: 0, open: 0, close: 24, jobs: ["警察", "警察"], mapX: 40, mapY: 60, powerConsumption: 10 },
+        { id: "hospital", name: "🏥 综合医院", category: "service", cost: 1500, desc: "设备先进的医疗中心", effect: "health", price: 80, open: 0, close: 24, jobs: ["主治医师", "护士", "保洁"], mapX: 55, mapY: 55, powerConsumption: 25 },
+        { id: "clinic", name: "💊 社区诊所", category: "service", cost: 400, desc: "方便快捷的小诊所", effect: "shop", price: 40, open: 8, close: 20, jobs: ["社区医生", "护士"], sells: ["bandage", "painkiller", "digestion_tablets", "cold_medicine", "anti_inflammatory", "fever_medicine"], mapX: 35, mapY: 55, powerConsumption: 8 },
+        { id: "school", name: "🏫 小镇学校", category: "service", cost: 1000, desc: "知识就是力量", effect: "study", price: 0, open: 7, close: 17, jobs: ["语文老师", "数学老师", "体育老师", "保安"], closedDays: [0, 6], mapX: 50, mapY: 25, powerConsumption: 18 },
+        { id: "library", name: "📚 图书馆", category: "fun", cost: 500, desc: "静谧的阅读时光", effect: "study", price: 0, open: 9, close: 21, jobs: ["图书管理员", "保洁"], mapX: 60, mapY: 35, powerConsumption: 10 },
+        { id: "church", name: "⛪ 婚礼教堂", category: "service", cost: 1200, desc: "神圣之地", effect: "marriage", price: 20, open: 8, close: 20, jobs: ["神父"], mapX: 30, mapY: 30, powerConsumption: 5 },
+        { id: "park", name: "🌳 中心公园", category: "fun", cost: 200, desc: "免费休闲", effect: "romance", price: 0, open: 0, close: 24, jobs: [], mapX: 50, mapY: 40, powerConsumption: 0 },
+        { id: "netcafe", name: "🎮 麦克电竞", category: "fun", cost: 450, desc: "通宵开黑", effect: "fun", price: 15, open: 0, close: 24, jobs: ["网管", "网吧保洁"], mapX: 40, mapY: 30, powerConsumption: 25 },
+        { id: "cinema", name: "🎬 电影院", category: "fun", cost: 400, desc: "恢复心情快", effect: "fun", price: 40, open: 10, close: 24, jobs: ["售票员"], mapX: 55, mapY: 30, powerConsumption: 20 },
+        { id: "bar", name: "🍺 深夜酒吧", category: "fun", cost: 500, desc: "买醉消愁", effect: "shop", price: 50, open: 18, close: 2, jobs: ["老板", "大厨", "跑堂"], closedDays: [0], sells: ["beer_tsingtao", "cocktail", "bloody_mary", "rum", "tequila", "whisky"], mapX: 35, mapY: 35, powerConsumption: 12 },
+        { id: "footshop", name: "💆 神秘洗脚店", category: "fun", cost: 600, desc: "涩情交易场所", effect: "ntr", price: 0, open: 0, close: 24, jobs: ["老板"], mapX: 25, mapY: 35, powerConsumption: 8 },
+        { id: "hotel", name: "🏩 快捷酒店", category: "fun", cost: 800, desc: "懂得都懂", effect: "ntr", price: 100, open: 0, close: 24, jobs: ["前台", "保洁"], mapX: 30, mapY: 40, powerConsumption: 15 },
+        { id: "flowershop", name: "🌹 浪漫花店", category: "shop", cost: 300, desc: "购买鲜花送给心上人", effect: "shop", price: 50, open: 9, close: 20, jobs: ["花艺师"], sells: ["rose"], mapX: 45, mapY: 45, powerConsumption: 5 },
+        { id: "statue", name: "🐱 黄金猫像", category: "landmark", cost: 5000, desc: "纯金打造的猫神像，吸引游客打卡 (税收+50/h)", effect: "tourist", price: 50, open: 0, close: 24, jobs: ["保安"], mapX: 48, mapY: 52, powerConsumption: 2 },
+        { id: "skytower", name: "🗼 通天塔", category: "landmark", cost: 8000, desc: "俯瞰全镇的观光塔 (税收+100/h, 幸福UP)", effect: "tourist_high", price: 100, open: 8, close: 22, jobs: ["检票员", "电梯员", "保洁"], mapX: 75, mapY: 50, powerConsumption: 25 },
+        { id: "hotspring", name: "♨️ 猫山温泉", category: "landmark", cost: 6000, desc: "著名的疗养胜地 (税收+80/h, 健康UP)", effect: "tourist_health", price: 80, open: 10, close: 23, jobs: ["前台", "技师"], mapX: 85, mapY: 40, powerConsumption: 30 },
+        { id: "bank", name: "🏦 银行", category: "government", cost: 3000, desc: "金融中心，提供存款和贷款服务", effect: "finance", price: 60, open: 9, close: 17, jobs: ["银行经理", "柜员", "保安"], closedDays: [0, 6], mapX: 45, mapY: 50, isBuilt: true, powerConsumption: 15 },
+        { id: "govbuilding", name: "🏛️ 政府大楼", category: "government", cost: 5000, desc: "小镇行政中心，提升政府效率 (税收+100/h, 政策效果+20%)", effect: "government", price: 100, open: 8, close: 18, jobs: ["镇长助理", "行政人员", "保安"], closedDays: [0, 6], mapX: 50, mapY: 60, powerConsumption: 20 },
+        { id: "sharehouse", name: "🏘️ 咕噜咕噜合租楼", category: "residence", cost: 0, desc: "简陋的合租楼，仅提供基本住所 (健康每日-1)", effect: "residence_basic", price: 0, open: 0, close: 24, jobs: [], isBuilt: true, mapX: 15, mapY: 20, residenceEffects: { health: -1 }, powerConsumption: 0 },
+        { id: "dormitory", name: "🏚️ 尾巴巷集体宿舍", category: "residence", cost: 800, desc: "条件稍好的集体宿舍 (健康每日+0.5, 心情每日+0.5)", effect: "residence_medium", price: 500, open: 0, close: 24, jobs: [], mapX: 18, mapY: 25, residenceEffects: { health: 0.5, happiness: 0.5 }, powerConsumption: 0 },
+        { id: "community", name: "🏡 爪印社区", category: "residence", cost: 2000, desc: "舒适的社区住宅 (健康每日+1, 心情每日+1, 体力恢复+10%)", effect: "residence_high", price: 1500, open: 0, close: 24, jobs: [], mapX: 20, mapY: 30, residenceEffects: { health: 1, happiness: 1, staminaRecovery: 0.1 }, powerConsumption: 0 },
+        { id: "tvstation", name: "📺 电视台", category: "government", cost: 4000, desc: "提供娱乐和新闻，提升居民心情", effect: "entertainment", price: 0, open: 6, close: 24, jobs: ["新闻主播", "节目制作人", "摄像师", "保安"], closedDays: [0], mapX: 60, mapY: 50, powerConsumption: 35 },
+        { id: "prison", name: "🔒 监狱", category: "government", cost: 3500, desc: "关押罪犯，减少犯罪率，并可能通过劳动产生收入", effect: "security", price: 0, open: 0, close: 24, jobs: ["狱警", "狱警", "监狱长", "保安"], mapX: 70, mapY: 60, powerConsumption: 20 },
+        { id: "concert", name: "🎵 音乐厅", category: "fun", cost: 2500, desc: "提供高雅艺术，提升文化技能和心情", effect: "culture", price: 60, open: 10, close: 22, jobs: ["音乐家", "售票员", "保洁"], closedDays: [0], mapX: 75, mapY: 30, powerConsumption: 15 },
+        { id: "windpower", name: "💨 风力发电站", category: "power", cost: 2000, desc: "清洁能源，为小镇提供基础电力", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 10, mapY: 10, powerGeneration: 50, isBuilt: true },
+        { id: "solarpower", name: "☀️ 太阳能发电站", category: "power", cost: 3000, desc: "利用太阳能发电，发电量较高", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 90, mapY: 10, powerGeneration: 80 },
+        { id: "hydropower", name: "💧 水力发电站", category: "power", cost: 5000, desc: "利用水力发电，发电量最高但成本较高", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 10, mapY: 70, powerGeneration: 120 },
+        { id: "coalpower", name: "🔥 火力发电站", category: "power", cost: 4000, desc: "传统火力发电，发电量稳定但污染环境", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 90, mapY: 70, powerGeneration: 100 }
     ];
-    const CATEGORY_NAMES = { 'food': '🍔 饮食餐饮', 'service': '🏥 公共服务', 'fun': '🎡 休闲娱乐', 'shop': '🛍️ 商业购物', 'landmark': '🚩 地标建筑', 'government': '🏛️ 政府建筑', 'residence': '🏠 居民住宅' };
+    const CATEGORY_NAMES = { 'food': '🍔 饮食餐饮', 'service': '🏥 公共服务', 'fun': '🎡 休闲娱乐', 'shop': '🛍️ 商业购物', 'landmark': '🚩 地标建筑', 'government': '🏛️ 政府建筑', 'residence': '🏠 居民住宅', 'power': '⚡ 发电设施' };
     const DAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
     // 新版特质系统 (已并入性格)
     const TRAITS = [
@@ -256,14 +263,14 @@ const TOWN_EVENTS = [
     ];
     function getJobWage(role) {
         if (role.includes("老板") || role.includes("主治医师")) return 35;
-        if (role.includes("神父") || role.includes("社区医生") || role.includes("讲解") || role.includes("银行经理")) return 25;
-        if (role.includes("警察") || role.includes("老师") || role.includes("教练")) return 22;
+        if (role.includes("神父") || role.includes("社区医生") || role.includes("讲解") || role.includes("银行经理") || role.includes("监狱长") || role.includes("节目制作人")) return 25;
+        if (role.includes("警察") || role.includes("老师") || role.includes("教练") || role.includes("狱警") || role.includes("新闻主播")) return 22;
         if (role.includes("卖银")) return 20;
         if (role.includes("柜员")) return 19;
         if (role.includes("大厨") || role.includes("火烧") || role.includes("护士") || role.includes("玩偶")) return 18;
         if (role.includes("花艺") || role.includes("炸鸡") || role.includes("保安")) return 16;
         if (role.includes("网管")) return 15;
-        if (role.includes("前台") || role.includes("图书管理员") || role.includes("检票") || role.includes("电梯")) return 15;
+        if (role.includes("前台") || role.includes("图书管理员") || role.includes("检票") || role.includes("电梯") || role.includes("摄像师") || role.includes("音乐家") || role.includes("维护工程师")) return 15;
         if (role.includes("拉面")) return 15;
         if (role.includes("收银") || role.includes("售票")) return 15;
         if (role.includes("网吧保洁") || role.includes("保洁") || role.includes("跑堂") || role.includes("早点")) return 15;
@@ -393,6 +400,10 @@ const TOWN_EVENTS = [
             // 投资记录 {charName: {amount: 投资金额, type: 'build'|'upgrade'}}
             this.investments = {};
             this.upgradeProgress = 0; // 升级进度（通过投资累积）
+            // 电力系统
+            this.powerConsumption = blueprint.powerConsumption || 0; // 用电量（千瓦/天）
+            this.powerGeneration = blueprint.powerGeneration || 0; // 发电量（千瓦/天，仅发电建筑）
+            this.powerCapacity = 0; // 发电槽（通过投资增加的额外发电量）
             if (this.isBuilt) {
                 this.currentProgress = this.totalCost;
                 this.hasPermit = true;
@@ -402,7 +413,8 @@ const TOWN_EVENTS = [
             this.history.unshift(msg);
             if (this.history.length > 10) this.history.pop();
         }
-        isOpen(hour, day) { if (!this.isBuilt) return false; if (this.closedDays.includes(day)) return false; if (this.jobs.length > 0 && this.staff.length === 0) return false; if (this.open === 0 && this.close === 24) return true; if (this.close < this.open) return hour >= this.open || hour < this.close; return hour >= this.open && hour < this.close; }
+        isOpen(hour, day, totalPower = 999999) { if (!this.isBuilt) return false; if (this.closedDays.includes(day)) return false; if (this.jobs.length > 0 && this.staff.length === 0) return false; if (this.powerConsumption > 0 && !this.hasEnoughPower(totalPower)) return false; if (this.open === 0 && this.close === 24) return true; if (this.close < this.open) return hour >= this.open || hour < this.close; return hour >= this.open && hour < this.close; }
+        hasEnoughPower(totalPower) { if (this.powerConsumption === 0) return true; return totalPower >= this.powerConsumption; }
     }
     class Game {
         constructor() {
@@ -478,6 +490,19 @@ const TOWN_EVENTS = [
                     // 初始化投资记录（兼容旧存档）
                     if (b.investments === undefined) b.investments = {};
                     if (b.upgradeProgress === undefined) b.upgradeProgress = 0;
+                    // 初始化电力属性（兼容旧存档）
+                    if (b.powerConsumption === undefined) {
+                        // 从蓝图获取默认值
+                        const blueprint = BUILDINGS_BLUEPRINT.find(bp => bp.id === b.id);
+                        b.powerConsumption = blueprint ? (blueprint.powerConsumption || 0) : 0;
+                    }
+                    if (b.powerGeneration === undefined) {
+                        // 从蓝图获取默认值
+                        const blueprint = BUILDINGS_BLUEPRINT.find(bp => bp.id === b.id);
+                        b.powerGeneration = blueprint ? (blueprint.powerGeneration || 0) : 0;
+                    }
+                    // 初始化发电槽（兼容旧存档）
+                    if (b.powerCapacity === undefined) b.powerCapacity = 0;
                 });
                 // 初始化居民投资记录（兼容旧存档）
                 this.chars.forEach(c => {
@@ -582,6 +607,16 @@ const TOWN_EVENTS = [
                         this.collectTax(b.price, `地标建筑收入 - ${b.name}`, b.id);
                         if (b.effect === 'tourist_high') { this.chars.forEach(c => c.happiness = Math.min(100, c.happiness + 0.5)); } else if (b.effect === 'tourist_health') { this.chars.forEach(c => c.health = Math.min(c.healthMax || 100, c.health + 0.5)); }
                     }
+                    // 电视台全局BUFF：每小时为所有居民提供心情加成
+                    if (b.isBuilt && b.id === 'tvstation') {
+                        this.chars.forEach(c => {
+                            c.happiness = Math.min(100, c.happiness + 0.3); // 每小时心情+0.3
+                            // 偶尔提升文化（5%概率）
+                            if (Math.random() < 0.05) {
+                                this.improveSkill(c, 'culture', 0.1);
+                            }
+                        });
+                    }
                 });
                 if (this.gameDay === 0 && this.gameTime === 720) {
                     this.triggerMayorElection();
@@ -591,6 +626,8 @@ const TOWN_EVENTS = [
             if (this.gameTime >= 1440) {
                 // 每日工资结算（在日期变更前）
                 this.settleDailyWages();
+                // 每日电费结算
+                this.settleElectricityBills();
                 // 重置建筑每日统计
                 this.resetBuildingDailyStats();
                 // 如果是新的一周（周日），重置每周统计
@@ -635,7 +672,27 @@ const TOWN_EVENTS = [
                 this.runElectionsAndHiring();
                 const weatherInfo = WEATHER_TYPES[this.weather] || WEATHER_TYPES['Sunny'];
                 this.chars.forEach(c => {
-                    if (c.jailTerm > 0) { c.jailTerm -= 60; if (c.jailTerm <= 0) { c.jailTerm = 0; this.log(`[🔓释放] **${c.name}** 刑满释放，重获自由！`, "tag-build"); } }
+                    if (c.jailTerm > 0) {
+                        c.jailTerm -= 60;
+                        if (c.jailTerm <= 0) {
+                            c.jailTerm = 0;
+                            this.log(`[🔓释放] **${c.name}** 刑满释放，重获自由！`, "tag-build");
+                        } else {
+                            // 监狱劳动产生收入
+                            const prison = this.buildings.find(b => b.id === 'prison');
+                            if (prison && prison.isBuilt) {
+                                // 每个囚犯每小时产生5-10元的劳动收入
+                                const laborIncome = parseFloat((rand(5, 10)).toFixed(2));
+                                if (!prison.buildingMoney) prison.buildingMoney = 0;
+                                prison.buildingMoney = parseFloat((prison.buildingMoney + laborIncome).toFixed(2));
+                                // 记录建筑收入（不交税，因为是政府建筑）
+                                this.recordBuildingRevenue('prison', laborIncome, 0);
+                                if (Math.random() < 0.1) { // 10%概率记录日志
+                                    prison.addLog(`${this.getDateTimeStr()} 囚犯 ${c.name} 参与劳动，产生收入 💰${this.formatMoney(laborIncome)}`);
+                                }
+                            }
+                        }
+                    }
                     c.hunger = Math.max(0, c.hunger - 0.4);
                     if (c.hunger === 0) c.happiness -= 2;
                     if (c.health < 30) c.happiness -= 5;
@@ -735,7 +792,8 @@ const TOWN_EVENTS = [
             if (this.lastConstructionVoteTime > 0 && (now - this.lastConstructionVoteTime) < 5000) {
                 return;
             }
-            const unbuilt = this.buildings.filter(b => !b.isBuilt && !b.isUnderConstruction);
+            // 排除发电建筑（只能玩家建造）
+            const unbuilt = this.buildings.filter(b => !b.isBuilt && !b.isUnderConstruction && b.category !== 'power');
             if (unbuilt.length === 0) return;
             const candidates = [];
             const tempUnbuilt = [...unbuilt];
@@ -872,7 +930,8 @@ const TOWN_EVENTS = [
                 'amusement': [{ icon: '🎡', text: '游玩娱乐', desc: addPrice('心情 +35，社交 +0.8，体力 +10', price) }],
                 'park': [{ icon: '🌳', text: '散步休闲', desc: '心情 +8~10，社交 +0.3，诚信 +0.1，体力 +10（免费）' }],
                 'baozi': [{ icon: '🥟', text: '用餐', desc: addPrice('饱食度 +25，心情 +5，体力 +8~33（根据包子类型）', price) }],
-                'clinic': [{ icon: '💊', text: '收费治疗', desc: addPrice('健康 +30，心情 +5，体力 +5', price) }, { icon: '📈', text: '上限提升', desc: '3%概率提升健康上限（最高120）' }]
+                'clinic': [{ icon: '💊', text: '收费治疗', desc: addPrice('健康 +30，心情 +5，体力 +5', price) }, { icon: '📈', text: '上限提升', desc: '3%概率提升健康上限（最高120）' }],
+                'concert': [{ icon: '🎼', text: '古典乐音乐会', desc: addPrice('文化 +1.5，心情 +15，体力 +8', 80) }, { icon: '🎵', text: '流行乐音乐会', desc: addPrice('文化 +1.0，心情 +18，社交 +0.3，体力 +8', 60) }, { icon: '🎸', text: '摇滚乐音乐会', desc: addPrice('文化 +0.8，心情 +20，社交 +0.5，体力 +10', 70) }]
             };
             return effects[buildingId] || null;
         }
@@ -933,16 +992,17 @@ const TOWN_EVENTS = [
         findItemInBag(p, type) { return p.bag.find(id => ITEMS_DB[id] && ITEMS_DB[id].type === type); }
         decideAction(p) {
             if (p.jailTerm > 0) { p.currentAction = `[🛑坐牢] 铁窗泪 (剩余 ${(p.jailTerm/60).toFixed(1)}h)`; p.hunger = Math.max(0, p.hunger - 0.5); p.happiness = Math.max(0, p.happiness - 0.5); p.consecutiveWork = 0; return; }
-            if (p.nextActionOverride) { const cmd = p.nextActionOverride; p.nextActionOverride = null; this.log(`[🕹️强制] 上帝控制 **${p.name}** 去 ${cmd.desc}...`, "tag-build"); if (cmd.type === 'work' && p.job) { const b = this.buildings.find(x => x.id === p.job.buildingId); const hour = Math.floor(this.gameTime / 60); if(b && b.isOpen(hour, this.gameDay)) { this.doWork(p, b); return; } else if(b && !b.isOpen(hour, this.gameDay)) { this.log(`[⚠️] ${b.name}当前不在营业时间，无法工作`, "tag-reject"); return; } } else if (cmd.type === 'rest') { this.doRest(p, {name:"家", price:0}); return; } else if (cmd.type === 'build') { const b = this.buildings.find(x => x.id === cmd.target); if (b) { this.doBuild(p, b); return; } } else if (cmd.type === 'visit') { const b = this.buildings.find(x => x.id === cmd.target); if (b) { if(b.effect==='food') this.doEat(p, b); else if(b.effect==='shop') this.doShopping(p, b); else this.doRest(p, b); return; } } else if (cmd.type === 'social') { const t = this.chars.find(x => x.name === cmd.target); if (t) { const park = this.buildings.find(b=>b.id==='park'); this.doSocialTarget(p, t, park || {name:"路边", effect:"none"}); return; } } else if (cmd.type === 'crime_rob') { const t = this.chars.find(x => x.name === cmd.target); if (t) { this.doRobbery(p, t); return; } } else if (cmd.type === 'crime_assault') { const t = this.chars.find(x => x.name === cmd.target); if (t) { this.doSexualAssault(p, t); return; } } }
+            if (p.nextActionOverride) { const cmd = p.nextActionOverride; p.nextActionOverride = null; this.log(`[🕹️强制] 上帝控制 **${p.name}** 去 ${cmd.desc}...`, "tag-build"); if (cmd.type === 'work' && p.job) { const b = this.buildings.find(x => x.id === p.job.buildingId); const hour = Math.floor(this.gameTime / 60); const totalPower = this.getTotalPowerGeneration(); if(b && b.isOpen(hour, this.gameDay, totalPower)) { this.doWork(p, b); return; } else if(b && !b.isOpen(hour, this.gameDay, totalPower)) { this.log(`[⚠️] ${b.name}当前不在营业时间或电力不足，无法工作`, "tag-reject"); return; } } else if (cmd.type === 'rest') { this.doRest(p, {name:"家", price:0}); return; } else if (cmd.type === 'build') { const b = this.buildings.find(x => x.id === cmd.target); if (b) { this.doBuild(p, b); return; } } else if (cmd.type === 'visit') { const b = this.buildings.find(x => x.id === cmd.target); if (b) { if(b.effect==='food') this.doEat(p, b); else if(b.effect==='shop') this.doShopping(p, b); else this.doRest(p, b); return; } } else if (cmd.type === 'social') { const t = this.chars.find(x => x.name === cmd.target); if (t) { const park = this.buildings.find(b=>b.id==='park'); this.doSocialTarget(p, t, park || {name:"路边", effect:"none"}); return; } } else if (cmd.type === 'crime_rob') { const t = this.chars.find(x => x.name === cmd.target); if (t) { this.doRobbery(p, t); return; } } else if (cmd.type === 'crime_assault') { const t = this.chars.find(x => x.name === cmd.target); if (t) { this.doSexualAssault(p, t); return; } } }
             this.breakInteraction(p);
             const hour = Math.floor(this.gameTime / 60);
+            const totalPower = this.getTotalPowerGeneration();
             // 生理需求判断
             if (p.stamina < 20) {
                 // 优先选择火烧铺或包子铺（随机选择，增加多样性）
                 const cheapFoodPlaces = this.buildings.filter(b => 
                     (b.id === 'huoshao' || b.id === 'baozi') && 
                     b.isBuilt && 
-                    b.isOpen(hour, this.gameDay) && 
+                    b.isOpen(hour, this.gameDay, totalPower) && 
                     p.money >= (b.price || 3.5)
                 );
                 if (cheapFoodPlaces.length > 0) {
@@ -953,17 +1013,17 @@ const TOWN_EVENTS = [
                 p.currentAction = "体力耗尽，被迫休息";
                 return;
             }
-            if (p.health < 40) { const medId = this.findItemInBag(p, 'medicine'); if (medId) { this.doUseItem(p, medId); return; } const clinic = this.buildings.find(b => b.id === 'clinic'); if (clinic && clinic.isBuilt && clinic.isOpen(hour, this.gameDay) && p.money >= 10) { this.doShopping(p, clinic, 'medicine'); return; } const hospitals = this.buildings.filter(b => b.isBuilt && b.effect === 'health' && b.isOpen(hour, this.gameDay) && p.money >= b.price); if (hospitals.length > 0) { this.doRest(p, choose(hospitals)); return; } this.doRest(p, {name:"家", price:0}); return; }
+            if (p.health < 40) { const medId = this.findItemInBag(p, 'medicine'); if (medId) { this.doUseItem(p, medId); return; } const clinic = this.buildings.find(b => b.id === 'clinic'); if (clinic && clinic.isBuilt && clinic.isOpen(hour, this.gameDay, totalPower) && p.money >= 10) { this.doShopping(p, clinic, 'medicine'); return; } const hospitals = this.buildings.filter(b => b.isBuilt && b.effect === 'health' && b.isOpen(hour, this.gameDay, totalPower) && p.money >= b.price); if (hospitals.length > 0) { this.doRest(p, choose(hospitals)); return; } this.doRest(p, {name:"家", price:0}); return; }
             if (p.hunger < 30) { const foodId = this.findItemInBag(p, 'food') || this.findItemInBag(p, 'snack'); if (foodId) { this.doUseItem(p, foodId); return; } 
                 // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理）
                 const restaurants = this.buildings.filter(b => 
                     b.isBuilt && 
-                    b.isOpen(hour, this.gameDay) && 
+                    b.isOpen(hour, this.gameDay, totalPower) && 
                     p.money >= (b.price || 0) &&
                     ((b.effect === 'food') || (b.id === 'baozi'))
                 ); 
                 if (restaurants.length > 0) { this.doEat(p, choose(restaurants)); return; } 
-                const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay) && b.id !== 'baozi'); 
+                const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay, totalPower) && b.id !== 'baozi'); 
                 if (shops.length > 0 && p.money >= 5) { this.doShopping(p, choose(shops), 'food'); return; } }
             const isMealTime = (hour >= 6 && hour < 9) || (hour >= 11 && hour < 14) || (hour >= 17 && hour < 20);
             const timeSinceLastMeal = this.gameTime - (p.lastMealTime || -999);
@@ -971,12 +1031,12 @@ const TOWN_EVENTS = [
                 // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理）
                 const restaurants = this.buildings.filter(b => 
                     b.isBuilt && 
-                    b.isOpen(hour, this.gameDay) && 
+                    b.isOpen(hour, this.gameDay, totalPower) && 
                     p.money >= (b.price || 0) &&
                     ((b.effect === 'food') || (b.id === 'baozi'))
                 ); 
                 if (restaurants.length > 0) { this.doEat(p, choose(restaurants)); return; } 
-                const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay) && b.id !== 'baozi'); 
+                const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay, totalPower) && b.id !== 'baozi'); 
                 if (shops.length > 0 && p.money >= 5) { this.doShopping(p, choose(shops), 'food'); return; } }
             const isPoor = p.money < 10; const isGreedy = p.hasTrait('greedy'); const isMilitant = p.ideology.name === '军国主义';
             const isHorny = p.hasTrait('estrous') || p.hasTrait('lustful'); const isUgly = p.appearance < 50; const isDepressed = p.happiness < 30;
@@ -1012,7 +1072,7 @@ const TOWN_EVENTS = [
             if (p.job) {
                 const workplace = this.buildings.find(b => b.id === p.job.buildingId);
                 if (workplace && workplace.isBuilt) {
-                    if (workplace.isOpen(hour, this.gameDay)) {
+                    if (workplace.isOpen(hour, this.gameDay, totalPower)) {
                         // 在营业时间内，如果满足工作条件就工作
                         if (p.hunger > 0 && p.stamina >= 30) {
                             this.doWork(p, workplace);
@@ -1029,9 +1089,9 @@ const TOWN_EVENTS = [
                     }
                 }
             }
-            if (p.prostitute && p.hunger > 0) { const footshop = this.buildings.find(b => b.id === p.prostitute.buildingId); if (footshop && footshop.isBuilt && footshop.isOpen(hour, this.gameDay)) { this.doProstitution(p, footshop); return; } }
+            if (p.prostitute && p.hunger > 0) { const footshop = this.buildings.find(b => b.id === p.prostitute.buildingId); if (footshop && footshop.isBuilt && footshop.isOpen(hour, this.gameDay, totalPower)) { this.doProstitution(p, footshop); return; } }
             if (!p.job && p.money < 20 && p.hunger > 0) { if ((p.hasTrait('estrous') || p.hasTrait('lustful')) && Math.random() < 0.6) { this.doStreetwalking(p); } else { this.doOddJob(p); } return; }
-            if (p.happiness < 40) { const funItemId = p.bag.find(id => ITEMS_DB[id] && (ITEMS_DB[id].type === 'alcohol' || ITEMS_DB[id].type === 'snack' || ITEMS_DB[id].type === 'drink' || ITEMS_DB[id].type === 'book')); if (funItemId) { this.doUseItem(p, funItemId); return; } const venues = this.buildings.filter(b => b.isBuilt && (b.category === 'fun' || b.effect === 'fun_high') && b.isOpen(hour, this.gameDay) && p.money >= b.price); if (venues.length > 0) { this.doRest(p, choose(venues)); return; } }
+            if (p.happiness < 40) { const funItemId = p.bag.find(id => ITEMS_DB[id] && (ITEMS_DB[id].type === 'alcohol' || ITEMS_DB[id].type === 'snack' || ITEMS_DB[id].type === 'drink' || ITEMS_DB[id].type === 'book')); if (funItemId) { this.doUseItem(p, funItemId); return; } const venues = this.buildings.filter(b => b.isBuilt && (b.category === 'fun' || b.effect === 'fun_high') && b.isOpen(hour, this.gameDay, totalPower) && p.money >= b.price); if (venues.length > 0) { this.doRest(p, choose(venues)); return; } }
             // 主动送礼：当对某个人的好感度达到30以上时，会尝试送礼物
             if (this.tryGiveGiftToLovedOne(p, hour)) return;
             // 投资判断：居民有钱时，有一定概率选择投资
@@ -1057,9 +1117,9 @@ const TOWN_EVENTS = [
                     }
                 }
             }
-            if (p.bag.length < 2 && p.money > 80 && Math.random() < 0.3) { const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.isOpen(hour, this.gameDay)); if (shops.length > 0) { let intention = 'food'; if (this.findItemInBag(p, 'food')) intention = 'medicine'; if (this.findItemInBag(p, 'medicine')) intention = 'gift'; this.doShopping(p, choose(shops), intention); return; } }
+            if (p.bag.length < 2 && p.money > 80 && Math.random() < 0.3) { const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.isOpen(hour, this.gameDay, totalPower)); if (shops.length > 0) { let intention = 'food'; if (this.findItemInBag(p, 'food')) intention = 'medicine'; if (this.findItemInBag(p, 'medicine')) intention = 'gift'; this.doShopping(p, choose(shops), intention); return; } }
             const multiplier = p.hasTrait('frugal') ? 0.5 : (p.hasTrait('lavish') ? 2 : 1);
-            const venues = this.buildings.filter(b => b.isBuilt && b.isOpen(hour, this.gameDay) && (p.money >= b.price * multiplier)); const venue = choose(venues) || { name: "路边", effect: "none", price: 0 };
+            const venues = this.buildings.filter(b => b.isBuilt && b.isOpen(hour, this.gameDay, totalPower) && (p.money >= b.price * multiplier)); const venue = choose(venues) || { name: "路边", effect: "none", price: 0 };
             const pendingProject = choose(this.buildings.filter(b => !b.isBuilt && b.isUnderConstruction));
             if (roll < 0.3 && p.hunger > 0) {
                 if (pendingProject) { this.doBuild(p, pendingProject); }
@@ -1076,7 +1136,7 @@ const TOWN_EVENTS = [
             if (!victim) { const targets = this.chars.filter(c => c.name !== p.name && c.appearance >= 70); victim = targets.length > 0 ? choose(targets) : choose(this.chars.filter(c => c.name !== p.name)); }
             if (!victim) return false;
             this.unlockAchievement('first_crime');
-            const policeStation = this.buildings.find(b => b.id === 'police'); const hasPolice = policeStation && policeStation.isBuilt && policeStation.staff.length > 0; let securityLevel = hasPolice ? policeStation.staff.length * 0.3 : 0; let successChance = 0.6 - securityLevel; if (p.appearance > 80) successChance += 0.2;
+            const policeStation = this.buildings.find(b => b.id === 'police'); const hasPolice = policeStation && policeStation.isBuilt && policeStation.staff.length > 0; const prison = this.buildings.find(b => b.id === 'prison'); const hasPrison = prison && prison.isBuilt && prison.staff.length > 0; let securityLevel = hasPolice ? policeStation.staff.length * 0.3 : 0; if (hasPrison) securityLevel += prison.staff.length * 0.2; // 监狱也提供治安加成 let successChance = 0.6 - securityLevel; if (p.appearance > 80) successChance += 0.2;
             const timeStr = this.getDateTimeStr();
             // 犯罪增加恶意值，减少诚信
             p.skills.malice = Math.min(100, (p.skills.malice||0) + 5);
@@ -1115,7 +1175,7 @@ const TOWN_EVENTS = [
             p.stamina = Math.max(0, p.stamina - 10);
             
             // 选择一个地点
-            const venues = this.buildings.filter(b => b.isBuilt && b.isOpen(Math.floor(this.gameTime / 60), this.gameDay));
+            const venues = this.buildings.filter(b => b.isBuilt && b.isOpen(Math.floor(this.gameTime / 60), this.gameDay, this.getTotalPowerGeneration()));
             const location = venues.length > 0 ? choose(venues) : { name: "偏僻角落", id: null };
             
             // 第一阶段：扣走目标
@@ -1451,7 +1511,7 @@ const TOWN_EVENTS = [
         }
         // 渲染政府建筑工资支出信息
         renderGovernmentWages() {
-            const governmentBuildings = ['bank', 'govbuilding', 'police'];
+            const governmentBuildings = ['bank', 'govbuilding', 'police', 'tvstation', 'prison'];
             let governmentWagesHtml = '';
             let totalWage = 0;
             
@@ -1771,7 +1831,7 @@ const TOWN_EVENTS = [
             });
             
             // 政府建筑列表（直接从镇库支付工资）
-            const governmentBuildings = ['bank', 'govbuilding', 'police'];
+            const governmentBuildings = ['bank', 'govbuilding', 'police', 'tvstation', 'prison'];
             
             // 从建筑资金槽支付工资，并将剩余资金移入银行
             Object.keys(buildingWages).forEach(buildingId => {
@@ -1818,15 +1878,27 @@ const TOWN_EVENTS = [
                     return; // 政府建筑处理完毕，跳过后续逻辑
                 }
                 
+                // 计算总发电量和总用电量
+                const totalPowerGeneration = this.getTotalPowerGeneration();
+                const totalPowerConsumption = this.getTotalPowerConsumption();
+                const hasEnoughPower = b.hasEnoughPower(totalPowerGeneration);
+                
+                // 如果电力不足，工资减半
+                let actualWage = totalWage;
+                if (!hasEnoughPower && b.powerConsumption > 0) {
+                    actualWage = parseFloat((totalWage * 0.5).toFixed(2));
+                    this.log(`[⚠️电力] **${b.name}** 电力不足，员工工资减半！`, "tag-reject");
+                }
+                
                 // 普通建筑：从建筑资金槽支付工资
                 let availableMoney = b.buildingMoney || 0;
                 
                 // 如果建筑资金槽不够，尝试从银行存款提取
-                if (availableMoney < totalWage) {
+                if (availableMoney < actualWage) {
                     const bank = this.buildings.find(x => x.id === 'bank');
                     if (bank && bank.isBuilt && bank.bankDeposits && bank.bankDeposits[b.id]) {
                         const bankDeposit = bank.bankDeposits[b.id] || 0;
-                        const needed = totalWage - availableMoney;
+                        const needed = actualWage - availableMoney;
                         if (bankDeposit >= needed) {
                             // 银行存款足够，提取所需金额
                             bank.bankDeposits[b.id] = parseFloat((bank.bankDeposits[b.id] - needed).toFixed(2));
@@ -1844,15 +1916,20 @@ const TOWN_EVENTS = [
                     }
                 }
                 
-                if (availableMoney >= totalWage) {
-                    // 资金充足，全额支付
-                    const usedFromBuilding = Math.min(b.buildingMoney || 0, totalWage);
+                if (availableMoney >= actualWage) {
+                    // 资金充足，支付（考虑电力影响）
+                    const usedFromBuilding = Math.min(b.buildingMoney || 0, actualWage);
                     b.buildingMoney = parseFloat(((b.buildingMoney || 0) - usedFromBuilding).toFixed(2));
                     
                     wageInfo.employees.forEach(emp => {
-                        emp.char.money = parseFloat((emp.char.money + emp.wage).toFixed(2));
-                        this.addCharIncome(emp.char, emp.wage, `工资 - ${b.name}`);
-                        emp.char.addLog(`[💰工资] 收到今日工资 💰${this.formatMoney(emp.wage)}`);
+                        // 根据电力情况支付工资
+                        let finalWage = emp.wage;
+                        if (!hasEnoughPower && b.powerConsumption > 0) {
+                            finalWage = parseFloat((emp.wage * 0.5).toFixed(2));
+                        }
+                        emp.char.money = parseFloat((emp.char.money + finalWage).toFixed(2));
+                        this.addCharIncome(emp.char, finalWage, `工资 - ${b.name}${!hasEnoughPower && b.powerConsumption > 0 ? '（电力不足减半）' : ''}`);
+                        emp.char.addLog(`[💰工资] 收到今日工资 💰${this.formatMoney(finalWage)}${!hasEnoughPower && b.powerConsumption > 0 ? '（电力不足，工资减半）' : ''}`);
                     });
                     
                     // 将剩余资金移入银行（存入银行建筑）
@@ -1872,14 +1949,20 @@ const TOWN_EVENTS = [
                     }
                 } else {
                     // 资金仍然不足，按比例支付
-                    const ratio = availableMoney / totalWage;
+                    const ratio = availableMoney / actualWage;
                     
                     wageInfo.employees.forEach(emp => {
-                        const actualWage = parseFloat((emp.wage * ratio).toFixed(2));
-                        if (actualWage > 0) {
-                            emp.char.money = parseFloat((emp.char.money + actualWage).toFixed(2));
-                            this.addCharIncome(emp.char, actualWage, `工资 - ${b.name}（部分）`);
-                            emp.char.addLog(`[💰工资] 收到今日工资 💰${this.formatMoney(actualWage)}（${b.name}资金不足，仅支付部分）`);
+                        // 先计算电力影响后的工资
+                        let baseWage = emp.wage;
+                        if (!hasEnoughPower && b.powerConsumption > 0) {
+                            baseWage = parseFloat((emp.wage * 0.5).toFixed(2));
+                        }
+                        // 再按资金比例支付
+                        const finalWage = parseFloat((baseWage * ratio).toFixed(2));
+                        if (finalWage > 0) {
+                            emp.char.money = parseFloat((emp.char.money + finalWage).toFixed(2));
+                            this.addCharIncome(emp.char, finalWage, `工资 - ${b.name}（部分${!hasEnoughPower && b.powerConsumption > 0 ? '，电力不足减半' : ''}）`);
+                            emp.char.addLog(`[💰工资] 收到今日工资 💰${this.formatMoney(finalWage)}（${b.name}资金不足，仅支付部分${!hasEnoughPower && b.powerConsumption > 0 ? '，且电力不足工资减半' : ''}）`);
                         } else {
                             emp.char.addLog(`[⚠️工资] ${b.name}资金不足，今日未收到工资`);
                         }
@@ -1887,6 +1970,82 @@ const TOWN_EVENTS = [
                     
                     b.buildingMoney = 0;
                     this.log(`[⚠️警告] **${b.name}** 资金不足，员工工资仅支付了部分！`, "tag-reject");
+                }
+            });
+        }
+        // 计算总发电量
+        getTotalPowerGeneration() {
+            return this.buildings
+                .filter(b => b.isBuilt && b.powerGeneration > 0)
+                .reduce((sum, b) => sum + (b.powerGeneration || 0) + (b.powerCapacity || 0), 0);
+        }
+        // 计算总用电量
+        getTotalPowerConsumption() {
+            return this.buildings
+                .filter(b => b.isBuilt && b.powerConsumption > 0)
+                .reduce((sum, b) => sum + (b.powerConsumption || 0), 0);
+        }
+        // 每日电费结算
+        settleElectricityBills() {
+            const totalPowerGeneration = this.getTotalPowerGeneration();
+            const totalPowerConsumption = this.getTotalPowerConsumption();
+            const electricityPrice = 0.5; // 每千瓦/天电费（元）
+            
+            // 政府建筑列表（直接从镇库扣除电费）
+            const governmentBuildings = ['bank', 'govbuilding', 'police', 'prison', 'tvstation'];
+            
+            // 为每个已建成的建筑结算电费
+            this.buildings.forEach(b => {
+                if (!b.isBuilt || b.powerConsumption === 0 || b.category === 'power') return;
+                
+                const hasEnoughPower = b.hasEnoughPower(totalPowerGeneration);
+                if (hasEnoughPower) {
+                    // 计算电费
+                    const electricityBill = parseFloat((b.powerConsumption * electricityPrice).toFixed(2));
+                    
+                    // 政府建筑直接从镇库扣除电费
+                    if (governmentBuildings.includes(b.id)) {
+                        if (this.townMoney >= electricityBill) {
+                            this.townMoney = parseFloat((this.townMoney - electricityBill).toFixed(2));
+                            this.addFinanceRecord(-electricityBill, `电费支出 - ${b.name}`);
+                        } else {
+                            // 镇库资金不足，记录警告
+                            this.log(`[⚠️电力] **${b.name}** 镇库资金不足，电费未支付！`, "tag-reject");
+                        }
+                    } else {
+                        // 普通建筑从建筑资金槽或银行存款扣除电费
+                        if (b.buildingMoney >= electricityBill) {
+                            b.buildingMoney = parseFloat((b.buildingMoney - electricityBill).toFixed(2));
+                            this.townMoney = parseFloat((this.townMoney + electricityBill).toFixed(2));
+                            this.addFinanceRecord(electricityBill, `电费收入 - ${b.name}`);
+                        } else {
+                            // 建筑资金不足，从银行存款扣除
+                            const bank = this.buildings.find(x => x.id === 'bank');
+                            if (bank && bank.isBuilt && bank.bankDeposits && bank.bankDeposits[b.id]) {
+                                const deposit = bank.bankDeposits[b.id] || 0;
+                                if (deposit >= electricityBill) {
+                                    bank.bankDeposits[b.id] = parseFloat((deposit - electricityBill).toFixed(2));
+                                    this.townMoney = parseFloat((this.townMoney + electricityBill).toFixed(2));
+                                    this.addFinanceRecord(electricityBill, `电费收入 - ${b.name}`);
+                                    if (bank.bankDeposits[b.id] <= 0) {
+                                        delete bank.bankDeposits[b.id];
+                                    }
+                                } else {
+                                    // 银行存款也不足，扣除全部存款
+                                    this.townMoney = parseFloat((this.townMoney + deposit).toFixed(2));
+                                    this.addFinanceRecord(deposit, `电费收入 - ${b.name}（部分）`);
+                                    delete bank.bankDeposits[b.id];
+                                    this.log(`[⚠️电力] **${b.name}** 资金不足，电费未完全支付！`, "tag-reject");
+                                }
+                            } else {
+                                // 没有银行存款，电费未支付
+                                this.log(`[⚠️电力] **${b.name}** 资金不足，电费未支付！`, "tag-reject");
+                            }
+                        }
+                    }
+                } else {
+                    // 电力不足，不交电费，但建筑运营受影响（已在工资结算中处理）
+                    this.log(`[⚠️电力] **${b.name}** 电力不足，无法正常运营！`, "tag-reject");
                 }
             });
         }
@@ -2243,7 +2402,7 @@ const TOWN_EVENTS = [
             p.consecutiveWork = 0;
             let victim = target; if (!victim) { const targets = this.chars.filter(c => c.name !== p.name && c.money > 20); if (targets.length === 0) return false; victim = choose(targets); }
             this.unlockAchievement('first_crime');
-            const policeStation = this.buildings.find(b => b.id === 'police'); const hasPolice = policeStation && policeStation.isBuilt && policeStation.staff.length > 0; let securityLevel = hasPolice ? policeStation.staff.length * 0.3 : 0; let successChance = 0.5; if (p.ideology.name === '军国主义') successChance += 0.2; successChance -= securityLevel;
+            const policeStation = this.buildings.find(b => b.id === 'police'); const hasPolice = policeStation && policeStation.isBuilt && policeStation.staff.length > 0; const prison = this.buildings.find(b => b.id === 'prison'); const hasPrison = prison && prison.isBuilt && prison.staff.length > 0; let securityLevel = hasPolice ? policeStation.staff.length * 0.3 : 0; if (hasPrison) securityLevel += prison.staff.length * 0.2; // 监狱也提供治安加成 let successChance = 0.5; if (p.ideology.name === '军国主义') successChance += 0.2; successChance -= securityLevel;
             const timeStr = this.getDateTimeStr();
             // 抢劫增加恶意值，大幅减少诚信
             p.skills.malice = Math.min(100, (p.skills.malice||0) + 10);
@@ -2254,9 +2413,14 @@ const TOWN_EVENTS = [
         doWork(p, b) {
             // 检查是否在营业时间内
             const hour = Math.floor(this.gameTime / 60);
-            if (!b.isOpen(hour, this.gameDay)) {
-                // 不在营业时间，员工应该离开工作岗位
-                p.currentAction = `[下班] ${b.name}已关门`;
+            const totalPower = this.getTotalPowerGeneration();
+            if (!b.isOpen(hour, this.gameDay, totalPower)) {
+                // 不在营业时间或电力不足，员工应该离开工作岗位
+                if (b.powerConsumption > 0 && !b.hasEnoughPower(totalPower)) {
+                    p.currentAction = `[停电] ${b.name}电力不足，无法工作`;
+                } else {
+                    p.currentAction = `[下班] ${b.name}已关门`;
+                }
                 return;
             }
             const role = p.job.role;
@@ -2509,6 +2673,55 @@ const TOWN_EVENTS = [
                             p.addLog(`${timeStr} 定期体检，身体更健康了！`);
                         }
                     }
+                    else if (buildingId === 'concert') {
+                        // 音乐厅：购买门票欣赏音乐会（随机选择演出类型）
+                        const concertTypes = [
+                            { name: '古典乐', icon: '🎼', price: 80, culture: 1.5, happiness: 15, stamina: 8, social: 0 },
+                            { name: '流行乐', icon: '🎵', price: 60, culture: 1.0, happiness: 18, stamina: 8, social: 0.3 },
+                            { name: '摇滚乐', icon: '🎸', price: 70, culture: 0.8, happiness: 20, stamina: 10, social: 0.5 }
+                        ];
+                        // 根据居民资金选择可负担的演出类型
+                        let availableTypes = concertTypes.filter(t => {
+                            let finalPrice = t.price;
+                            if (p.hasTrait('frugal')) finalPrice *= 0.8;
+                            if (p.hasTrait('lavish')) finalPrice *= 1.5;
+                            return p.money >= finalPrice;
+                        });
+                        if (availableTypes.length === 0) {
+                            // 如果都买不起，选择最便宜的
+                            availableTypes = [concertTypes.reduce((min, t) => t.price < min.price ? t : min)];
+                        }
+                        const selectedConcert = choose(availableTypes);
+                        // 计算实际门票价格（考虑特质影响）
+                        let concertPrice = selectedConcert.price;
+                        if (p.hasTrait('frugal')) concertPrice *= 0.8;
+                        if (p.hasTrait('lavish')) concertPrice *= 1.5;
+                        concertPrice = parseFloat(concertPrice.toFixed(2));
+                        // 检查资金是否足够
+                        if (p.money < concertPrice) {
+                            p.currentAction = `在 路边 闲逛`;
+                            p.addLog(`${timeStr} 想观看${selectedConcert.name}音乐会但资金不足`);
+                            return;
+                        }
+                        // 扣除门票费用（需要扣除额外费用，因为cost已经基于v.price扣除了）
+                        const basePrice = v.price || 0;
+                        const additionalCost = parseFloat((concertPrice - basePrice).toFixed(2));
+                        if (additionalCost > 0) {
+                            p.money = parseFloat((p.money - additionalCost).toFixed(2));
+                            this.collectTax(additionalCost, `音乐会门票 - ${p.name}在${v.name}观看${selectedConcert.name}`, buildingId);
+                        } else if (additionalCost < 0) {
+                            // 如果实际价格低于基础价格，退还多余部分（理论上不会发生）
+                            p.money = parseFloat((p.money - additionalCost).toFixed(2));
+                        }
+                        happyGain = selectedConcert.happiness;
+                        staminaGain += selectedConcert.stamina;
+                        p.currentAction = `[${selectedConcert.icon}${selectedConcert.name}] 在 ${v.name} 欣赏${selectedConcert.name}音乐会`;
+                        this.improveSkill(p, 'culture', selectedConcert.culture);
+                        if (selectedConcert.social > 0) {
+                            this.improveSkill(p, 'social', selectedConcert.social);
+                        }
+                        v.addLog(`${timeStr} ${p.name} 购买了${selectedConcert.name}音乐会门票 💰${this.formatMoney(concertPrice)}`);
+                    }
                     else if (v.effect === 'food') {
                         p.hunger = Math.min(100, p.hunger + v.food);
                         p.lastMealTime = this.gameTime;
@@ -2539,6 +2752,21 @@ const TOWN_EVENTS = [
                         staminaGain += 5;
                         p.currentAction = `[参观] 在 ${v.name} 增长见闻`;
                         this.improveSkill(p, 'culture', 0.5);
+                    }
+                    else if (v.effect === 'culture') {
+                        // 音乐厅：高雅艺术，提升文化技能和心情
+                        happyGain = 12;
+                        staminaGain += 8;
+                        p.currentAction = `[🎵欣赏] 在 ${v.name} 聆听高雅音乐`;
+                        this.improveSkill(p, 'culture', 1.0);
+                        this.improveSkill(p, 'social', 0.2);
+                    }
+                    else if (v.effect === 'entertainment') {
+                        // 电视台：提供娱乐和新闻，提升居民心情
+                        happyGain = 10;
+                        staminaGain += 5;
+                        p.currentAction = `[📺观看] 在 ${v.name} 观看节目`;
+                        this.improveSkill(p, 'culture', 0.3);
                     }
                     else if (v.effect === 'tourist') {
                         happyGain = 10;
@@ -2617,6 +2845,28 @@ const TOWN_EVENTS = [
                         staminaGain += 5;
                         p.currentAction = `[学习] 在 ${v.name} 汲取知识`;
                         this.improveSkill(p, 'culture', 0.5);
+                    }
+                    else if (buildingId === 'concert') {
+                        // 音乐厅：免费参观（如果价格是0）
+                        p.happiness = Math.min(100, p.happiness + 10);
+                        staminaGain += 5;
+                        p.currentAction = `[🎵参观] 在 ${v.name} 参观`;
+                        this.improveSkill(p, 'culture', 0.5);
+                    }
+                    else if (v.effect === 'culture') {
+                        // 音乐厅：高雅艺术，提升文化技能和心情（通用效果）
+                        p.happiness = Math.min(100, p.happiness + 12);
+                        staminaGain += 8;
+                        p.currentAction = `[🎵欣赏] 在 ${v.name} 聆听高雅音乐`;
+                        this.improveSkill(p, 'culture', 1.0);
+                        this.improveSkill(p, 'social', 0.2);
+                    }
+                    else if (v.effect === 'entertainment') {
+                        // 电视台：提供娱乐和新闻，提升居民心情
+                        p.happiness = Math.min(100, p.happiness + 10);
+                        staminaGain += 5;
+                        p.currentAction = `[📺观看] 在 ${v.name} 观看节目`;
+                        this.improveSkill(p, 'culture', 0.3);
                     } else {
                         p.currentAction = `在 ${v.name} 放松`;
                     }
@@ -2700,17 +2950,19 @@ const TOWN_EVENTS = [
             if (giftIndex !== -1) {
                 // 有礼物，主动去找那个人并送礼物
                 // 找一个合适的场所进行社交互动
-                const venue = this.buildings.find(b => b.isBuilt && b.isOpen(hour, this.gameDay)) || { name: "路边", effect: "none", price: 0 };
+                const totalPower = this.getTotalPowerGeneration();
+                const venue = this.buildings.find(b => b.isBuilt && b.isOpen(hour, this.gameDay, totalPower)) || { name: "路边", effect: "none", price: 0 };
                 // 直接进行社交互动，doSocial 中会自动尝试送礼物
                 this.doSocialWithTarget(p, lovedOne, venue);
                 return true;
             } else {
                 // 没有礼物，尝试购买礼物
                 // 需要有钱且能找到卖礼物的商店
+                const totalPower = this.getTotalPowerGeneration();
                 const giftShops = this.buildings.filter(b => 
                     b.isBuilt && 
                     b.effect === 'shop' && 
-                    b.isOpen(hour, this.gameDay) && 
+                    b.isOpen(hour, this.gameDay, totalPower) && 
                     b.sells.some(id => ITEMS_DB[id] && ITEMS_DB[id].type === 'gift')
                 );
                 if (giftShops.length > 0) {
@@ -2955,6 +3207,9 @@ const TOWN_EVENTS = [
                     if (bData.weeklyTax === undefined) b.weeklyTax = 0;
                     if (bData.lastResetDay === undefined) b.lastResetDay = this.dateDay;
                     if (bData.lastResetWeek === undefined) b.lastResetWeek = this.gameDay;
+                    // 初始化发电槽（兼容旧存档）
+                    if (bData.powerCapacity !== undefined) b.powerCapacity = bData.powerCapacity;
+                    else b.powerCapacity = 0;
                     return b;
                 });
                 this.chars = data.chars.map(cData => {
@@ -3010,7 +3265,7 @@ const TOWN_EVENTS = [
         }
         renderUIStatic() {
             const bList = document.getElementById('build-list'); if(!bList) return; bList.innerHTML = '';
-            const categories = ['food', 'fun', 'service', 'shop', 'landmark', 'government', 'residence'];
+            const categories = ['food', 'fun', 'service', 'shop', 'landmark', 'government', 'residence', 'power'];
             categories.forEach(cat => {
                 const catHeader = document.createElement('div'); catHeader.className = 'category-header'; catHeader.innerText = CATEGORY_NAMES[cat] || cat; bList.appendChild(catHeader);
                 this.buildings.filter(b => b.category === cat).forEach(b => {
@@ -3022,7 +3277,12 @@ const TOWN_EVENTS = [
                         } else if (b.currentProgress > 0 || b.hasPermit) {
                             btnHtml = `<button class="btn resume-build" onclick="gameInstance.toggleConstruction('${b.id}')">▶ 恢复施工</button>`;
                         } else {
-                            btnHtml = `<button class="btn start-build" disabled title="请等待镇长发起投票">🗳️ 待投票启动</button>`;
+                            // 发电建筑可以直接建造，不需要投票
+                            if (b.category === 'power') {
+                                btnHtml = `<button class="btn start-build" onclick="gameInstance.toggleConstruction('${b.id}')">🏗️ 开始建造</button>`;
+                            } else {
+                                btnHtml = `<button class="btn start-build" disabled title="请等待镇长发起投票">🗳️ 待投票启动</button>`;
+                            }
                         }
                     }
                     // 获取当前在此建筑工作的员工
@@ -3293,6 +3553,12 @@ const TOWN_EVENTS = [
                 modal.classList.add('active');
                 return;
             }
+            // 如果是发电建筑，使用特殊显示逻辑
+            if(b.category === 'power') {
+                this.showPowerBuildingDetail(b, content);
+                modal.classList.add('active');
+                return;
+            }
             const staffHtml = b.staff.map((sName, index) => {
                 const char = this.chars.find(c => c.name === sName);
                 let wageInfo = "未知";
@@ -3467,7 +3733,7 @@ const TOWN_EVENTS = [
                                 </div>
                                 <button class="btn" style="background:#e67e22; color:white; padding:6px 12px; font-size:0.85rem; margin-left:10px;" onclick="gameInstance.transferDepositToTreasury('${bid}')">转入镇库</button>
                             </div>`;
-                        }
+                }
                     });
                     bankDepositsHtml = `
                     <div class="section-title">🏦 建筑存款</div>
@@ -3518,13 +3784,21 @@ const TOWN_EVENTS = [
                 <div style="display:flex;flex-direction:column;gap:15px;">
                     <div style="font-size:0.9rem; color:#555; padding:10px; background:#f8f9fa; border-radius:6px;">${b.desc}</div>
                     ${buildInvestmentHtml}
-                    ${statsHtml}
+                ${statsHtml}
                     <div class="section-title">📋 基本信息</div>
                     <div style="background:#f8f9fa; padding:12px; border-radius:6px; border:1px solid #eee; font-size:0.9rem;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">🕒 营业时间:</span><span style="font-weight:bold; color:#2c3e50;">${openTimeStr || '未设置'}</span></div>
-                        <div style="display:flex; justify-content:space-between;"><span style="color:#666;">📅 休息日:</span><span style="font-weight:bold; color:#2c3e50;">${closedDaysStr}</span></div>
-                    </div>
-                    ${wageInfoHtml}
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">📅 休息日:</span><span style="font-weight:bold; color:#2c3e50;">${closedDaysStr}</span></div>
+                        ${b.category === 'power' ? `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">⚡ 发电量:</span><span style="font-weight:bold; color:#27ae60;">${b.powerGeneration || 0} 千瓦/天</span></div>` : ''}
+                        ${b.powerConsumption > 0 ? (() => {
+                            const totalPower = this.getTotalPowerGeneration();
+                            const hasEnoughPower = b.hasEnoughPower(totalPower);
+                            const electricityBill = parseFloat((b.powerConsumption * 0.5).toFixed(2));
+                            return `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">⚡ 用电量:</span><span style="font-weight:bold; color:${hasEnoughPower ? '#27ae60' : '#e74c3c'};">${b.powerConsumption} 千瓦/天 ${hasEnoughPower ? '✅' : '⚠️电力不足'}</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#666;">💰 每日电费:</span><span style="font-weight:bold; color:#e67e22;">${this.formatMoney(electricityBill)}</span></div>`;
+                        })() : ''}
+                </div>
+                ${wageInfoHtml}
                     ${buildingMoneyHtml}
                     ${bankDepositsHtml}
                 </div>
@@ -3533,12 +3807,12 @@ const TOWN_EVENTS = [
             const rightColumn = `
                 <div style="display:flex;flex-direction:column;gap:15px;">
                     ${interactionHtml}
-                    ${sellsHtml}
+                ${sellsHtml}
                     ${(b.jobs && b.jobs.length > 0) ? `<div class="section-title">员工列表 (${b.staff.length}/${b.jobs.length})</div><div style="max-height:200px; overflow-y:auto; border:1px solid #eee; border-radius:4px;">${staffHtml}</div>` : ''}
                     ${prosHtml ? `<div class="section-title">特殊服务人员</div><div style="max-height:120px; overflow-y:auto; border:1px solid #eee; border-radius:4px;">${prosHtml}</div>` : ''}
                     ${revenueStatsHtml}
                     <div class="section-title">📝 经营日志</div>
-                    ${historyHtml}
+                ${historyHtml}
                 </div>
             `;
             content.innerHTML = leftColumn + rightColumn;
@@ -3581,6 +3855,119 @@ const TOWN_EVENTS = [
                 ${residentsHtml}
                 <div class="section-title">📋 基本信息</div><div style="background:#f8f9fa; padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid #eee; font-size:0.9rem;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">🏗️ 建设成本:</span><span style="font-weight:bold; color:#2c3e50;">💰 ${b.cost}</span></div><div style="display:flex; justify-content:space-between;"><span style="color:#666;">📊 状态:</span><span style="font-weight:bold; color:${b.isBuilt ? '#27ae60' : '#e67e22'};">${b.isBuilt ? '✅ 已建成' : (b.isUnderConstruction ? '🏗️ 建设中' : '❌ 未建造')}</span></div></div>
             `;
+        }
+        showPowerBuildingDetail(b, content) {
+            // 发电建筑特殊显示逻辑
+            const openTimeStr = this.formatOpenTime(b.open, b.close);
+            const closedDaysStr = this.formatClosedDays(b.closedDays);
+            const basePower = b.powerGeneration || 0;
+            const capacityPower = b.powerCapacity || 0;
+            const totalPower = basePower + capacityPower;
+            const totalPowerGeneration = this.getTotalPowerGeneration();
+            
+            // 发电槽显示
+            const upgradeCost = 500; // 每次升级增加10千瓦，花费500元
+            const powerCapacityHtml = `
+                <div class="section-title">⚡ 发电槽</div>
+                <div style="background:#e8f5e9; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #4caf50;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div>
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:5px;">基础发电量</div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:#27ae60;">⚡ ${basePower} 千瓦/天</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:5px;">额外发电量</div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:#2ecc71;">⚡ +${capacityPower} 千瓦/天</div>
+                        </div>
+                    </div>
+                    <div style="border-top:1px solid #4caf50; padding-top:10px; margin-top:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div>
+                                <div style="font-size:0.85rem; color:#666; margin-bottom:3px;">总发电量</div>
+                                <div style="font-size:1.5rem; font-weight:bold; color:#27ae60;">⚡ ${totalPower} 千瓦/天</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="background:#27ae60; color:white; width:100%; padding:10px; font-size:0.9rem; margin-top:10px;" onclick="gameInstance.upgradePowerCapacity('${b.id}')">
+                            ⚡ 增加发电箱 (+10千瓦/天) 💰${upgradeCost}
+                        </button>
+                        <div style="font-size:0.75rem; color:#666; margin-top:5px; text-align:center;">通过增加发电箱等配套设施提升发电量</div>
+                    </div>
+                </div>
+            `;
+            
+            // 生成建造进度显示（未建成的建筑）
+            let buildInvestmentHtml = '';
+            if (!b.isBuilt) {
+                const totalBuildInvestment = Object.values(b.investments || {}).reduce((sum, inv) => {
+                    if (inv.type === 'build') return sum + (inv.amount || 0);
+                    return sum;
+                }, 0);
+                const buildProgressPercent = Math.min(100, (b.currentProgress / b.totalCost) * 100);
+                buildInvestmentHtml = `
+                <div style="margin-bottom:15px; padding:10px; background:#fff3cd; border-radius:6px; border:1px solid #ffc107;">
+                    <div style="font-size:0.9rem; color:#856404; margin-bottom:8px;">🏗️ 建造进度</div>
+                    <div style="background:#e0e0e0; height:20px; border-radius:10px; overflow:hidden; margin-bottom:5px; position:relative;">
+                        <div style="background:linear-gradient(90deg, #ffc107, #ff9800); height:100%; width:${buildProgressPercent}%; transition:width 0.3s; display:flex; align-items:center; justify-content:center; color:white; font-size:0.85rem; font-weight:bold;">${buildProgressPercent.toFixed(1)}%</div>
+                    </div>
+                    <div style="font-size:0.85rem; color:#666; text-align:center; margin-bottom:5px;">进度: ${this.formatMoney(b.currentProgress)} / ${this.formatMoney(b.totalCost)}</div>
+                    ${totalBuildInvestment > 0 ? `<div style="font-size:0.75rem; color:#856404; text-align:center; margin-bottom:3px;">💰 居民投资: ${this.formatMoney(totalBuildInvestment)}</div>` : ''}
+                    <div style="font-size:0.75rem; color:#999; text-align:center;">居民会自动进行投资以加速建造</div>
+                </div>
+                `;
+            }
+            
+            content.innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; max-height:70vh; overflow-y:auto;">
+                    <div style="display:flex;flex-direction:column;gap:15px;">
+                        <div style="font-size:0.9rem; color:#555; padding:10px; background:#f8f9fa; border-radius:6px;">${b.desc}</div>
+                        ${buildInvestmentHtml}
+                        ${b.isBuilt ? powerCapacityHtml : ''}
+                        <div class="section-title">📋 基本信息</div>
+                        <div style="background:#f8f9fa; padding:12px; border-radius:6px; border:1px solid #eee; font-size:0.9rem;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">🕒 营业时间:</span><span style="font-weight:bold; color:#2c3e50;">${openTimeStr || '未设置'}</span></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">📅 休息日:</span><span style="font-weight:bold; color:#2c3e50;">${closedDaysStr}</span></div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">⚡ 基础发电量:</span><span style="font-weight:bold; color:#27ae60;">${basePower} 千瓦/天</span></div>
+                            ${b.isBuilt ? `<div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color:#666;">⚡ 额外发电量:</span><span style="font-weight:bold; color:#2ecc71;">+${capacityPower} 千瓦/天</span></div>` : ''}
+                            ${b.isBuilt ? `<div style="display:flex; justify-content:space-between;"><span style="color:#666;">⚡ 总发电量:</span><span style="font-weight:bold; color:#27ae60;">${totalPower} 千瓦/天</span></div>` : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:15px;">
+                        <div class="section-title">📊 全镇电力状况</div>
+                        <div style="background:#f0f8ff; padding:12px; border-radius:6px; border:1px solid #b3d9ff;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span style="color:#666;">⚡ 总发电量:</span>
+                                <span style="font-weight:bold; color:#27ae60;">${totalPowerGeneration} 千瓦/天</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span style="color:#666;">⚡ 总用电量:</span>
+                                <span style="font-weight:bold; color:#e67e22;">${this.getTotalPowerConsumption()} 千瓦/天</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:#666;">⚡ 电力余量:</span>
+                                <span style="font-weight:bold; color:${totalPowerGeneration >= this.getTotalPowerConsumption() ? '#27ae60' : '#e74c3c'};">${totalPowerGeneration - this.getTotalPowerConsumption()} 千瓦/天</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        upgradePowerCapacity(bid) {
+            const b = this.buildings.find(x => x.id === bid);
+            if (!b || !b.isBuilt || b.category !== 'power') return;
+            
+            const upgradeCost = 500; // 每次升级花费500元
+            const powerIncrease = 10; // 每次增加10千瓦
+            
+            if (this.townMoney >= upgradeCost) {
+                this.townMoney = parseFloat((this.townMoney - upgradeCost).toFixed(2));
+                b.powerCapacity = (b.powerCapacity || 0) + powerIncrease;
+                this.addFinanceRecord(-upgradeCost, `发电槽升级 - ${b.name}`);
+                this.log(`[⚡发电] **${b.name}** 增加了发电箱，额外发电量 +${powerIncrease} 千瓦/天！`, "tag-build");
+                this.showBuildingDetail(bid);
+                this.updateUI();
+            } else {
+                alert(`资金不足，增加发电箱需要 💰${upgradeCost}`);
+            }
         }
         closeBuildingDetail() { this.closeModal('building-detail-modal'); }
         updateWeatherEffect() {
