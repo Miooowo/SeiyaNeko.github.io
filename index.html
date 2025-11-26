@@ -116,7 +116,7 @@
         if (role.includes("厨") || role.includes("火烧") || role.includes("花艺") || role.includes("技师")) return 'social';
         if (role.includes("警察") || role.includes("保安") || role.includes("搬砖")) return 'malice'; // 警察需要懂罪犯？或者暂时关联这个
         if (role.includes("技术员") || role.includes("质检员") || role.includes("生产线工人") || role.includes("仓库管理员")) return 'culture'; // 工业岗位需要文化技能
-        if (role.includes("农场工人")) return 'social'; // 农业岗位需要社交技能
+        if (role.includes("农场工人") || role.includes("水稻工人")) return 'social'; // 农业岗位需要社交技能
         return 'social';
     }
     function getLevelInfo(skillVal) {
@@ -164,6 +164,7 @@
         { id: "hydropower", name: "💧 水力发电站", category: "power", cost: 5000, desc: "利用水力发电，发电量最高但成本较高", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 10, mapY: 70, powerGeneration: 120 },
         { id: "coalpower", name: "🔥 火力发电站", category: "power", cost: 4000, desc: "传统火力发电，发电量稳定但污染环境", effect: "power", price: 0, open: 0, close: 24, jobs: [], mapX: 90, mapY: 70, powerGeneration: 100 },
         { id: "wheatfarm", name: "🌾 小麦农场", category: "agriculture", cost: 500, desc: "种植小麦，提供基础农业工作岗位", effect: "food", price: 0, open: 6, close: 18, jobs: ["农场工人"], mapX: 15, mapY: 60, powerConsumption: 5 },
+        { id: "ricefield", name: "🌾 水稻田地", category: "agriculture", cost: 600, desc: "种植水稻，提供基础农业工作岗位", effect: "food", price: 0, open: 6, close: 18, jobs: ["水稻工人"], mapX: 20, mapY: 65, powerConsumption: 5 },
         { id: "electronics", name: "🏭 电子厂", category: "industry", cost: 2000, desc: "生产电子产品，提供多个工业工作岗位", effect: "shop", price: 0, open: 8, close: 20, jobs: ["生产线工人", "质检员", "技术员", "仓库管理员"], mapX: 25, mapY: 70, powerConsumption: 30 }
     ];
     const CATEGORY_NAMES = { 'food': '🍔 饮食餐饮', 'service': '🏥 公共服务', 'fun': '🎡 休闲娱乐', 'shop': '🛍️ 商业购物', 'landmark': '🚩 地标建筑', 'government': '🏛️ 政府建筑', 'residence': '🏠 居民住宅', 'power': '⚡ 发电设施', 'agriculture': '🌾 农业', 'industry': '🏭 工业' };
@@ -252,6 +253,7 @@ const TOWN_EVENTS = [
         { id: 'crackdown', name: '⚔️ 扫黑除恶', cost: 300, desc: '对罪恶值高的居民进行打击，扣除部分金钱纳入镇库，并减少其罪恶值。', emoji: '⚔️', special: true },
         { id: 'infrastructure', name: '🏗️ 推进基础设施建设', cost: 0, desc: '增加在建设的建筑的20%进度。副作用：居民因施工噪音心情-5。3天内只能进行一次。', emoji: '🏗️', special: true },
         { id: 'literacy', name: '📚 扫盲教育推进', cost: 200, desc: '居民文化技能普遍提升。', emoji: '📚', special: true },
+        { id: 'investment', name: '💰 投资行动', cost: 0, desc: '鼓励全镇居民对建造中的建筑或现有建筑进行大额投资。3天内只能进行一次。', emoji: '💰', special: true },
         // 节日 / 特定日期
         { id: 'new_year', name: '🧨 元旦佳节', cost: 300, desc: '新年新气象！全员快乐+20，消费欲望提升。', emoji: '🧨', date: {m:1, d:1} },
         { id: 'cat_return', name: '🐱 猫咪报恩日', cost: 0, desc: '传说中猫神显灵的日子，每位居民都会遇到随机好事！', emoji: '🐱', date: {m:2, d:22} },
@@ -274,7 +276,7 @@ const TOWN_EVENTS = [
         if (role.includes("老板") || role.includes("主治医师")) return 35;
         if (role.includes("神父") || role.includes("社区医生") || role.includes("讲解") || role.includes("银行经理") || role.includes("监狱长") || role.includes("节目制作人") || role.includes("技术员")) return 25;
         if (role.includes("警察") || role.includes("老师") || role.includes("教练") || role.includes("狱警") || role.includes("新闻主播") || role.includes("质检员") || role.includes("仓库管理员")) return 22;
-        if (role.includes("农场工人") || role.includes("生产线工人")) return 18;
+        if (role.includes("农场工人") || role.includes("水稻工人") || role.includes("生产线工人")) return 18;
         if (role.includes("卖银")) return 20;
         if (role.includes("柜员")) return 19;
         if (role.includes("大厨") || role.includes("火烧") || role.includes("护士") || role.includes("玩偶")) return 18;
@@ -415,6 +417,18 @@ const TOWN_EVENTS = [
             this.powerConsumption = blueprint.powerConsumption || 0; // 用电量（千瓦/天）
             this.powerGeneration = blueprint.powerGeneration || 0; // 发电量（千瓦/天，仅发电建筑）
             this.powerCapacity = 0; // 发电槽（通过投资增加的额外发电量）
+            // 小麦库存（仅小麦农场）
+            if (this.id === 'wheatfarm') {
+                this.wheat = 0; // 小麦数量
+            }
+            // 水稻库存（仅水稻田地）
+            if (this.id === 'ricefield') {
+                this.rice = 0; // 水稻数量
+            }
+            // 电子元件库存（仅电子厂）
+            if (this.id === 'electronics') {
+                this.electronics = 0; // 电子元件数量
+            }
             // 酒店住宿统计（仅酒店建筑）
             if (this.id === 'hotel') {
                 this.residentStays = 0; // 居民住宿次数
@@ -482,9 +496,11 @@ const TOWN_EVENTS = [
             this.voteTimer = null;
             this.firstVoteTriggered = false; // 标记是否已触发首次公投
             this.lastConstructionVoteTime = 0; // 上次建筑建造完成后的公投时间
+            this.constructionVoteCount = 0; // 建筑公投次数（用于优化前三次公投）
             this.townLevel = 0; // 小镇等级：0=村庄, 1=村镇, 2=小镇, 3=小县城, 4=县城
             this.townLevelPopupShown = new Set(); // 记录已经显示过弹窗的等级，防止重复弹出
             this.lastInfrastructureBuildTime = 0; // 上次使用"推进基础设施建设"的时间（游戏天数）
+            this.lastInvestmentActionTime = 0; // 上次使用"投资行动"的时间（游戏天数）
             this.dailyTotalRevenue = 0; // 每日总收入（只统计收入，不包括支出）
             this.lastRevenueResetDay = 0; // 上次重置每日收入的日期
             // DeepSeek API 配置
@@ -556,12 +572,13 @@ const TOWN_EVENTS = [
                 this.loadFromJSON(saveStr);
                 // 确保所有建筑都有收入统计属性（兼容旧存档）
                 this.buildings.forEach(b => {
-                    if (b.dailyRevenue === undefined) b.dailyRevenue = 0;
-                    if (b.dailyTax === undefined) b.dailyTax = 0;
-                    if (b.weeklyRevenue === undefined) b.weeklyRevenue = 0;
-                    if (b.weeklyTax === undefined) b.weeklyTax = 0;
-                    if (b.lastResetDay === undefined) b.lastResetDay = this.dateDay;
-                    if (b.lastResetWeek === undefined) b.lastResetWeek = this.gameDay;
+                    // 初始化属性（如果不存在或为null）
+                    if (b.dailyRevenue === undefined || b.dailyRevenue === null) b.dailyRevenue = 0;
+                    if (b.dailyTax === undefined || b.dailyTax === null) b.dailyTax = 0;
+                    if (b.weeklyRevenue === undefined || b.weeklyRevenue === null) b.weeklyRevenue = 0;
+                    if (b.weeklyTax === undefined || b.weeklyTax === null) b.weeklyTax = 0;
+                    if (b.lastResetDay === undefined || b.lastResetDay === null) b.lastResetDay = this.dateDay;
+                    if (b.lastResetWeek === undefined || b.lastResetWeek === null) b.lastResetWeek = this.gameDay;
                     // 初始化建筑资金槽（兼容旧存档）
                     if (b.buildingMoney === undefined) b.buildingMoney = 0;
                     // 初始化银行存款记录（仅银行建筑，兼容旧存档）
@@ -588,6 +605,18 @@ const TOWN_EVENTS = [
                     if (b.id === 'hotel') {
                         if (b.residentStays === undefined) b.residentStays = 0;
                         if (b.touristStays === undefined) b.touristStays = 0;
+                    }
+                    // 初始化小麦库存（兼容旧存档）- 这里只处理undefined的情况，实际值已在loadFromJSON中恢复
+                    if (b.id === 'wheatfarm') {
+                        if (b.wheat === undefined || b.wheat === null) b.wheat = 0;
+                    }
+                    // 初始化水稻库存（兼容旧存档）- 这里只处理undefined的情况，实际值已在loadFromJSON中恢复
+                    if (b.id === 'ricefield') {
+                        if (b.rice === undefined || b.rice === null) b.rice = 0;
+                    }
+                    // 初始化电子元件库存（兼容旧存档）- 这里只处理undefined的情况，实际值已在loadFromJSON中恢复
+                    if (b.id === 'electronics') {
+                        if (b.electronics === undefined || b.electronics === null) b.electronics = 0;
                     }
                 });
                 // 兼容旧存档：初始化小镇等级
@@ -723,6 +752,12 @@ const TOWN_EVENTS = [
             if (this.gameTime >= 1440) {
                 // 每日工资结算（在日期变更前）
                 this.settleDailyWages();
+                // 每日小麦生产（小麦农场）
+                this.produceWheat();
+                // 每日水稻生产（水稻田地）
+                this.produceRice();
+                // 每日电子元件生产（电子厂）
+                this.produceElectronics();
                 // 每日电费结算
                 this.settleElectricityBills();
                 // 个人所得税结算
@@ -913,17 +948,39 @@ const TOWN_EVENTS = [
                 return;
             }
             // 排除发电建筑（只能玩家建造）
-            const unbuilt = this.buildings.filter(b => !b.isBuilt && !b.isUnderConstruction && b.category !== 'power');
+            let unbuilt = this.buildings.filter(b => !b.isBuilt && !b.isUnderConstruction && b.category !== 'power');
             if (unbuilt.length === 0) return;
+            
+            // 优化前三次公投：降低地标建筑概率
+            const isFirstThreeVotes = this.constructionVoteCount < 3;
+            if (isFirstThreeVotes) {
+                // 将地标建筑权重降低（只保留20%的地标建筑）
+                const landmarks = unbuilt.filter(b => b.category === 'landmark');
+                const nonLandmarks = unbuilt.filter(b => b.category !== 'landmark');
+                // 如果地标建筑太多，随机移除一部分
+                if (landmarks.length > 0 && nonLandmarks.length > 0) {
+                    const landmarkRatio = landmarks.length / unbuilt.length;
+                    if (landmarkRatio > 0.2) {
+                        // 只保留20%的地标建筑
+                        const keepLandmarkCount = Math.max(1, Math.floor(nonLandmarks.length * 0.2));
+                        const shuffledLandmarks = [...landmarks].sort(() => Math.random() - 0.5);
+                        const keptLandmarks = shuffledLandmarks.slice(0, keepLandmarkCount);
+                        unbuilt = [...nonLandmarks, ...keptLandmarks];
+                    }
+                }
+            }
+            
             const candidates = [];
             const tempUnbuilt = [...unbuilt];
-            const count = Math.min(3, tempUnbuilt.length);
+            const count = Math.min(5, tempUnbuilt.length);
             for(let i=0; i<count; i++) {
                 const idx = Math.floor(Math.random() * tempUnbuilt.length);
                 const b = tempUnbuilt[idx];
                 candidates.push({ id: b.id, name: b.name, desc: `${b.desc} (💰${b.totalCost})`, extra: CATEGORY_NAMES[b.category] });
                 tempUnbuilt.splice(idx, 1);
             }
+            // 增加公投次数计数
+            this.constructionVoteCount++;
             this.triggerVoting("🏗️ 建设公投", candidates, (winner) => {
                 const building = this.buildings.find(b => b.id === winner.id);
                 if(building && !building.isUnderConstruction) {
@@ -1069,9 +1126,11 @@ const TOWN_EVENTS = [
                 'baozi': [{ icon: '🥟', text: '用餐', desc: addPrice('饱食度 +25，心情 +5，体力 +8~33（根据包子类型）', price) }],
                 'clinic': [{ icon: '💊', text: '收费治疗', desc: addPrice('健康 +30，心情 +5，体力 +5', price) }, { icon: '📈', text: '上限提升', desc: '3%概率提升健康上限（最高120）' }],
                 'concert': [{ icon: '🎼', text: '古典乐音乐会', desc: addPrice('文化 +1.5，心情 +15，体力 +8', 80) }, { icon: '🎵', text: '流行乐音乐会', desc: addPrice('文化 +1.0，心情 +18，社交 +0.3，体力 +8', 60) }, { icon: '🎸', text: '摇滚乐音乐会', desc: addPrice('文化 +0.8，心情 +20，社交 +0.5，体力 +10', 70) }],
-                'hotel': [{ icon: '🛏️', text: '过夜', desc: addPrice('心情 +15，体力 +30，健康 +5', price) }, { icon: '💤', text: '休息效果', desc: '提供舒适的住宿环境，快速恢复体力和心情' }]
+                'hotel': [{ icon: '🛏️', text: '过夜', desc: addPrice('心情 +15，体力 +30，健康 +5', price) }, { icon: '💤', text: '休息效果', desc: '提供舒适的住宿环境，快速恢复体力和心情' }],
+                'wheatfarm': [], // 小麦农场无特殊互动效果
+                'ricefield': [] // 水稻田地无特殊互动效果
             };
-            return effects[buildingId] || null;
+            return effects[buildingId] !== undefined ? effects[buildingId] : null;
         }
         getGenericEffects(effect, price, food) {
             const addPrice = (desc, p) => p > 0 ? `消费 💰${p} | ${desc}` : desc;
@@ -1153,12 +1212,13 @@ const TOWN_EVENTS = [
             }
             if (p.health < 40) { const medId = this.findItemInBag(p, 'medicine'); if (medId) { this.doUseItem(p, medId); return; } const clinic = this.buildings.find(b => b.id === 'clinic'); if (clinic && clinic.isBuilt && clinic.isOpen(hour, this.gameDay, totalPower) && p.money >= 10) { this.doShopping(p, clinic, 'medicine'); return; } const hospitals = this.buildings.filter(b => b.isBuilt && b.effect === 'health' && b.isOpen(hour, this.gameDay, totalPower) && p.money >= b.price); if (hospitals.length > 0) { this.doRest(p, choose(hospitals)); return; } this.doRest(p, {name:"家", price:0}); return; }
             if (p.hunger < 30) { const foodId = this.findItemInBag(p, 'food') || this.findItemInBag(p, 'snack'); if (foodId) { this.doUseItem(p, foodId); return; } 
-                // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理）
+                // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理），排除生产建筑
                 const restaurants = this.buildings.filter(b => 
                     b.isBuilt && 
                     b.isOpen(hour, this.gameDay, totalPower) && 
                     p.money >= (b.price || 0) &&
-                    ((b.effect === 'food') || (b.id === 'baozi'))
+                    ((b.effect === 'food') || (b.id === 'baozi')) &&
+                    b.id !== 'wheatfarm' && b.id !== 'ricefield' && b.id !== 'electronics' // 排除生产建筑
                 ); 
                 if (restaurants.length > 0) { this.doEat(p, choose(restaurants)); return; } 
                 const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay, totalPower) && b.id !== 'baozi'); 
@@ -1166,12 +1226,13 @@ const TOWN_EVENTS = [
             const isMealTime = (hour >= 6 && hour < 9) || (hour >= 11 && hour < 14) || (hour >= 17 && hour < 20);
             const timeSinceLastMeal = this.gameTime - (p.lastMealTime || -999);
             if (isMealTime && p.hunger < 80 && (timeSinceLastMeal > 180 || timeSinceLastMeal < 0)) { const foodId = this.findItemInBag(p, 'food'); if (foodId) { this.doUseItem(p, foodId); return; } 
-                // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理）
+                // 选择餐厅：包括effect为food的建筑，以及包子铺（特殊处理），排除生产建筑
                 const restaurants = this.buildings.filter(b => 
                     b.isBuilt && 
                     b.isOpen(hour, this.gameDay, totalPower) && 
                     p.money >= (b.price || 0) &&
-                    ((b.effect === 'food') || (b.id === 'baozi'))
+                    ((b.effect === 'food') || (b.id === 'baozi')) &&
+                    b.id !== 'wheatfarm' && b.id !== 'ricefield' && b.id !== 'electronics' // 排除生产建筑
                 ); 
                 if (restaurants.length > 0) { this.doEat(p, choose(restaurants)); return; } 
                 const shops = this.buildings.filter(b => b.isBuilt && b.effect === 'shop' && b.sells.some(id => ITEMS_DB[id].type === 'food') && b.isOpen(hour, this.gameDay, totalPower) && b.id !== 'baozi'); 
@@ -1332,11 +1393,13 @@ const TOWN_EVENTS = [
             if (p.money > 30 && Math.random() < (p.money > 200 ? 0.15 : p.money > 100 ? 0.12 : 0.08)) {
                 const calcInvestment = (money, isUpgrade) => {
                     if (isUpgrade) {
-                        const tiers = [[500, 0.18, 300], [300, 0.15, 200], [100, 0.12, 100], [0, 0.10, 50]];
+                        // 升级投资：根据资金量分级，比例和上限都提高
+                        const tiers = [[500, 0.25, 500], [300, 0.22, 350], [100, 0.18, 200], [0, 0.15, 100]];
                         const [ratio, max] = tiers.find(([threshold]) => money >= threshold).slice(1);
                         return Math.min(money * ratio, max);
                     }
-                    return Math.min(money * 0.15, 100);
+                    // 建造投资：提高比例和上限
+                    return Math.min(money * 0.22, 200);
                 };
                 const tryInvest = (buildings, type) => {
                     if (buildings.length === 0) return false;
@@ -1344,8 +1407,8 @@ const TOWN_EVENTS = [
                     const amount = Math.floor(calcInvestment(p.money, type === 'upgrade') / 5) * 5;
                     return amount >= 5 && this.investInBuilding(p.name, target.id, amount, type);
                 };
-                if (tryInvest(this.buildings.filter(b => !b.isBuilt && b.isUnderConstruction), 'build') || 
-                    (Math.random() < 0.5 && tryInvest(this.buildings.filter(b => b.isBuilt && b.level < 3), 'upgrade'))) {
+                if (tryInvest(this.buildings.filter(b => !b.isBuilt && b.isUnderConstruction && b.category !== 'residence'), 'build') || 
+                    (Math.random() < 0.5 && tryInvest(this.buildings.filter(b => b.isBuilt && b.level < 3 && b.category !== 'residence'), 'upgrade'))) {
                     return;
                 }
             }
@@ -1357,7 +1420,8 @@ const TOWN_EVENTS = [
                 b.isBuilt && 
                 b.isOpen(hour, this.gameDay, totalPower) && 
                 (p.money >= b.price * multiplier) &&
-                !nonConsumableEffects.includes(b.effect) // 排除不能消费的建筑
+                !nonConsumableEffects.includes(b.effect) && // 排除不能消费的建筑
+                b.id !== 'wheatfarm' && b.id !== 'ricefield' && b.id !== 'electronics' // 排除生产建筑（即使effect是food或shop）
             ); 
             const venue = choose(venues) || { name: "路边", effect: "none", price: 0 };
             const pendingProject = choose(this.buildings.filter(b => !b.isBuilt && b.isUnderConstruction));
@@ -1978,16 +2042,232 @@ const TOWN_EVENTS = [
             this.townMoney = parseFloat((this.townMoney + amount).toFixed(2));
             this.addFinanceRecord(amount, `银行存款转入 - ${building.name}`);
             this.log(`[💰转账] 将 **${building.name}** 在银行的存款 💰${this.formatMoney(amount)} 转入镇库`, "tag-build");
-            
-            // 如果银行详情界面是打开的，刷新显示
-            const bankDetailModal = document.getElementById('building-detail-modal');
-            if (bankDetailModal && bankDetailModal.classList.contains('active')) {
+            this.updateUI();
+        }
+        // 售出小麦（全部）
+        sellWheat(buildingId, amount) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'wheatfarm' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentWheat = b.wheat || 0;
+            if (currentWheat <= 0) {
+                alert('当前没有小麦库存！');
+                return;
+            }
+            const sellAmount = amount === 'all' ? currentWheat : Math.min(amount, currentWheat);
+            if (sellAmount <= 0) {
+                alert('售出数量必须大于0！');
+                return;
+            }
+            const wheatPrice = 3; // 每单位小麦售价3元
+            const totalRevenue = sellAmount * wheatPrice;
+            // 计算税费
+            const tax = parseFloat((totalRevenue * (this.taxRate / 100)).toFixed(2));
+            const netRevenue = parseFloat((totalRevenue - tax).toFixed(2));
+            // 扣除小麦库存
+            b.wheat = currentWheat - sellAmount;
+            // 将净收入存入建筑资金槽
+            b.buildingMoney = parseFloat(((b.buildingMoney || 0) + netRevenue).toFixed(2));
+            // 记录收入统计
+            b.dailyRevenue = parseFloat(((b.dailyRevenue || 0) + totalRevenue).toFixed(2));
+            b.dailyTax = parseFloat(((b.dailyTax || 0) + tax).toFixed(2));
+            b.weeklyRevenue = parseFloat(((b.weeklyRevenue || 0) + totalRevenue).toFixed(2));
+            b.weeklyTax = parseFloat(((b.weeklyTax || 0) + tax).toFixed(2));
+            // 将税费转入镇库
+            this.townMoney = parseFloat((this.townMoney + tax).toFixed(2));
+            this.addFinanceRecord(tax, `小麦销售税 - ${b.name}`);
+            this.dailyTotalRevenue = parseFloat((this.dailyTotalRevenue + totalRevenue).toFixed(2));
+            // 记录日志
+            b.addLog(`${this.getDateTimeStr()} 售出小麦 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`);
+            this.log(`[🌾销售] **${b.name}** 售出小麦 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`, "tag-build");
+            alert(`成功售出 ${sellAmount} 单位小麦！\n\n总收入：💰${this.formatMoney(totalRevenue)}\n税费：💰${this.formatMoney(tax)}\n净收入：💰${this.formatMoney(netRevenue)}\n\n净收入已存入建筑资金槽。`);
+            // 如果建筑详情界面是打开的，刷新显示
+            const buildingDetailModal = document.getElementById('building-detail-modal');
+            if (buildingDetailModal && buildingDetailModal.classList.contains('active')) {
                 const nameEl = document.getElementById('b-detail-name');
-                if (nameEl && nameEl.innerText === bank.name) {
-                    this.showBuildingDetail('bank');
+                if (nameEl && nameEl.innerText === b.name) {
+                    this.showBuildingDetail(buildingId);
                 }
             }
             this.updateUI();
+        }
+        // 显示部分售出小麦的弹窗
+        showSellWheatModal(buildingId) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'wheatfarm' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentWheat = b.wheat || 0;
+            if (currentWheat <= 0) {
+                alert('当前没有小麦库存！');
+                return;
+            }
+            const wheatPrice = 3;
+            const amountStr = prompt(`请输入要售出的小麦数量（当前库存：${currentWheat} 单位，单价：💰${wheatPrice}/单位）：`, currentWheat.toString());
+            if (!amountStr) return;
+            const amount = parseInt(amountStr);
+            if (isNaN(amount) || amount <= 0) {
+                alert('请输入有效的数量！');
+                return;
+            }
+            if (amount > currentWheat) {
+                alert(`售出数量不能超过当前库存（${currentWheat} 单位）！`);
+                return;
+            }
+            this.sellWheat(buildingId, amount);
+        }
+        // 售出电子元件（全部）
+        sellElectronics(buildingId, amount) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'electronics' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentElectronics = b.electronics || 0;
+            if (currentElectronics <= 0) {
+                alert('当前没有电子元件库存！');
+                return;
+            }
+            const sellAmount = amount === 'all' ? currentElectronics : Math.min(amount, currentElectronics);
+            if (sellAmount <= 0) {
+                alert('售出数量必须大于0！');
+                return;
+            }
+            const electronicsPrice = 9; // 每单位电子元件售价9元
+            const totalRevenue = sellAmount * electronicsPrice;
+            // 计算税费
+            const tax = parseFloat((totalRevenue * (this.taxRate / 100)).toFixed(2));
+            const netRevenue = parseFloat((totalRevenue - tax).toFixed(2));
+            // 扣除电子元件库存
+            b.electronics = currentElectronics - sellAmount;
+            // 将净收入存入建筑资金槽
+            b.buildingMoney = parseFloat(((b.buildingMoney || 0) + netRevenue).toFixed(2));
+            // 记录收入统计
+            b.dailyRevenue = parseFloat(((b.dailyRevenue || 0) + totalRevenue).toFixed(2));
+            b.dailyTax = parseFloat(((b.dailyTax || 0) + tax).toFixed(2));
+            b.weeklyRevenue = parseFloat(((b.weeklyRevenue || 0) + totalRevenue).toFixed(2));
+            b.weeklyTax = parseFloat(((b.weeklyTax || 0) + tax).toFixed(2));
+            // 将税费转入镇库
+            this.townMoney = parseFloat((this.townMoney + tax).toFixed(2));
+            this.addFinanceRecord(tax, `电子元件销售税 - ${b.name}`);
+            this.dailyTotalRevenue = parseFloat((this.dailyTotalRevenue + totalRevenue).toFixed(2));
+            // 记录日志
+            b.addLog(`${this.getDateTimeStr()} 售出电子元件 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`);
+            this.log(`[🏭销售] **${b.name}** 售出电子元件 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`, "tag-build");
+            alert(`成功售出 ${sellAmount} 单位电子元件！\n\n总收入：💰${this.formatMoney(totalRevenue)}\n税费：💰${this.formatMoney(tax)}\n净收入：💰${this.formatMoney(netRevenue)}\n\n净收入已存入建筑资金槽。`);
+            // 如果建筑详情界面是打开的，刷新显示
+            const buildingDetailModal = document.getElementById('building-detail-modal');
+            if (buildingDetailModal && buildingDetailModal.classList.contains('active')) {
+                const nameEl = document.getElementById('b-detail-name');
+                if (nameEl && nameEl.innerText === b.name) {
+                    this.showBuildingDetail(buildingId);
+                }
+            }
+            this.updateUI();
+        }
+        // 显示部分售出电子元件的弹窗
+        showSellElectronicsModal(buildingId) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'electronics' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentElectronics = b.electronics || 0;
+            if (currentElectronics <= 0) {
+                alert('当前没有电子元件库存！');
+                return;
+            }
+            const electronicsPrice = 9;
+            const amountStr = prompt(`请输入要售出的电子元件数量（当前库存：${currentElectronics} 单位，单价：💰${electronicsPrice}/单位）：`, currentElectronics.toString());
+            if (!amountStr) return;
+            const amount = parseInt(amountStr);
+            if (isNaN(amount) || amount <= 0) {
+                alert('请输入有效的数量！');
+                return;
+            }
+            if (amount > currentElectronics) {
+                alert(`售出数量不能超过当前库存（${currentElectronics} 单位）！`);
+                return;
+            }
+            this.sellElectronics(buildingId, amount);
+        }
+        // 售出水稻（全部）
+        sellRice(buildingId, amount) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'ricefield' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentRice = b.rice || 0;
+            if (currentRice <= 0) {
+                alert('当前没有水稻库存！');
+                return;
+            }
+            const sellAmount = amount === 'all' ? currentRice : Math.min(amount, currentRice);
+            if (sellAmount <= 0) {
+                alert('售出数量必须大于0！');
+                return;
+            }
+            const ricePrice = 3.5; // 每单位水稻售价3.5元
+            const totalRevenue = sellAmount * ricePrice;
+            // 计算税费
+            const tax = parseFloat((totalRevenue * (this.taxRate / 100)).toFixed(2));
+            const netRevenue = parseFloat((totalRevenue - tax).toFixed(2));
+            // 扣除水稻库存
+            b.rice = currentRice - sellAmount;
+            // 将净收入存入建筑资金槽
+            b.buildingMoney = parseFloat(((b.buildingMoney || 0) + netRevenue).toFixed(2));
+            // 记录收入统计
+            b.dailyRevenue = parseFloat(((b.dailyRevenue || 0) + totalRevenue).toFixed(2));
+            b.dailyTax = parseFloat(((b.dailyTax || 0) + tax).toFixed(2));
+            b.weeklyRevenue = parseFloat(((b.weeklyRevenue || 0) + totalRevenue).toFixed(2));
+            b.weeklyTax = parseFloat(((b.weeklyTax || 0) + tax).toFixed(2));
+            // 将税费转入镇库
+            this.townMoney = parseFloat((this.townMoney + tax).toFixed(2));
+            this.addFinanceRecord(tax, `水稻销售税 - ${b.name}`);
+            this.dailyTotalRevenue = parseFloat((this.dailyTotalRevenue + totalRevenue).toFixed(2));
+            // 记录日志
+            b.addLog(`${this.getDateTimeStr()} 售出水稻 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`);
+            this.log(`[🌾销售] **${b.name}** 售出水稻 ${sellAmount} 单位，获得收入 💰${this.formatMoney(totalRevenue)}，交税 💰${this.formatMoney(tax)}，净收入 💰${this.formatMoney(netRevenue)}`, "tag-build");
+            alert(`成功售出 ${sellAmount} 单位水稻！\n\n总收入：💰${this.formatMoney(totalRevenue)}\n税费：💰${this.formatMoney(tax)}\n净收入：💰${this.formatMoney(netRevenue)}\n\n净收入已存入建筑资金槽。`);
+            // 如果建筑详情界面是打开的，刷新显示
+            const buildingDetailModal = document.getElementById('building-detail-modal');
+            if (buildingDetailModal && buildingDetailModal.classList.contains('active')) {
+                const nameEl = document.getElementById('b-detail-name');
+                if (nameEl && nameEl.innerText === b.name) {
+                    this.showBuildingDetail(buildingId);
+                }
+            }
+            this.updateUI();
+        }
+        // 显示部分售出水稻的弹窗
+        showSellRiceModal(buildingId) {
+            const b = this.buildings.find(x => x.id === buildingId);
+            if (!b || b.id !== 'ricefield' || !b.isBuilt) {
+                alert('无效的建筑！');
+                return;
+            }
+            const currentRice = b.rice || 0;
+            if (currentRice <= 0) {
+                alert('当前没有水稻库存！');
+                return;
+            }
+            const ricePrice = 3.5;
+            const amountStr = prompt(`请输入要售出的水稻数量（当前库存：${currentRice} 单位，单价：💰${ricePrice}/单位）：`, currentRice.toString());
+            if (!amountStr) return;
+            const amount = parseInt(amountStr);
+            if (isNaN(amount) || amount <= 0) {
+                alert('请输入有效的数量！');
+                return;
+            }
+            if (amount > currentRice) {
+                alert(`售出数量不能超过当前库存（${currentRice} 单位）！`);
+                return;
+            }
+            this.sellRice(buildingId, amount);
         }
         // 显示批款界面
         showGrantModal() {
@@ -2354,6 +2634,120 @@ const TOWN_EVENTS = [
                 }
             });
         }
+        // 每日小麦生产（小麦农场）
+        produceWheat() {
+            const wheatFarm = this.buildings.find(b => b.id === 'wheatfarm' && b.isBuilt);
+            if (!wheatFarm) return;
+            
+            // 基础产出：15-35单位
+            const baseProduced = rand(15, 35);
+            
+            // 计算员工技能加成（农场工人需要 social 技能）
+            let skillBonus = 1.0;
+            if (wheatFarm.staff && wheatFarm.staff.length > 0) {
+                let totalSkill = 0;
+                let staffCount = 0;
+                wheatFarm.staff.forEach(staffName => {
+                    const staff = this.chars.find(c => c.name === staffName);
+                    if (staff && staff.job && staff.job.buildingId === wheatFarm.id) {
+                        totalSkill += staff.skills.social || 0;
+                        staffCount++;
+                    }
+                });
+                if (staffCount > 0) {
+                    const avgSkill = totalSkill / staffCount;
+                    // 技能加成：每10点技能增加5%产出（最高100%加成）
+                    skillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                }
+            }
+            
+            // 建筑等级加成：每级增加10%产出
+            const levelBonus = 1.0 + (wheatFarm.level - 1) * 0.1;
+            
+            // 计算最终产出
+            const produced = Math.floor(baseProduced * skillBonus * levelBonus);
+            
+            wheatFarm.wheat = (wheatFarm.wheat || 0) + produced;
+            const skillInfo = wheatFarm.staff && wheatFarm.staff.length > 0 ? `（技能加成：${((skillBonus - 1) * 100).toFixed(1)}%，等级加成：${((levelBonus - 1) * 100).toFixed(1)}%）` : '';
+            wheatFarm.addLog(`${this.getDateTimeStr()} 生产小麦 ${produced} 单位${skillInfo}，当前库存：${wheatFarm.wheat} 单位`);
+            this.log(`[🌾农场] **${wheatFarm.name}** 生产小麦 ${produced} 单位${skillInfo}，当前库存：${wheatFarm.wheat} 单位`, "tag-build");
+        }
+        // 每日水稻生产（水稻田地）
+        produceRice() {
+            const riceField = this.buildings.find(b => b.id === 'ricefield' && b.isBuilt);
+            if (!riceField) return;
+            
+            // 基础产出：15-35单位
+            const baseProduced = rand(15, 35);
+            
+            // 计算员工技能加成（水稻工人需要 social 技能）
+            let skillBonus = 1.0;
+            if (riceField.staff && riceField.staff.length > 0) {
+                let totalSkill = 0;
+                let staffCount = 0;
+                riceField.staff.forEach(staffName => {
+                    const staff = this.chars.find(c => c.name === staffName);
+                    if (staff && staff.job && staff.job.buildingId === riceField.id) {
+                        totalSkill += staff.skills.social || 0;
+                        staffCount++;
+                    }
+                });
+                if (staffCount > 0) {
+                    const avgSkill = totalSkill / staffCount;
+                    // 技能加成：每10点技能增加5%产出（最高100%加成）
+                    skillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                }
+            }
+            
+            // 建筑等级加成：每级增加10%产出
+            const levelBonus = 1.0 + (riceField.level - 1) * 0.1;
+            
+            // 计算最终产出
+            const produced = Math.floor(baseProduced * skillBonus * levelBonus);
+            
+            riceField.rice = (riceField.rice || 0) + produced;
+            const skillInfo = riceField.staff && riceField.staff.length > 0 ? `（技能加成：${((skillBonus - 1) * 100).toFixed(1)}%，等级加成：${((levelBonus - 1) * 100).toFixed(1)}%）` : '';
+            riceField.addLog(`${this.getDateTimeStr()} 生产水稻 ${produced} 单位${skillInfo}，当前库存：${riceField.rice} 单位`);
+            this.log(`[🌾田地] **${riceField.name}** 生产水稻 ${produced} 单位${skillInfo}，当前库存：${riceField.rice} 单位`, "tag-build");
+        }
+        // 每日电子元件生产（电子厂）
+        produceElectronics() {
+            const electronicsFactory = this.buildings.find(b => b.id === 'electronics' && b.isBuilt);
+            if (!electronicsFactory) return;
+            
+            // 基础产出：10-20单位
+            const baseProduced = rand(10, 20);
+            
+            // 计算员工技能加成（电子厂员工需要 culture 技能）
+            let skillBonus = 1.0;
+            if (electronicsFactory.staff && electronicsFactory.staff.length > 0) {
+                let totalSkill = 0;
+                let staffCount = 0;
+                electronicsFactory.staff.forEach(staffName => {
+                    const staff = this.chars.find(c => c.name === staffName);
+                    if (staff && staff.job && staff.job.buildingId === electronicsFactory.id) {
+                        totalSkill += staff.skills.culture || 0;
+                        staffCount++;
+                    }
+                });
+                if (staffCount > 0) {
+                    const avgSkill = totalSkill / staffCount;
+                    // 技能加成：每10点技能增加5%产出（最高100%加成）
+                    skillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                }
+            }
+            
+            // 建筑等级加成：每级增加10%产出
+            const levelBonus = 1.0 + (electronicsFactory.level - 1) * 0.1;
+            
+            // 计算最终产出
+            const produced = Math.floor(baseProduced * skillBonus * levelBonus);
+            
+            electronicsFactory.electronics = (electronicsFactory.electronics || 0) + produced;
+            const skillInfo = electronicsFactory.staff && electronicsFactory.staff.length > 0 ? `（技能加成：${((skillBonus - 1) * 100).toFixed(1)}%，等级加成：${((levelBonus - 1) * 100).toFixed(1)}%）` : '';
+            electronicsFactory.addLog(`${this.getDateTimeStr()} 生产电子元件 ${produced} 单位${skillInfo}，当前库存：${electronicsFactory.electronics} 单位`);
+            this.log(`[🏭工厂] **${electronicsFactory.name}** 生产电子元件 ${produced} 单位${skillInfo}，当前库存：${electronicsFactory.electronics} 单位`, "tag-build");
+        }
         // 计算总发电量
         getTotalPowerGeneration() {
             return this.buildings
@@ -2391,20 +2785,28 @@ const TOWN_EVENTS = [
                 );
                 if (availableNames.length === 0) break; // 没有可用名称
                 const tourist = new Tourist(choose(availableNames));
-                // 如果没有酒店，游客当天来当天走
+                // 如果没有酒店，游客当天来当天走（但会待到晚上才离开）
                 if (!hasHotel) {
                     tourist.maxStayDays = 1;
+                    tourist.shouldLeaveAtNight = true; // 标记为应该在晚上离开
                 }
                 this.tourists.push(tourist);
-                this.log(`[✈️游客] **${tourist.name}** 来到小镇旅游！${!hasHotel ? '（无酒店，当天离开）' : ''}`, "tag-venue");
+                this.log(`[✈️游客] **${tourist.name}** 来到小镇旅游！${!hasHotel ? '（无酒店，晚上离开）' : ''}`, "tag-venue");
             }
         }
         // 处理游客行为
         processTouristActions() {
             const hour = Math.floor(this.gameTime / 60);
             const totalPower = this.getTotalPowerGeneration();
-            this.tourists.forEach(t => {
-                if (t.stayDays >= t.maxStayDays) return; // 即将离开的游客不再行动
+            const toRemove = [];
+            this.tourists.forEach((t, index) => {
+                // 如果没有酒店且标记为应该在晚上离开，且时间到了晚上（20:00之后），则离开
+                if (t.shouldLeaveAtNight && hour >= 20 && t.stayDays >= t.maxStayDays) {
+                    this.log(`[✈️离开] 游客 **${t.name}** 因为没有酒店，在晚上离开了小镇。${t.satisfaction > 60 ? '（满意度：' + Math.floor(t.satisfaction) + '）' : ''}`, "tag-venue");
+                    toRemove.push(index);
+                    return;
+                }
+                if (t.stayDays >= t.maxStayDays && !t.shouldLeaveAtNight) return; // 即将离开的游客不再行动（除非是应该晚上离开的）
                 // 检查是否在过夜时间段（20:00-5:00）
                 const isOvernightTime = hour >= 20 || hour < 5;
                 // 优先检查是否有酒店（游客需要住宿）
@@ -2500,6 +2902,8 @@ const TOWN_EVENTS = [
                     t.addLog(`${this.getDateTimeStr()} 访问了 ${targetBuilding.name}，消费 💰${this.formatMoney(cost)}`);
                 }
             });
+            // 从后往前删除，避免索引问题
+            toRemove.reverse().forEach(idx => this.tourists.splice(idx, 1));
         }
         // 处理游客离开和定居
         processTouristDeparture() {
@@ -2507,6 +2911,11 @@ const TOWN_EVENTS = [
             this.tourists.forEach((t, index) => {
                 t.stayDays++;
                 // 检查是否应该离开
+                // 如果没有酒店且标记为应该在晚上离开，则不在24:00时离开，而是在processTouristActions中晚上离开
+                if (t.shouldLeaveAtNight) {
+                    // 应该在晚上离开的游客，不在24:00时离开
+                    return;
+                }
                 if (t.stayDays >= t.maxStayDays) {
                     // 满意度高（>70）且有足够资金，可能定居
                     if (t.satisfaction > 70 && t.money >= 50 && Math.random() < 0.15) {
@@ -2857,17 +3266,18 @@ const TOWN_EVENTS = [
                 const div = document.createElement('div'); 
                 div.className = 'event-card'; 
                 const canAfford = this.townMoney >= ev.cost;
-                // 特殊处理：推进基础设施建设 - 检查3天限制
+                // 特殊处理：推进基础设施建设、投资行动 - 检查3天限制
                 let buttonText = canAfford ? '🎉 立即举办' : '💸 资金不足';
                 let buttonDisabled = !canAfford;
-                if (ev.id === 'infrastructure') {
+                if (ev.id === 'infrastructure' || ev.id === 'investment') {
                     let currentTotalDays = 0;
                     for (let m = 1; m < this.dateMonth; m++) {
                         currentTotalDays += MONTH_DAYS[m];
                     }
                     currentTotalDays += this.dateDay;
-                    if (this.lastInfrastructureBuildTime > 0) {
-                        const daysDiff = currentTotalDays - this.lastInfrastructureBuildTime;
+                    const lastTime = ev.id === 'infrastructure' ? this.lastInfrastructureBuildTime : this.lastInvestmentActionTime;
+                    if (lastTime > 0) {
+                        const daysDiff = currentTotalDays - lastTime;
                         if (daysDiff < 3) {
                             const remainingDays = 3 - daysDiff;
                             buttonText = `⏳ 冷却中 (还需${remainingDays}天)`;
@@ -3068,6 +3478,79 @@ const TOWN_EVENTS = [
                 
                 this.logInteraction(`[📚专项行动] 扫盲教育推进完成！共花费 💰200，${improvedCount} 位居民的文化技能得到提升。`, "tag-build");
             }
+            else if (id === 'investment') {
+                // 计算当前总天数（从游戏开始计算）
+                let currentTotalDays = 0;
+                for (let m = 1; m < this.dateMonth; m++) {
+                    currentTotalDays += MONTH_DAYS[m];
+                }
+                currentTotalDays += this.dateDay;
+                
+                // 检查是否在3天内使用过
+                if (this.lastInvestmentActionTime > 0) {
+                    const daysDiff = currentTotalDays - this.lastInvestmentActionTime;
+                    if (daysDiff < 3) {
+                        const remainingDays = 3 - daysDiff;
+                        this.logInteraction(`[⚠️限制] 投资行动在3天内只能使用一次，还需等待 ${remainingDays} 天。`, "tag-reject");
+                        return;
+                    }
+                }
+                
+                // 投资行动：让全镇居民有概率对建造中的建筑或现有建筑进行大额投资（排除住宅建筑）
+                let investmentCount = 0;
+                let totalInvestment = 0;
+                const buildingsUnderConstruction = this.buildings.filter(b => !b.isBuilt && b.isUnderConstruction && b.category !== 'residence');
+                const buildingsCanUpgrade = this.buildings.filter(b => b.isBuilt && b.level < 3 && b.category !== 'residence');
+                
+                this.chars.forEach(c => {
+                    // 居民需要有足够的资金（至少50元）才有概率投资
+                    if (c.money < 50) return;
+                    
+                    // 40%概率进行投资
+                    if (Math.random() < 0.4) {
+                        // 计算大额投资金额（居民资金的30-50%，最少100，最多500）
+                        const investmentRatio = 0.3 + Math.random() * 0.2; // 30%-50%
+                        let investmentAmount = Math.floor(c.money * investmentRatio / 5) * 5; // 向下取整到5的倍数
+                        investmentAmount = Math.max(100, Math.min(500, investmentAmount)); // 限制在100-500之间
+                        
+                        if (investmentAmount > c.money) {
+                            investmentAmount = Math.floor(c.money / 5) * 5; // 如果超过居民资金，则使用最大可用金额
+                        }
+                        
+                        if (investmentAmount < 50) return; // 投资金额太小，跳过
+                        
+                        // 随机选择投资类型：建造投资或升级投资
+                        let invested = false;
+                        if (Math.random() < 0.6 && buildingsUnderConstruction.length > 0) {
+                            // 60%概率投资建造中的建筑
+                            const target = choose(buildingsUnderConstruction);
+                            if (this.investInBuilding(c.name, target.id, investmentAmount, 'build')) {
+                                invested = true;
+                            }
+                        } else if (buildingsCanUpgrade.length > 0) {
+                            // 40%概率投资现有建筑的升级
+                            const target = choose(buildingsCanUpgrade);
+                            if (this.investInBuilding(c.name, target.id, investmentAmount, 'upgrade')) {
+                                invested = true;
+                            }
+                        }
+                        
+                        if (invested) {
+                            investmentCount++;
+                            totalInvestment += investmentAmount;
+                        }
+                    }
+                });
+                
+                // 记录使用时间（使用总天数）
+                this.lastInvestmentActionTime = currentTotalDays;
+                
+                if (investmentCount > 0) {
+                    this.logInteraction(`[💰专项行动] 投资行动完成！共有 ${investmentCount} 位居民进行了大额投资，总投资额 💰${this.formatMoney(totalInvestment)}。`, "tag-build");
+                } else {
+                    this.logInteraction(`[💰专项行动] 投资行动完成，但当前没有符合条件的建筑或居民资金不足，无人进行投资。`, "tag-build");
+                }
+            }
             else if (id === 'new_year') { this.chars.forEach(c => { c.happiness = Math.min(100, c.happiness + 20); c.money = Math.floor(c.money * 1.1); }); this.log("新年新气象，大家心情大好，存款似乎也变多了？", "tag-promote"); }
             else if (id === 'fools_day') { this.chars.forEach(c => { c.happiness = Math.min(100, c.happiness + 10); }); if(Math.random()<0.5) { const v = choose(this.chars); v.happiness -= 15; this.logInteraction(`[🤡恶搞] **${v.name}** 被人贴了"我是笨蛋"的纸条，气得不行！`, "tag-reject"); } }
             else if (id === 'labor_day') { this.chars.forEach(c => { if(c.job) { const bonus = 50; this.collectTax(bonus, `劳动节奖金 - ${c.name}`); c.money += bonus; this.addCharIncome(c, bonus, '劳动节奖金'); c.addLog(`获得劳动节奖金 💰50`); } else { c.happiness += 5; } }); this.log("劳动节快乐！所有在职员工获得了50奖金。", "tag-build"); }
@@ -3161,6 +3644,8 @@ const TOWN_EVENTS = [
         upgradeBuilding(bid) { 
             const b = this.buildings.find(x => x.id === bid); 
             if(!b || !b.isBuilt) return; 
+            // 住宅建筑不允许升级
+            if(b.category === 'residence') { alert("住宅建筑不支持升级！"); return; }
             if(b.level >= 3) { alert("已达到最高等级！"); return; } 
             const cost = parseFloat((b.totalCost * b.level).toFixed(2));
             // 检查是否有足够的投资进度
@@ -3169,24 +3654,16 @@ const TOWN_EVENTS = [
             if (currentProgress >= upgradeCost) {
                 // 投资进度足够，直接升级
                 b.upgradeProgress = 0;
-                // 清除升级投资记录
-                Object.keys(b.investments || {}).forEach(charName => {
-                    if (b.investments[charName].type === 'upgrade') {
-                        delete b.investments[charName];
-                        const char = this.chars.find(c => c.name === charName);
-                        if (char && char.investments && char.investments[bid]) {
-                            delete char.investments[bid];
-                        }
-                    }
-                });
+                // 先返还升级投资收益（在清除记录之前）
+                this.distributeInvestmentReturn(b, 'upgrade');
                 b.level++;
                 this.log(`[🏗️升级] **${b.name}** 升级到了 Lv.${b.level}！员工收入将获得提升！`, "tag-build");
-                // 返还升级投资收益
-                this.distributeInvestmentReturn(b, 'upgrade');
                 this.showBuildingDetail(bid);
                 this.updateUI();
             } else if(this.townMoney >= cost) {
                 // 使用镇库资金升级
+                // 如果有投资记录，先返还投资收益
+                this.distributeInvestmentReturn(b, 'upgrade');
                 this.townMoney = parseFloat((this.townMoney - cost).toFixed(2)); 
                 b.level++; 
                 this.log(`[🏗️升级] **${b.name}** 升级到了 Lv.${b.level}！员工收入将获得提升！`, "tag-build"); 
@@ -3203,6 +3680,8 @@ const TOWN_EVENTS = [
             const building = this.buildings.find(b => b.id === buildingId);
             if (!char || !building) return false;
             if (char.money < amount) return false;
+            // 住宅建筑不允许投资
+            if (building.category === 'residence') return false;
             if (type === 'build' && building.isBuilt) return false;
             if (type === 'upgrade' && (!building.isBuilt || building.level >= 3)) return false;
             // 扣除居民资金
@@ -4099,7 +4578,7 @@ const TOWN_EVENTS = [
         updateRelationshipStatus(p, t, pRel, tRel) { if (pRel.status === 'stranger' && pRel.love > 10) { pRel.status = 'friend'; tRel.status = 'friend'; } else if (pRel.status === 'friend' && pRel.love > 60 && !['lover','spouse','mistress','enemy','ex'].includes(pRel.status)) { pRel.status = 'bestfriend'; tRel.status = 'bestfriend'; } }
         checkRomanceEvent(p, t, pRel, tRel, v) { if (!p.partner && !t.partner && pRel.love > 70 && pRel.status !== 'spouse') { if (Math.random() < 0.2) { if (t.decideProposal(p.name, 'confess')) { p.partner = t.name; t.partner = p.name; pRel.status = "lover"; tRel.status = "lover"; p.happiness += 20; t.happiness += 20; this.unlockAchievement('first_marriage'); this.logInteraction(`[❤️表白] ${p.name} 向 ${t.name} 表白成功！`, "tag-love"); } else { p.happiness -= 20; pRel.love -= 10; this.logInteraction(`[💔拒绝] ${p.name} 表白失败...`, "tag-reject"); } return true; } } return false; }
         breakInteraction(c) { if (c.interactingWith) { const partner = this.chars.find(x => x.name === c.interactingWith); if (partner) { partner.interactingWith = null; partner.currentAction = "发呆"; } c.interactingWith = null; } }
-        saveData(isAuto = false) { const data = { chars: this.chars, buildings: this.buildings, tourists: this.tourists || [], townMoney: this.townMoney, gameTime: this.gameTime, gameDay: this.gameDay, dateMonth: this.dateMonth, dateDay: this.dateDay, weather: this.weather, achievements: this.achievements, policySocialSecurity: this.policySocialSecurity, policyHousing: this.policyHousing, policyFood: this.policyFood, policyTaxHike: this.policyTaxHike, enableDayNight: this.enableDayNight, enableWeatherEffect: this.enableWeatherEffect, mayor: this.mayor, taxRate: this.taxRate, financeHistory: this.financeHistory, townLevel: this.townLevel, townLevelPopupShown: this.townLevelPopupShown ? Array.from(this.townLevelPopupShown) : [], lastInfrastructureBuildTime: this.lastInfrastructureBuildTime || 0, dailyTotalRevenue: this.dailyTotalRevenue || 0, lastRevenueResetDay: this.lastRevenueResetDay || 0, ts: Date.now() }; localStorage.setItem('happyTownV2_Save', JSON.stringify(data)); this.lastSaveTime = Date.now(); if (!isAuto) alert("✅ 存档成功！"); }
+        saveData(isAuto = false) { const data = { chars: this.chars, buildings: this.buildings, tourists: this.tourists || [], townMoney: this.townMoney, gameTime: this.gameTime, gameDay: this.gameDay, dateMonth: this.dateMonth, dateDay: this.dateDay, weather: this.weather, achievements: this.achievements, policySocialSecurity: this.policySocialSecurity, policyHousing: this.policyHousing, policyFood: this.policyFood, policyTaxHike: this.policyTaxHike, enableDayNight: this.enableDayNight, enableWeatherEffect: this.enableWeatherEffect, mayor: this.mayor, taxRate: this.taxRate, financeHistory: this.financeHistory, townLevel: this.townLevel, townLevelPopupShown: this.townLevelPopupShown ? Array.from(this.townLevelPopupShown) : [], lastInfrastructureBuildTime: this.lastInfrastructureBuildTime || 0, lastInvestmentActionTime: this.lastInvestmentActionTime || 0, dailyTotalRevenue: this.dailyTotalRevenue || 0, lastRevenueResetDay: this.lastRevenueResetDay || 0, constructionVoteCount: this.constructionVoteCount || 0, ts: Date.now() }; localStorage.setItem('happyTownV2_Save', JSON.stringify(data)); this.lastSaveTime = Date.now(); if (!isAuto) alert("✅ 存档成功！"); }
         loadFromJSON(jsonStr) {
             try {
                 const data = JSON.parse(jsonStr);
@@ -4126,9 +4605,12 @@ const TOWN_EVENTS = [
                 this.townLevel = data.townLevel !== undefined ? data.townLevel : 0;
                 this.townLevelPopupShown = data.townLevelPopupShown ? new Set(data.townLevelPopupShown) : new Set();
                 this.lastInfrastructureBuildTime = data.lastInfrastructureBuildTime || 0;
+                this.lastInvestmentActionTime = data.lastInvestmentActionTime || 0;
                 // 加载每日总收入相关数据（兼容旧存档）
                 this.dailyTotalRevenue = data.dailyTotalRevenue !== undefined ? data.dailyTotalRevenue : 0;
                 this.lastRevenueResetDay = data.lastRevenueResetDay !== undefined ? data.lastRevenueResetDay : 0;
+                // 加载建筑公投次数（兼容旧存档）
+                this.constructionVoteCount = data.constructionVoteCount !== undefined ? data.constructionVoteCount : 0;
                 // 加载游客数据（兼容旧存档）
                 this.tourists = data.tourists ? data.tourists.map(tData => {
                     const t = new Tourist(tData.name);
@@ -4165,16 +4647,37 @@ const TOWN_EVENTS = [
                         if (bData.bankDeposits !== undefined) b.bankDeposits = bData.bankDeposits;
                         else b.bankDeposits = {};
                     }
-                    // 初始化收入统计（兼容旧存档）
-                    if (bData.dailyRevenue === undefined) b.dailyRevenue = 0;
-                    if (bData.dailyTax === undefined) b.dailyTax = 0;
-                    if (bData.weeklyRevenue === undefined) b.weeklyRevenue = 0;
-                    if (bData.weeklyTax === undefined) b.weeklyTax = 0;
-                    if (bData.lastResetDay === undefined) b.lastResetDay = this.dateDay;
-                    if (bData.lastResetWeek === undefined) b.lastResetWeek = this.gameDay;
+                    // 初始化收入统计（兼容旧存档）- 从存档数据中恢复
+                    if (bData.dailyRevenue !== undefined) b.dailyRevenue = bData.dailyRevenue;
+                    else b.dailyRevenue = 0;
+                    if (bData.dailyTax !== undefined) b.dailyTax = bData.dailyTax;
+                    else b.dailyTax = 0;
+                    if (bData.weeklyRevenue !== undefined) b.weeklyRevenue = bData.weeklyRevenue;
+                    else b.weeklyRevenue = 0;
+                    if (bData.weeklyTax !== undefined) b.weeklyTax = bData.weeklyTax;
+                    else b.weeklyTax = 0;
+                    if (bData.lastResetDay !== undefined) b.lastResetDay = bData.lastResetDay;
+                    else b.lastResetDay = this.dateDay;
+                    if (bData.lastResetWeek !== undefined) b.lastResetWeek = bData.lastResetWeek;
+                    else b.lastResetWeek = this.gameDay;
                     // 初始化发电槽（兼容旧存档）
                     if (bData.powerCapacity !== undefined) b.powerCapacity = bData.powerCapacity;
                     else b.powerCapacity = 0;
+                    // 初始化小麦库存（兼容旧存档）
+                    if (b.id === 'wheatfarm') {
+                        if (bData.wheat !== undefined) b.wheat = bData.wheat;
+                        else b.wheat = 0;
+                    }
+                    // 初始化水稻库存（兼容旧存档）
+                    if (b.id === 'ricefield') {
+                        if (bData.rice !== undefined) b.rice = bData.rice;
+                        else b.rice = 0;
+                    }
+                    // 初始化电子元件库存（兼容旧存档）
+                    if (b.id === 'electronics') {
+                        if (bData.electronics !== undefined) b.electronics = bData.electronics;
+                        else b.electronics = 0;
+                    }
                     return b;
                 });
                 this.chars = data.chars.map(cData => {
@@ -4913,7 +5416,7 @@ const TOWN_EVENTS = [
                 sellsHtml += '</div>';
             }
             let statsHtml = '';
-            if (b.isBuilt) {
+            if (b.isBuilt && b.category !== 'residence') {
                 const upgradeCost = b.level < 3 ? parseFloat((b.totalCost * b.level).toFixed(2)) : 0;
                 const upgradeProgress = b.upgradeProgress || 0;
                 const upgradeProgressPercent = upgradeCost > 0 ? Math.min(100, (upgradeProgress / upgradeCost) * 100) : 0;
@@ -4992,6 +5495,153 @@ const TOWN_EVENTS = [
                         </div>
                     </div>
                     ${nationalSupportHtml}
+                </div>
+                `;
+            }
+            // 小麦库存显示（仅小麦农场）
+            let wheatHtml = '';
+            if (b.isBuilt && b.id === 'wheatfarm') {
+                const wheatAmount = b.wheat || 0;
+                const wheatPrice = 3; // 每单位小麦售价3元
+                const totalValue = wheatAmount * wheatPrice;
+                // 计算产出范围（基础15-35，考虑实际员工技能和等级加成）
+                const baseMin = 15, baseMax = 35;
+                // 计算实际员工技能加成（与生产函数逻辑一致）
+                let actualSkillBonus = 1.0;
+                if (b.staff && b.staff.length > 0) {
+                    let totalSkill = 0;
+                    let staffCount = 0;
+                    b.staff.forEach(staffName => {
+                        const staff = this.chars.find(c => c.name === staffName);
+                        if (staff && staff.job && staff.job.buildingId === b.id) {
+                            totalSkill += staff.skills.social || 0;
+                            staffCount++;
+                        }
+                    });
+                    if (staffCount > 0) {
+                        const avgSkill = totalSkill / staffCount;
+                        // 技能加成：每10点技能增加5%产出（最高100%加成）
+                        actualSkillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                    }
+                }
+                const levelBonus = 1.0 + (b.level - 1) * 0.1; // 等级加成
+                const minProduced = Math.floor(baseMin * levelBonus);
+                const maxProduced = Math.floor(baseMax * actualSkillBonus * levelBonus);
+                wheatHtml = `
+                <div class="section-title">🌾 小麦库存</div>
+                <div style="background:#fff8e1; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ffc107;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:5px;">当前库存</div>
+                            <div style="font-size:1.5rem; font-weight:bold; color:#f57c00;">🌾 ${wheatAmount} 单位</div>
+                            <div style="font-size:0.75rem; color:#999; margin-top:5px;">每单位售价：💰${wheatPrice} | 总价值：💰${this.formatMoney(totalValue)}</div>
+                            <div style="font-size:0.75rem; color:#666; margin-top:8px; padding-top:8px; border-top:1px solid #ffecb3;">📊 每日产出范围：${minProduced}-${maxProduced} 单位（基础${baseMin}-${baseMax}，受员工技能和建筑等级影响）</div>
+                        </div>
+                    </div>
+                    ${wheatAmount > 0 ? `
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="background:#f57c00; color:white; flex:1;" onclick="gameInstance.sellWheat('${b.id}', 'all')">全部售出 (💰${this.formatMoney(totalValue)})</button>
+                        <button class="btn" style="background:#ff9800; color:white; flex:1;" onclick="gameInstance.showSellWheatModal('${b.id}')">部分售出</button>
+                    </div>
+                    ` : '<div style="text-align:center; color:#999; padding:10px;">暂无小麦库存，每日24:00自动生产</div>'}
+                </div>
+                `;
+            }
+            // 水稻库存显示（仅水稻田地）
+            let riceHtml = '';
+            if (b.isBuilt && b.id === 'ricefield') {
+                const riceAmount = b.rice || 0;
+                const ricePrice = 3.5; // 每单位水稻售价3.5元
+                const totalValue = riceAmount * ricePrice;
+                // 计算产出范围（基础15-35，考虑实际员工技能和等级加成）
+                const baseMin = 15, baseMax = 35;
+                // 计算实际员工技能加成（与生产函数逻辑一致）
+                let actualSkillBonus = 1.0;
+                if (b.staff && b.staff.length > 0) {
+                    let totalSkill = 0;
+                    let staffCount = 0;
+                    b.staff.forEach(staffName => {
+                        const staff = this.chars.find(c => c.name === staffName);
+                        if (staff && staff.job && staff.job.buildingId === b.id) {
+                            totalSkill += staff.skills.social || 0;
+                            staffCount++;
+                        }
+                    });
+                    if (staffCount > 0) {
+                        const avgSkill = totalSkill / staffCount;
+                        // 技能加成：每10点技能增加5%产出（最高100%加成）
+                        actualSkillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                    }
+                }
+                const levelBonus = 1.0 + (b.level - 1) * 0.1; // 等级加成
+                const minProduced = Math.floor(baseMin * levelBonus);
+                const maxProduced = Math.floor(baseMax * actualSkillBonus * levelBonus);
+                riceHtml = `
+                <div class="section-title">🌾 水稻库存</div>
+                <div style="background:#fff8e1; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ffc107;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:5px;">当前库存</div>
+                            <div style="font-size:1.5rem; font-weight:bold; color:#f57c00;">🌾 ${riceAmount} 单位</div>
+                            <div style="font-size:0.75rem; color:#999; margin-top:5px;">每单位售价：💰${ricePrice} | 总价值：💰${this.formatMoney(totalValue)}</div>
+                            <div style="font-size:0.75rem; color:#666; margin-top:8px; padding-top:8px; border-top:1px solid #ffecb3;">📊 每日产出范围：${minProduced}-${maxProduced} 单位（基础${baseMin}-${baseMax}，受员工技能和建筑等级影响）</div>
+                        </div>
+                    </div>
+                    ${riceAmount > 0 ? `
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="background:#f57c00; color:white; flex:1;" onclick="gameInstance.sellRice('${b.id}', 'all')">全部售出 (💰${this.formatMoney(totalValue)})</button>
+                        <button class="btn" style="background:#ff9800; color:white; flex:1;" onclick="gameInstance.showSellRiceModal('${b.id}')">部分售出</button>
+                    </div>
+                    ` : '<div style="text-align:center; color:#999; padding:10px;">暂无水稻库存，每日24:00自动生产</div>'}
+                </div>
+                `;
+            }
+            // 电子元件库存显示（仅电子厂）
+            let electronicsHtml = '';
+            if (b.isBuilt && b.id === 'electronics') {
+                const electronicsAmount = b.electronics || 0;
+                const electronicsPrice = 9; // 每单位电子元件售价9元
+                const totalValue = electronicsAmount * electronicsPrice;
+                // 计算产出范围（基础10-20，考虑实际员工技能和等级加成）
+                const baseMin = 10, baseMax = 20;
+                // 计算实际员工技能加成（与生产函数逻辑一致）
+                let actualSkillBonus = 1.0;
+                if (b.staff && b.staff.length > 0) {
+                    let totalSkill = 0;
+                    let staffCount = 0;
+                    b.staff.forEach(staffName => {
+                        const staff = this.chars.find(c => c.name === staffName);
+                        if (staff && staff.job && staff.job.buildingId === b.id) {
+                            totalSkill += staff.skills.culture || 0;
+                            staffCount++;
+                        }
+                    });
+                    if (staffCount > 0) {
+                        const avgSkill = totalSkill / staffCount;
+                        // 技能加成：每10点技能增加5%产出（最高100%加成）
+                        actualSkillBonus = 1.0 + Math.min(1.0, (avgSkill / 10) * 0.05);
+                    }
+                }
+                const levelBonus = 1.0 + (b.level - 1) * 0.1; // 等级加成
+                const minProduced = Math.floor(baseMin * levelBonus);
+                const maxProduced = Math.floor(baseMax * actualSkillBonus * levelBonus);
+                electronicsHtml = `
+                <div class="section-title">🔌 电子元件库存</div>
+                <div style="background:#e8eaf6; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #3f51b5;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <div style="font-size:0.85rem; color:#666; margin-bottom:5px;">当前库存</div>
+                            <div style="font-size:1.5rem; font-weight:bold; color:#3f51b5;">🔌 ${electronicsAmount} 单位</div>
+                            <div style="font-size:0.75rem; color:#999; margin-top:5px;">每单位售价：💰${electronicsPrice} | 总价值：💰${this.formatMoney(totalValue)}</div>
+                            <div style="font-size:0.75rem; color:#666; margin-top:8px; padding-top:8px; border-top:1px solid #c5cae9;">📊 每日产出范围：${minProduced}-${maxProduced} 单位（基础${baseMin}-${baseMax}，受员工技能和建筑等级影响）</div>
+                        </div>
+                    </div>
+                    ${electronicsAmount > 0 ? `
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="background:#3f51b5; color:white; flex:1;" onclick="gameInstance.sellElectronics('${b.id}', 'all')">全部售出 (💰${this.formatMoney(totalValue)})</button>
+                        <button class="btn" style="background:#5c6bc0; color:white; flex:1;" onclick="gameInstance.showSellElectronicsModal('${b.id}')">部分售出</button>
+                    </div>
+                    ` : '<div style="text-align:center; color:#999; padding:10px;">暂无电子元件库存，每日24:00自动生产</div>'}
                 </div>
                 `;
             }
@@ -5133,6 +5783,9 @@ const TOWN_EVENTS = [
                 </div>
                 ${wageInfoHtml}
                     ${buildingMoneyHtml}
+                    ${wheatHtml}
+                    ${riceHtml}
+                    ${electronicsHtml}
                     ${bankDepositsHtml}
                     ${b.id === 'hotel' && b.isBuilt ? `
                     <div class="section-title">🛏️ 住宿统计</div>
